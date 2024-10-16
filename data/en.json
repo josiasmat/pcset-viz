@@ -1,0 +1,319 @@
+{
+    "strings": {
+        "main-title": "Pitch-Class Set Visualizer",
+        "input-main": "Type a set:",
+        "row-normal": "Normal order:",
+        "row-reduced": "Transposed to zero:",
+        "row-prime": "Prime form:",
+        "row-forte": "Forte name:",
+        "row-carter": "Carter number:",
+        "row-descriptive-name": "Descriptive name(s):",
+        "row-ic-vector": "Interval-class vector:",
+        "row-ct-vector": "Common tone vector:"
+    },
+
+    "sets": {
+        "[]": {
+            "names": ["Null set"]
+        },
+        "[0]": {
+            "names": ["Singleton", "Note", "Unison"]
+        },
+        "[01]": {
+            "names": ["Interval-class 1", "Semitone", "Minor second", "Major seventh", "Chromatic dyad"]
+        },
+        "[02]": {
+            "names": ["Interval-class 2", "Whole-tone", "Major second", "Minor seventh"]
+        },
+        "[03]": {
+            "names": ["Interval-class 3", "Minor third", "Major sixth", "Augmented second", "Diminished seventh"]
+        },
+        "[04]": {
+            "names": ["Interval-class 4", "Major third", "Minor sixth", "Diminished fourth", "Augmented fifth"]
+        },
+        "[05]": {
+            "names": ["Interval-class 5", "Perfect fourth", "Perfect fifth"]
+        },
+        "[06]": {
+            "names": ["Interval-class 6", "Tritone", "Augmented fourth", "Diminished fifth", "Maximally even dyad"]
+        },
+        "[012]": {
+            "names": ["Chromatic trichord", "BACH trichord", "Chromatic trimirror"]
+        },
+        "[013]": {
+            "names": ["Phrygian trichord", "Octatonic segment"]
+        },
+        "[023]": {
+            "names": ["Minor trichord"]
+        },
+        "[014]": {
+            "names": ["Major-minor trichord 1", "Hexatonic segment"]
+        },
+        "[034]": {
+            "names": ["Major-minor trichord 2"]
+        },
+        "[015]": {
+            "names": ["Incomplete major-seventh chord 1"]
+        },
+        "[045]": {
+            "names": ["Incomplete major-seventh chord 2"]
+        },
+        "[016]": {
+            "names": ["Rite chord 1"]
+        },
+        "[056]": {
+            "names": ["Rite chord 2"]
+        },
+        "[024]": {
+            "names": ["Whole-tone trichord"]
+        },
+        "[025]": {
+            "names": ["Incomplete minor-seventh chord"]
+        },
+        "[035]": {
+            "names": ["Incomplete dominant-seventh chord 2"]
+        },
+        "[026]": {
+            "names": ["Incomplete dominant-seventh chord 1", "Italian sixth"]
+        },
+        "[046]": {
+            "names": ["Incomplete half-diminished-seventh chord"]
+        },
+        "[027]": {
+            "names": ["Quartal trichord"]
+        },
+        "[036]": {
+            "names": ["Diminished triad", "Diminished chord"]
+        },
+        "[037]": {
+            "names": ["Minor triad", "Minor chord"]
+        },
+        "[047]": {
+            "names": ["Major triad", "Major chord"]
+        },
+        "[048]": {
+            "names": ["Augmented triad", "Augmented chord"]
+        },
+        "[0123]": {
+            "names": ["Chromatic tetrachord", "BACH tetrachord"]
+        },
+        "[0124]": {
+            "names": ["Major-second tetracluster 2"]
+        },
+        "[0234]": {
+            "names": ["Major-second tetracluster 1"]
+        },
+        "[0134]": {
+            "names": []
+        },
+        "[0125]": {
+            "names": []
+        },
+        "[0345]": {
+            "names": []
+        },
+        "[0126]": {
+            "names": []
+        },
+        "[0456]": {
+            "names": []
+        },
+        "[0127]": {
+            "names": []
+        },
+        "[0145]": {
+            "names": ["Arabian tetrachord"]
+        },
+        "[0156]": {
+            "names": []
+        },
+        "[0167]": {
+            "names": []
+        },
+        "[0235]": {
+            "names": ["Minor tetrachord", "Dorian tetrachord"]
+        },
+        "[0135]": {
+            "names": ["Phrygian tetrachord"]
+        },
+        "[0245]": {
+            "names": ["Major tetrachord", "Ionian tetrachord"]
+        },
+        "[0236]": {
+            "names": ["Harmonic-minor tetrachord"]
+        },
+        "[0346]": {
+            "names": []
+        },
+        "[0136]": {
+            "names": []
+        },
+        "[0356]": {
+            "names": []
+        },
+        "[0237]": {
+            "names": []
+        },
+        "[0457]": {
+            "names": []
+        },
+        "[0146]": {
+            "names": ["All-interval tetrachord 1"]
+        },
+        "[0256]": {
+            "names": ["All-interval tetrachord 2"]
+        },
+        "[0157]": {
+            "names": []
+        },
+        "[0267]": {
+            "names": []
+        },
+        "[0347]": {
+            "names": []
+        },
+        "[0147]": {
+            "names": []
+        },
+        "[0367]": {
+            "names": []
+        },
+        "[0148]": {
+            "names": []
+        },
+        "[0348]": {
+            "names": []
+        },
+        "[0158]": {
+            "names": ["Major-seventh chord"]
+        },
+        "[0246]": {
+            "names": ["Whole-tone tetrachord"]
+        },
+        "[0247]": {
+            "names": []
+        },
+        "[0357]": {
+            "names": []
+        },
+        "[0257]": {
+            "names": []
+        },
+        "[0248]": {
+            "names": ["Augmented seventh chord"]
+        },
+        "[0268]": {
+            "names": ["French-sixth chord"]
+        },
+        "[0358]": {
+            "names": ["Minor seventh chord"]
+        },
+        "[0258]": {
+            "names": ["Half-diminished seventh chord"]
+        },
+        "[0368]": {
+            "names": ["Dominant-seventh chord", "German-sixth chord"]
+        },
+        "[0369]": {
+            "names": ["Diminished-seventh chord", "Maximally even tetrachord"]
+        },
+        "[0137]": {
+            "names": ["All-interval tetrachord 3"]
+        },
+        "[0467]": {
+            "names": ["All-interval tetrachord 4"]
+        },
+
+        "[01234]": {
+            "names": ["Chromatic pentachord"]
+        },
+        "[01235]": {
+            "names": []
+        },
+        "[02345]": {
+            "names": []
+        },
+        "[01245]": {
+            "names": []
+        },
+        "[01345]": {
+            "names": []
+        },
+        "[01236]": {
+            "names": []
+        },
+        "[03456]": {
+            "names": []
+        },
+        "[01237]": {
+            "names": []
+        },
+        "[04567]": {
+            "names": []
+        },
+        "[01256]": {
+            "names": []
+        },
+        "[01456]": {
+            "names": []
+        },
+        "[01267]": {
+            "names": []
+        },
+        "[01567]": {
+            "names": []
+        },
+        "[02346]": {
+            "names": ["Tritone-symmetric pentamirror"]
+        },
+        "[01246]": {
+            "names": ["Tritone-expanding pentachord"]
+        },
+        "[02456]": {
+            "names": ["Tritone-contracting pentachord"]
+        },
+        "[01346]": {
+            "names": ["Alternating pentachord 1"]
+        },
+        "[02356]": {
+            "names": ["Alternating pentachord 2"]
+        },
+        "[02347]": {
+            "names": ["Center-cluster pentachord 1"]
+        },
+        "[03457]": {
+            "names": ["Center-cluster pentachord 2"]
+        },
+        "[01356]": {
+            "names": ["Locrian pentamirror"]
+        },
+        "[01248]": {
+            "names": ["Augmented pentacluster 1"]
+        },
+        "[02348]": {
+            "names": ["Augmented pentacluster 2"]
+        },
+        "[01257]": {
+            "names": ["Double-seconds triple-fourth pentachord 1"]
+        },
+        "[02567]": {
+            "names": ["Double-seconds triple-fourth pentachord 2"]
+        },
+        
+        "[02479]": {
+            "names": [
+                "Pentatonic anhemitonic scale", 
+                "Maximally even pentachord"
+            ]
+        },
+        "[013568A]": {
+            "names": ["Diatonic heptachord"]
+        },
+        "[0123456789AB]": {
+            "names": [
+                "Chromatic scale",
+                "Dodecachord"
+            ]
+        }
+    }
+}

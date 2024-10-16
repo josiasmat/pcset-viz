@@ -1,0 +1,16 @@
+{
+  "sets": {
+    "[]": {
+      "names": ["Null set"]
+    },
+    "[016]": {
+      "names": ["Rite chord 2", "Tritone-fourth 1"]
+    },
+    "[037]": {
+      "names": ["Minor chord"]
+    },
+    "[047]": {
+      "names": ["Major chord"]
+    },
+  }
+}

@@ -1,0 +1,425 @@
+/*
+Pitch-class set visualizer
+Copyright (C) 2024 Josias Matschulat
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+/* @import url('https://fonts.googleapis.com/css?family=Droid Sans'); */
+
+:root {
+    --bg-light: white;
+    --bg-dark: #111;
+    --fg-light: black;
+    --fg-dark: #eee;
+--bg-alternate-light: #eee;
+    --bg-alternate-dark: #202020;
+    &[theme="light"], &:not([theme]) {
+        --bg-border-color: gray;
+        --bg-color: var(--bg-light);
+        --fg-color: var(--fg-light);
+        --fg-dim-color: #444;
+        --table-alternate-color: var(--bg-alternate-light);
+        --hyperlink-fg-color: #0000dd;
+        --hyperlink-hover-bg-color: rgba(0,0,0,0.05);
+        --hyperlink-hover-border-color: rgba(0,0,0,0.2);
+        --button-bg-color: lightgray;
+        --polygon-border-color: var(--fg-color);
+        --polygon-fill-color: #ccc;
+        --axis-color: var(--fg-color);
+        --pc-hover-color: #b0edff;
+        --pc-selected-hover-color: #ffc1c1;
+        --pc-moving-from-stroke: red;
+        --pc-moving-to-stroke: green;
+        --pc-moving-to-fill: #98ffbf;
+        --popup-border-color: var(--bg-color);
+        --popup-bg-dim-color: rgba(63, 63, 63, 0.9);
+        --popup-shadow-color: black;
+        --popup-title-bg-color: #333;
+        --popup-title-fg-color: white;
+        --close-btn-bg-color: var(--popup-title-bg-color);
+        --close-btn-fg-color: var(--popup-title-fg-color);
+    }
+    &[theme="dark"] {
+        --bg-border-color: #333;
+        --bg-color: var(--bg-dark);
+        --fg-color: var(--bg-light);
+        --fg-dim-color: #aaa;
+        --table-alternate-color: var(--bg-alternate-dark);
+        --hyperlink-fg-color: #aaaaff;
+        --hyperlink-hover-bg-color: rgba(255,255,255,0.1);
+        --hyperlink-hover-border-color: rgba(255,255,255,0.2);
+        --button-bg-color: gray;
+        --polygon-border-color: var(--fg-color);
+        --polygon-fill-color: #444;
+        --axis-color: var(--fg-color);
+        --pc-hover-color: #0c4d61;
+        --pc-selected-hover-color: #521c1c;
+        --pc-moving-from-stroke: red;
+        --pc-moving-to-stroke: lightgreen;
+        --pc-moving-to-fill: darkgreen;
+        --popup-border-color: #777;
+        --popup-bg-dim-color: rgba(63, 63, 63, 0.9);
+        --popup-shadow-color: black;
+        --popup-title-bg-color: #444;
+        --popup-title-fg-color: var(--fg-color);
+    }
+}
+
+body {
+    position: absolute; 
+    width: 100%; 
+    background-color: var(--bg-border-color); 
+    box-sizing: border-box;
+    margin: 0;
+}
+
+@media (orientation: landscape) {
+    body {
+        overflow: hidden; 
+        height: 100%;
+    }
+}
+@media (orientation: portrait) {
+    body {
+        overflow: visible; 
+        height: auto;
+    }
+}
+
+main {
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    color: var(--fg-color);
+}
+
+@media (orientation: landscape) {
+    main {
+        height: 100%;
+        flex-direction: row;
+        & > div:first-child {
+            border-right: none !important;
+        }
+    }
+}
+@media (orientation: portrait) {
+    main {
+        height: auto;
+        flex-direction: column;
+        & > div:first-child {
+            border-bottom: none !important;
+        }
+    }
+}
+
+#visualization-area, #data-area {
+    padding: 10px;
+    border: 6px solid var(--bg-border-color);
+    box-sizing: border-box;
+}
+
+#visualization-area {
+    background-color: var(--bg-color);
+}
+
+@media (orientation: landscape) {
+    #visualization-area {
+        width: 50%;
+        height: 100%;
+    }
+}
+@media (orientation: portrait) {
+    #visualization-area {
+        width: 100%;
+        aspect-ratio: 1/1;
+    }
+}
+
+#data-area {
+    background-color: var(--bg-color);
+    color: var(--fg-color);
+    overflow: auto;
+    font-family: sans-serif;
+    table {
+        th, td {
+            &:first-child {
+                width: 20ch;
+            }
+        }
+        #input-main {
+            font-size: x-large;
+        }
+    }
+    #options-area {
+        font-size: 90%;
+        input, label {
+            cursor: pointer;
+        }
+        span {
+            text-wrap: nowrap;
+            margin-right: 10px;
+        }
+    }
+    .graphics-view {
+        line-height: 0px;
+        svg {
+            box-sizing: border-box; 
+            object-fit: contain;
+            max-width: 100%; 
+            height: auto;
+        }
+    }
+    #ruler-view {
+        padding-top: 3px;
+        padding-bottom: 3px;
+    }
+    #staff-view {
+        padding-top: 3px;
+        padding-bottom: 3px;
+    }
+}
+
+@media (orientation: landscape) {
+    #data-area {
+        width: 50%;
+        height: 100%;
+    }
+}
+@media (orientation: portrait) {
+    #data-area {
+        width: 100%;
+        height: auto;
+    }
+}
+
+.monofont {
+    font-family: monospace;
+    font-size: larger;
+}
+
+.popup-outer-container {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: var(--popup-bg-dim-color);
+    font-family: sans-serif;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    .popup-inner-container {
+        overflow: hidden;
+        box-sizing: border-box;
+        max-width: 95%;
+        padding: 4px;
+        background-color: var(--bg-color);
+        border: 2px solid var(--popup-border-color);
+        filter: drop-shadow(5px 5px 8px var(--popup-shadow-color));
+        display: flex;
+        flex-direction: column;
+        .popup-header {
+            width: 100%;
+            box-sizing: border-box;
+            background-color: var(--popup-title-bg-color);
+            padding: 4px;
+            height: 2.2lh;
+            line-height: 100%;
+            text-align: center;
+            margin-bottom: 5px;
+            .popup-title {
+                display: inline-block;
+                vertical-align: middle;
+                text-align: center;
+                padding-top: 0.4lh;
+                margin-left: 1.8lh;
+                font-size: large;
+                font-weight: bold;
+                color: var(--popup-title-fg-color);
+            }
+            .close-button {
+                float: inline-end;
+                background-color: var(--popup-title-bg-color);
+                color: var(--popup-title-fg-color);
+                font-size: large;
+                border: none;
+                padding: 0.3lh !important;
+                height: 100%;
+                box-sizing: border-box;
+                &:hover {
+                    background-color: red;
+                    color: white;
+                    border: none;
+                }
+            }
+        }
+        .popup-main {
+            overflow: auto;
+            box-sizing: border-box;
+            width: 100%;
+            padding: 6px;
+        }
+    }
+}
+
+#popup-about .popup-main {
+    padding: 25px;
+    line-height: 150%;
+}
+
+#popup-set-selector .popup-inner-container {
+    width: 85%;
+    min-width: min(70ch, 95%);
+    max-width: 95%;
+    max-height: 95%;
+    table {
+        width: 100%;
+        user-select: none;
+        th, td {
+            &:first-child {
+                width: 13ch;
+                text-align: center;
+            }
+        }
+    }
+}
+
+#popup-config .popup-inner-container {
+    width: 80%;
+    min-width: min(90ch, 95%);
+    max-width: 95%;
+    max-height: 95%;
+    table {
+        user-select: none;
+        th, td {
+            &:first-child {
+                width: 15ch;
+                text-align: center;
+            }
+            &:last-child {
+                line-height: 200%;
+            }
+            span {
+                text-wrap: nowrap;
+                margin-right: 10px;
+            }
+        }
+        .keyboard-shortcut {
+            font-size: small;
+            color: var(--fg-dim-color);
+        }
+    }
+}
+
+#popup-export-image .popup-inner-container {
+    width: 70%;
+    min-width: min(90ch, 95%);
+    max-width: 95%;
+    max-height: 95%;
+    .popup-main {
+        display: flex;
+        flex-direction: row;
+    }
+    #popup-export-preview {
+        /* min-height: 100%; */
+        /* height: 100%; */
+        /* min-width: 100px; */
+        flex: 1 0;
+        aspect-ratio: 1/1;
+        /* border-color: var(--popup-border-color); */
+        /* background-color: white; */
+        margin: 2px;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+    #popup-export-options {
+        flex: 2 1;
+        /* width: minmax(54ch, 90ch); */
+        /* height: fit-content; */
+        max-height: fit-content;
+        min-width: 54ch;
+        margin-left: 8px;
+        padding-left: 7px;
+        border-left: 3px solid var(--table-alternate-color);
+        /* min-width: 70ch; */
+        table {
+            th, td {
+                &:first-child {
+                    width: 15ch;
+                    text-align: center;
+                }
+                &:last-child {
+                    line-height: 200%;
+                }
+                span {
+                    text-wrap: nowrap;
+                    margin-right: 10px;
+                }
+            }
+        }
+    }
+}
+
+table {
+    table-layout: fixed;
+    width: 100%;
+    th, td {
+        line-height: 140%;
+        padding: 7px 15px;
+        &:first-child {
+            width: 25%;
+        }
+    }
+    :nth-child(odd of tr:not([hidden])) {
+        background-color: var(--table-alternate-color);
+    }
+}
+
+a {
+    text-decoration: none;
+    border: 1px solid transparent;
+    padding: 1px 1px;
+    text-wrap: nowrap;
+    color: var(--hyperlink-fg-color);
+    &:hover {
+        background-color: var(--hyperlink-hover-bg-color);
+        border: 1px solid var(--hyperlink-hover-border-color);
+    }
+}
+
+input[type="checkbox"], input[type="radio"] {
+    width: 1lh;
+    height: 1lh;
+    &, + label {
+        cursor: pointer;
+    }
+}
+
+span.range-label {
+    font-size: small;
+    color: var(--fg-dim-color);
+    vertical-align: middle;
+    padding: 0 0 0.3lh 1ch;
+    margin: 0;
+    /* padding-bottom: 0.5lh; */
+}
+
+/* sub {
+    font-size: 75%;
+} */
+
+@keyframes pulse_animation {
+    0%   { transform: scale(100%); }
+    100% { transform: scale(105%); }
+}

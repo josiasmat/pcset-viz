@@ -1,0 +1,95 @@
+
+#visualization-area svg {
+    box-sizing: border-box; 
+    object-fit: contain;
+    width: 100%; 
+    height: 100%; 
+    g.pc {
+        cursor: pointer;
+        transform-origin: center;
+        transform-box: border-box;
+    text {
+            font-family: serif;
+            font-size: 2.5em;
+            text-anchor: middle;
+            text-align: center;
+            dominant-baseline: central;
+            user-select: none;
+            fill: var(--fg-color);
+            &.pc-text-note tspan {
+                font-size: 65%;
+            }
+        }
+        circle {
+            fill: var(--bg-color);
+            stroke: transparent;
+            stroke-width: 2px;
+            transition: stroke 0.2s ease-in-out;
+        }
+        &:hover {
+            animation: 0.2s ease-in-out alternate infinite pulse_animation;
+            circle {
+                transition: none;
+                fill: var(--pc-hover-color);
+            }
+        }
+        &.selected {
+            circle {
+                fill: var(--bg-color);
+                stroke: var(--fg-color);
+            }
+            text {
+                fill: var(--fg-color);
+            }
+            &:hover circle {
+                fill: var(--pc-selected-hover-color);
+            }
+        }
+        &.pc-moving-from {
+            cursor: move;
+            animation: 0.2s ease-in-out alternate infinite pulse_animation;
+            circle {
+                /* fill: #ffc1c1 !important; */
+                /* stroke: transparent; */
+                stroke-dasharray: 10,5;
+                transition: none;
+            }
+            &:hover circle {
+                stroke: var(--pc-moving-from-stroke);
+            }
+        }
+        &.pc-moving-to {
+            cursor: move;
+            circle { 
+                fill: var(--pc-moving-to-fill) !important;
+                stroke: var(--pc-moving-to-stroke);
+                transition: none;
+            };
+        }
+    }
+    #polygon {
+        stroke: var(--polygon-border-color);
+        stroke-width: 2px;
+        fill: var(--polygon-fill-color);
+        transition: all 0.3s ease-in-out;
+    }
+    #move-line {
+        fill: none;
+        stroke: var(--pc-moving-to-stroke);
+        stroke-width: 4px;
+        /* stroke-dasharray: 10,5; */
+        transition: all 0.1s ease-out;
+        marker-end: url(#marker-arrow);
+    }
+    .symmetry-axis {
+        fill: none;
+        stroke: var(--axis-color);
+        stroke-width: 2px;
+        stroke-dasharray: 5,10;
+        stroke-dashoffset: 1;
+    }
+    .interval-line {
+        stroke: var(--axis-color);
+        stroke-width: 2px;
+    }
+}
