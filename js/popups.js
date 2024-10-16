@@ -308,7 +308,7 @@ function loadImageExportPopupSettings() {
     document.getElementById("chk-export-ic6").checked = config_export_image.readBool("ic6", config.ic6);
     document.getElementById("expimg-select-theme").value = config_export_image.readString("theme", "basic");
     document.getElementById("expimg-select-theme-color").value = config_export_image.readString("theme-color", "");
-    document.getElementById("expimg-select-theme-bg").value = config_export_image.readString("theme-bg", "-light");
+    document.getElementById("expimg-select-theme-bg").value = config_export_image.readString("theme-bg", "light");
     document.getElementById("expimg-select-staff-clef").value = config_export_image.readString("staff-clef", "G2");
     document.getElementById("expimg-select-staff-notehead").value = config_export_image.readString("staff-notehead", "q");
     document.getElementById("chk-export-staff-flats").value = config_export_image.readBool("staff-flats", false);
