@@ -334,7 +334,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                             <option value="staff-set">Staff (set)</option>
                                         </select></td>
                                     </tr>
-                                    <tr excludetype="staff-set">
+                                    <tr>
                                         <td>Elements:</td>
                                         <td id="expimg-elements-area">
                                             <span includetype="clockface-intervals">
@@ -381,12 +381,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                                 <input id="chk-export-double-row" type="checkbox" onchange="updateImageExportPopup()">
                                                 <label for="chk-export-double-row">Double row (as in a keyboard)</label>
                                             </span>
-                                        </td>
-                                    </tr>
-                                    <tr includetype="staff-set">
-                                        <td><label for="expimg-select-staff-clef">Staff options:</label></td>
-                                        <td>
-                                            <span style="padding-right: 0.5ch;">
+                                            <span includetype="staff-set" style="padding-right: 0.5ch;">
                                                 <label for="expimg-select-staff-clef">Clef:</label>
                                                 <select name="expimg-staff-clef" id="expimg-select-staff-clef" onchange="updateImageExportPopup()">
                                                     <option value="G2">Treble</option>
@@ -395,7 +390,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                                     <option value="F4">Bass</option>
                                                 </select> 
                                             </span>
-                                            <span style="padding-right: 0.5ch;">
+                                            <span includetype="staff-set" style="padding-right: 0.5ch;">
                                                 <label for="expimg-select-staff-notehead">Notehead:</label>
                                                 <select name="expimg-staff-notehead" id="expimg-select-staff-notehead" onchange="updateImageExportPopup()">
                                                     <option value="q">Quarter</option>
@@ -403,10 +398,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                                     <option value="w">Whole</option>
                                                 </select> 
                                             </span>
-                                            <span>
+                                            <span includetype="staff-set">
                                                 <input id="chk-export-staff-flats" type="checkbox" onchange="updateImageExportPopup()">
                                                 <label for="chk-export-staff-flats">Use flats</label>
                                             </span>
+                                        </td>
+                                    </tr>
+                                    <tr includetype="staff-set">
+                                        <td><label for="expimg-select-staff-clef">Ordering:</label></td>
+                                        <td>
+                                            <a id="expimg-staff-shiftup-link" href="javascript:staffShiftNotes(1)">Shift to right</a> • 
+                                            <a id="expimg-staff-shiftdown-link" href="javascript:staffShiftNotes(-1)">Shift to left</a>
                                         </td>
                                     </tr>                                    
                                     <tr>

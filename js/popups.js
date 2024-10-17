@@ -18,6 +18,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 "use strict";
 
 
+var pcset_export = null;
+
+
 function showConfigPopup() {
     const checkboxes = document.querySelectorAll("#visible-data-checkboxes-area input");
     for ( let checkbox of checkboxes ) {
@@ -242,6 +245,7 @@ function showSetSelector(type = null) {
 
 
 function showExportImagePopup() {
+    pcset_export = state.pcset;
     loadImageExportPopupSettings();
     showPopup("popup-export-image");
     updateImageExportPopup();
@@ -295,6 +299,12 @@ function updateImageExportPopup() {
 }
 
 
+function staffShiftNotes(amount) {
+    pcset_export = pcset_export.shift(amount);
+    updateImageExportPopup();
+}
+
+
 function loadImageExportPopupSettings() {
     document.getElementById("chk-export-note-names").checked = config_export_image.readBool("note-names", config.note_names);
     document.getElementById("chk-export-polygon").checked = config_export_image.readBool("polygon", config.polygon);
@@ -345,7 +355,7 @@ function saveImageExportPopupSettings() {
 
 function makeClockfaceSvgFromParams(theme) {
     return new StaticClockfaceView(
-        state.pcset.normal, 
+        pcset_export.normal, 
         {
             note_names: document.getElementById("chk-export-note-names").checked,
             polygon: document.getElementById("chk-export-polygon").checked, 
@@ -367,7 +377,7 @@ function makeClockfaceIntervalsSvgFromParams(theme) {
     if ( document.getElementById("chk-export-ic5").checked ) interval_classes.push(5);
     if ( document.getElementById("chk-export-ic6").checked ) interval_classes.push(6);
     return new StaticClockfaceView(
-        state.pcset.normal, 
+        pcset_export.normal, 
         {
             note_names: document.getElementById("chk-export-note-names").checked,
             fifths: document.getElementById("chk-export-fifths").checked,
@@ -381,7 +391,7 @@ function makeClockfaceIntervalsSvgFromParams(theme) {
 
 function makeRulerSvgFromParams(theme) {
     return new StaticRulerPcSetView(
-        state.pcset.normal, 
+        pcset_export.normal, 
         {
             note_names: document.getElementById("chk-export-note-names").checked,
             symmetry_axes: document.getElementById("chk-export-sym-axes").checked,
@@ -395,7 +405,7 @@ function makeRulerSvgFromParams(theme) {
 
 function makeStaffSvgFromParams(theme) {
     return new StaticStaffPcSetView(
-        state.pcset.normal, 
+        pcset_export, 
         {
             clef: document.getElementById("expimg-select-staff-clef").value,
             notehead: document.getElementById("expimg-select-staff-notehead").value,
@@ -434,8 +444,10 @@ function copyImageToClipboard() {
     const graphics_type = document.getElementById("expimg-select-type").value;
     let svg;
     switch ( graphics_type ) {
-        case "clockface-set": svg = makeClockfaceSvgFromParams(); break;
-        case "ruler-set"    : svg = makeRulerSvgFromParams(); break;
+        case "clockface-set"      : svg = makeClockfaceSvgFromParams(theme); break;
+        case "clockface-intervals": svg = makeClockfaceIntervalsSvgFromParams(theme); break;
+        case "ruler-set"          : svg = makeRulerSvgFromParams(theme); break;
+        case "staff-set"          : svg = makeStaffSvgFromParams(theme); break;
     }
     if ( type == "svg" )
         svg.svgToClipboard();
