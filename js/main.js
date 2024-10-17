@@ -553,7 +553,7 @@ readConfig();
 addEventListener("popstate", historyEventHandler);
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener("change", on_system_theme_change_event_handler);
 
-fetchDataFiles(["/data/en.json"]);
+fetchDataFiles(["data/en.json"]);
 createSvg(document.getElementById("visualization-svg"));
 enableKeyboardShortcuts();
 
