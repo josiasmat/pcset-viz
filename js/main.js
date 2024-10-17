@@ -120,7 +120,8 @@ function strWithCopyLink(s, cs = null) {
 
 function pushSetToHistory() {
     const s = state.pcset.toString("short-ab", false);
-    window.history.pushState([s,state.last_op,++state.history_index], document.title, "/?set="+s);
+    window.history.pushState([s,state.last_op,++state.history_index], document.title, 
+                             `${window.location.pathname}?set=${s}`);
     config.last_set = s;
     config_storage.writeString("last-set", s);
 }
