@@ -17,13 +17,18 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 /* @import url('https://fonts.googleapis.com/css?family=Droid Sans'); */
+/* @import url('https://fonts.googleapis.com/css2?family=Koh+Santepheap:wght@300;400;700;900&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 
 :root {
+    --serif-font: "Frank Ruhl Libre", "Koh Santepheap", serif;
     --bg-light: white;
     --bg-dark: #111;
     --fg-light: black;
     --fg-dark: #eee;
---bg-alternate-light: #eee;
+    --bg-alternate-light: #eee;
     --bg-alternate-dark: #202020;
     &[theme="light"], &:not([theme]) {
         --bg-border-color: gray;
@@ -35,6 +40,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         --hyperlink-hover-bg-color: rgba(0,0,0,0.05);
         --hyperlink-hover-border-color: rgba(0,0,0,0.2);
         --button-bg-color: lightgray;
+        --input-bg-color: #fff;
+        --input-fg-color: var(--fg-light);
+        --input-border-color: lightgray;
         --polygon-border-color: var(--fg-color);
         --polygon-fill-color: #ccc;
         --axis-color: var(--fg-color);
@@ -57,10 +65,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         --fg-color: var(--bg-light);
         --fg-dim-color: #aaa;
         --table-alternate-color: var(--bg-alternate-dark);
-        --hyperlink-fg-color: #aaaaff;
+        --hyperlink-fg-color: #ccccff;
         --hyperlink-hover-bg-color: rgba(255,255,255,0.1);
         --hyperlink-hover-border-color: rgba(255,255,255,0.2);
         --button-bg-color: gray;
+        --input-bg-color: #111;
+        --input-fg-color: var(--fg-dark);
+        --input-border-color: gray;
         --polygon-border-color: var(--fg-color);
         --polygon-fill-color: #444;
         --axis-color: var(--fg-color);
@@ -83,6 +94,9 @@ body {
     background-color: var(--bg-border-color); 
     box-sizing: border-box;
     margin: 0;
+    font-family: var(--serif-font), serif;
+    font-weight: 300;
+    font-style: normal;
 }
 
 @media (orientation: landscape) {
@@ -151,15 +165,23 @@ main {
     background-color: var(--bg-color);
     color: var(--fg-color);
     overflow: auto;
-    font-family: sans-serif;
+    /* font-family: serif; */
     table {
         th, td {
             &:first-child {
-                width: 20ch;
+                width: 21ch;
             }
         }
         #input-main {
-            font-size: x-large;
+            appearance: none;
+            color: var(--input-fg-color);
+            background-color: var(--input-bg-color);
+            border-color: var(--input-border-color);
+            border-style: solid;
+            font-family: var(--serif-font);
+            font-size: 140%;
+            width: 98%;
+            padding: 0 0.5ch;
         }
     }
     #options-area {
@@ -186,8 +208,8 @@ main {
         padding-bottom: 3px;
     }
     #staff-view {
-        padding-top: 3px;
-        padding-bottom: 3px;
+        padding-top: 1px;
+        padding-bottom: 1px;
     }
 }
 
@@ -204,9 +226,12 @@ main {
     }
 }
 
-.monofont {
-    font-family: monospace;
-    font-size: larger;
+.setfont {
+    font-family: "JetBrains Mono", monospace;
+    /* font-family: "IBM Plex Mono", monospace; */
+    /* font-size: larger; */
+    font-size: 90%;
+    font-weight: 200;
 }
 
 .popup-outer-container {
@@ -215,7 +240,7 @@ main {
     width: 100%;
     height: 100%;
     background-color: var(--popup-bg-dim-color);
-    font-family: sans-serif;
+    /* font-family: sans-serif; */
     justify-content: center;
     align-items: center;
     user-select: none;
@@ -242,7 +267,7 @@ main {
                 display: inline-block;
                 vertical-align: middle;
                 text-align: center;
-                padding-top: 0.4lh;
+                padding-top: 0.35lh;
                 margin-left: 1.8lh;
                 font-size: large;
                 font-weight: bold;
@@ -292,6 +317,16 @@ main {
                 text-align: center;
             }
         }
+    }
+    #input-set-filter {
+        appearance: none;
+        color: var(--input-fg-color);
+        background-color: var(--input-bg-color);
+        border-color: var(--input-border-color);
+        border-style: solid;
+        font-family: var(--serif-font);
+        width: 99%;
+        padding: 2px 0.5ch;
     }
 }
 
@@ -362,10 +397,10 @@ main {
                 &:last-child {
                     line-height: 200%;
                 }
-                span {
+                /* span {
                     text-wrap: nowrap;
                     margin-right: 10px;
-                }
+                } */
             }
         }
     }
@@ -396,6 +431,15 @@ a {
         background-color: var(--hyperlink-hover-bg-color);
         border: 1px solid var(--hyperlink-hover-border-color);
     }
+}
+
+.disabled-link {
+    text-decoration: none;
+    border: 1px solid transparent;
+    padding: 1px 1px;
+    text-wrap: nowrap;
+    /* color: var(--fg-dim-color); */
+    opacity: 25%;
 }
 
 input[type="checkbox"], input[type="radio"] {

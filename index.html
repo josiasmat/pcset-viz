@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         <link rel="stylesheet" href="css/default.css">
         <link rel="stylesheet" href="css/clockface.css">
         <script type="text/javascript" src="js/pcset.js"></script>
+        <script type="text/javascript" src="js/musicnote.js"></script>
         <script type="text/javascript" src="js/storage-handler.js"></script>
         <script type="text/javascript" src="js/clockface.js"></script>
         <script type="text/javascript" src="js/popups.js" async></script>
@@ -29,37 +30,43 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         <script type="text/javascript" src="js/utils.js"></script>
         <script type="text/javascript" src="js/i18n.js" defer></script>
         <script type="text/javascript" src="js/main.js" defer></script>
-        <link rel="icon" type="image/png" href="/favicon.png">
+        <link rel="icon" type="image/png" href="favicon.png">
     </head>
     <body>
         <main id="main-area">
             <div id="visualization-area">
                 <svg id="visualization-svg" width="500" height="500" viewbox="0 0 500 500"></svg>
             </div>
-            <div id="data-area">
+            <div id="data-area" tabindex="-1">
                 <table id="data-table">
                     <tbody id="data-table-body">
                         <tr id="row-input" always-visible>
                             <td><label for="input-main" i18n="input-main">Type a set:</label></td>
                             <td>
-                                <input id="input-main" class="monofont" type="text" oninput="onInput()">
+                                <input id="input-main" class="setfont" type="text" oninput="onInput()">
                             </td>
                         </tr>
-                        <tr id="row-ruler-view">
-                            <td i18n="row-ruler-view">Ruler view:</td>
+                        <tr id="row-ruler-view" hidden>
+                            <td i18n="row-ruler-view"><span>Ruler view:</span>
+                            <span style="float: inline-end;">
+                                <a href="javascript:rulerShift(1)">◀</a>
+                                <a href="javascript:rulerShift(-1)">▶</a>
+                            </span>
+                            </td>
                             <td id="ruler-view" class="graphics-view"></td>
                         </tr>
                         <tr id="row-staff-view">
-                            <td i18n="row-staff-view">Staff view:</td>
-                            <td id="staff-view" class="graphics-view"></td>
+                            <td i18n="row-staff-view">
+                                <span style="float: left; padding-top: 0.5lh">Staff view:</span>
+                                <span style="float: right">
+                                    <a href="javascript:pcsetRotate(1)">▲</a><br /><a href="javascript:pcsetRotate(-1)">▼</a>
+                                </span>
+                            </td>
+                            <td id="staff-view" style="display: inline-flex"></td>
                         </tr>
                         <tr id="row-normal">
                             <td i18n="row-normal">Normal order:</td>
                             <td id="normal-form"></td>
-                        </tr>
-                        <tr id="row-reduced">
-                            <td i18n="row-reduced">Transposed to zero:</td>
-                            <td id="reduced-form"></td>
                         </tr>
                         <tr id="row-prime">
                             <td i18n="row-prime">Prime form: <a href="javascript:showPrimeSelector()">&#128269;</a></td>
@@ -93,20 +100,38 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                             <td>Z-correspondent:</td>
                             <td id="zcorrespondent"></td>
                         </tr>
+                        <tr id="row-operations">
+                            <td i18n="row-operations">Operation:</td>
+                            <td id="operations">
+                                <select name="operation-selector" id="operation-selector" onchange="operationUpdate(true)">
+                                    <option value="Tn">Transpose</option>
+                                    <option value="In">Invert</option>
+                                    <option value="Mn">Multiply</option>
+                                    <option value="Rn">Shift</option>
+                                </select>
+                                <input type="number" id="operation-index" name="operation-index" 
+                                    min="-12" max="12" value="1" previous="1" oninput="operationUpdate()"/>
+                                =&nbsp;<span id="operation-result"></span>
+                            </td>
+                        </tr>
+                        <tr id="row-rotations" hidden>
+                            <td i18n="row-rotations">Orderings:</td>
+                            <td id="rotations"></td>
+                        </tr>
                         <tr id="row-symmetries" hidden>
                             <td>Symmetries:</td>
                             <td id="symmetries"></td>
                         </tr>
-                        <tr id="row-inversions">
+                        <tr id="row-inversions" hidden>
                             <td>Inversions:</td>
                             <td id="inversions"></td>
                         </tr>
-                        <tr id="row-transposition">
+                        <tr id="row-transposition" hidden>
                             <td>Transpositions:</td>
                             <td id="transpositions"></td>
                         </tr>
                         <tr id="row-multiples" hidden>
-                            <td>Multiples:</td>
+                            <td>Multiplications:</td>
                             <td id="multiples"></td>
                         </tr>
                         <tr id="row-subsets" hidden>
@@ -120,10 +145,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                             <td id="misc-area">
                                 <span>
                                     <a href="javascript:showExportImagePopup()">Export&nbsp;image</a>
-                                </span> • 
+                                </span> · 
                                 <span>
                                     <a href="javascript:showConfigPopup()">Options</a>
-                                </span> • 
+                                </span> · 
                                 <span>
                                     <a href="javascript:showAboutPopup()">About</a>
                                 </span>
@@ -139,9 +164,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                         <a class="close-button" href="javascript:hidePopup('popup-about')">&#128473;</a>
                     </div>
                     <div class="popup-main">
-                        <b>Pitch-set class visualizer, version <span id="version-number"></span></b>.<br />
+                        <b>Pitch-Class Set Visualizer, version <span id="version-number"></span></b>.<br />
                         Licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">GNU Affero General Public License version 3</a>.<br />
-                        &#169;&nbsp;2024 Josias Matschulat.
+                        &#169;&nbsp;2024 Josias Matschulat.<br /><br />
+                        Descriptive names by Larry Solomon, &#169;&nbsp;1997, 2005.
                     </div>
                 </div>
             </div>
@@ -157,6 +183,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                 <tr>
                                     <th>Type</th>
                                     <th id="popup-set-selector-second-column-header">Sets</th>
+                                </tr>
+                                <tr id="table-set-row-filter">
+                                    <td><label for="input-set-filter" i18n="input-set-filter">Filter:</label></td>
+                                    <td><input id="input-set-filter" type="text""></td>
                                 </tr>
                                 <tr>
                                     <td>Dyads:</td>
@@ -213,17 +243,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                         <table id="popup-config-table">
                             <tbody>
                                 <tr>
-                                    <td>App layout:</td>
-                                    <td>
-                                        <span>
-                                            <input id="radio-svg-first" type="radio" name="div-layout" value="svg-first" onchange="onChange()" checked>
-                                            <label for="radio-svg-first">Clockface visualization first</label>
-                                        </span>
-                                        <span>
-                                            <input id="radio-data-first" type="radio" name="div-layout" value="data-first" onchange="onChange()">
-                                            <label for="radio-data-first">Data table first</label>
-                                        </span>
+                                    <td>Visible data:<br />
+                                        (<a href="javascript:resetVisibleDataRows()">Reset</a>)
                                     </td>
+                                    <td id="visible-data-checkboxes-area"></td>
                                 </tr>
                                 <tr>
                                     <td>Set format:</td>
@@ -259,15 +282,25 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                             <label for="radio-vectorformat-short">&lt;254361&gt;</label>
                                         </span>
                                         <span>
-                                            <input id="radio-vectorformat-long" type="radio" name="vector-format" value="long" onchange="onChange()" checked>
+                                            <input id="radio-vectorformat-long" type="radio" name="vector-format" value="long" onchange="onChange()">
                                             <label for="radio-vectorformat-long">&lt;2,5,4,3,6,1&gt;</label>
                                         </span>
                                         <span class="keyboard-shortcut" style="float: inline-end;">(Alt+V)</span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Visible data:</td>
-                                    <td id="visible-data-checkboxes-area"></td>
+                                    <td>Inversion format:</td>
+                                    <td>
+                                        <span>
+                                            <input id="radio-inversionformat-in" type="radio" name="inversion-format" value="In" onchange="onChange()" checked>
+                                            <label for="radio-inversionformat-in">Simple (I<sub>n</sub>)</label>
+                                        </span>
+                                        <span>
+                                            <input id="radio-inversionformat-tni" type="radio" name="inversion-format" value="TnI" onchange="onChange()">
+                                            <label for="radio-inversionformat-tni">Compound (T<sub>n</sub>I)</label>
+                                        </span>
+                                        <span class="keyboard-shortcut" style="float: inline-end;">(Alt+I)</span>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Clockface visualization:</td>
@@ -287,6 +320,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                         <span>
                                             <input id="chk-fifths" type="checkbox" onchange="onChange()">
                                             <label for="chk-fifths">Circle of fifths <span class="keyboard-shortcut">(Alt+5)</span></label>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>App layout:</td>
+                                    <td>
+                                        <span>
+                                            <input id="radio-svg-first" type="radio" name="div-layout" value="svg-first" onchange="onChange()" checked>
+                                            <label for="radio-svg-first">Clockface visualization first</label>
+                                        </span>
+                                        <span>
+                                            <input id="radio-data-first" type="radio" name="div-layout" value="data-first" onchange="onChange()">
+                                            <label for="radio-data-first">Data table first</label>
                                         </span>
                                     </td>
                                 </tr>
@@ -399,16 +445,21 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                                 </select> 
                                             </span>
                                             <span includetype="staff-set">
-                                                <input id="chk-export-staff-flats" type="checkbox" onchange="updateImageExportPopup()">
-                                                <label for="chk-export-staff-flats">Use flats</label>
+                                                <label for="expimg-select-staff-barline">Barline:</label>
+                                                <select name="expimg-staff-barline" id="expimg-select-staff-barline" onchange="updateImageExportPopup()">
+                                                    <option value="">None</option>
+                                                    <option value="single">Single</option>
+                                                    <option value="double">Double</option>
+                                                    <option value="final">Final</option>
+                                                </select> 
                                             </span>
                                         </td>
                                     </tr>
                                     <tr includetype="staff-set">
-                                        <td><label for="expimg-select-staff-clef">Ordering:</label></td>
+                                        <td><label for="expimg-select-staff-clef">Shift:</label></td>
                                         <td>
-                                            <a id="expimg-staff-shiftup-link" href="javascript:staffShiftNotes(1)">Shift to right</a> • 
-                                            <a id="expimg-staff-shiftdown-link" href="javascript:staffShiftNotes(-1)">Shift to left</a>
+                                            <a id="expimg-staff-shiftup-link" href="javascript:exportStaffShiftNotes(-1)">▼ Down</a> • 
+                                            <a id="expimg-staff-shiftdown-link" href="javascript:exportStaffShiftNotes(1)">Up ▲</a>
                                         </td>
                                     </tr>                                    
                                     <tr>

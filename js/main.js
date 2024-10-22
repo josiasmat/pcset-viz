@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 "use strict";
 
-const VERSION = "0.1";
+const VERSION = "2024-10-22";
 
 const config_storage = new LocalStorageHandler("pcsetviz");
 const config_visible_data = new LocalStorageHandler("pcsetviz-visible-data");
@@ -27,6 +27,8 @@ const input_main = document.getElementById("input-main");
 
 const SET_FORMATS = ["short-ab","short-te","numbers","notes-sharps","notes-flats"];
 const VECTOR_FORMATS = ["short", "long"];
+const INVERSION_FORMATS = ["In", "TnI"];
+const STAFF_CLEFS = ["G2", "C3", "C4", "F4"];
 
 const config = {
     last_set: "",
@@ -37,18 +39,21 @@ const config = {
     fifths: false,
     theme: "auto",
     layout: "svg-first",
-    set_format: "short-ab",
-    vector_format: "short"
+    staff_clef: STAFF_CLEFS[0],
+    set_format: SET_FORMATS[0],
+    vector_format: VECTOR_FORMATS[0],
+    inversion_format: INVERSION_FORMATS[0],
 }
 
 class DataRow {
-    element; id; label;
+    element; id; label; default;
 
     constructor(element) {
         this.element = element;
         this.id = element.id;
         const text = element.firstElementChild.textContent;
         this.label = text.substring(0, text.indexOf(":"));
+        this.default = !element.hasAttribute("hidden");
     }
 
     get visible() { return !(this.hidden); }
@@ -68,7 +73,11 @@ var state = {
     axes: [],
     last_op: null,
     undone_op: null,
-    history_index: 0
+    history_index: 0,
+    staff_accidental_swap: Array(12).fill(false),
+    ruler: {
+        start: 0
+    }
 }
 
 var string_data = new Object();
@@ -101,8 +110,9 @@ function textOrDash(s) {
 function pcsetHyperlink(pcset, options = {}) {
     const ss = pcset.toString("short-ab", false);
     const js = (options.op) ? `javascript:goto('${ss}', ['${options.op[0]}',${options.op[1]}])`: `javascript:goto('${ss}')`;
-    const tx = (options.text) ? options.text : htmlEscape(pcset.normal.toString(config.set_format, true));
-    const anchor = makeAnchorStr(js, { text: tx, classes: ["monofont"] });
+    const tx = (options.text) ? options.text : htmlEscape(pcset.toString(config.set_format, true));
+    //const tx = (options.text) ? options.text : htmlEscape(pcset.normal.toString(config.set_format, true));
+    const anchor = makeAnchorStr(js, { text: tx, classes: ["setfont"] });
     return ( options.copy ) ? [anchor, copyLink(tx)].join(" ") : anchor;
 }
 
@@ -146,6 +156,7 @@ function showPcset(options = {}) {
     const icvector = state.pcset.icvector();
     const ctvector = state.pcset.ctvector();
     const transpositions = state.pcset.transpositions_unique(false);
+    const rotations = state.pcset.rotations(false).map((x) => x[1]);
     const inversions = state.pcset.inversions_unique();
     const inversional_symmetries = state.pcset.inversionally_symmetric_sets();
     const transpositional_symmetries = state.pcset.transpositionally_symmetric_sets(false);
@@ -162,15 +173,15 @@ function showPcset(options = {}) {
         if (cond) return "&nbsp;=&nbsp;" + s;
         return "";
     }
-    
+
     document.getElementById("normal-form").setHTMLUnsafe(
         checkmarkIf(state.pcset.isEqualTo(normal)) + pcsetHyperlink(normal, {copy: true})
     );
 
-    document.getElementById("reduced-form").setHTMLUnsafe(
-        checkmarkIf(state.pcset.isEqualTo(reduced)) + pcsetHyperlink(reduced, {copy: true, op: ["T", 12-state.pcset.head]})
-        + addEquivIf(!state.pcset.isEqualTo(reduced), `T<sub>${12-state.pcset.head}</sub>`)
-    );
+    // document.getElementById("reduced-form").setHTMLUnsafe(
+    //     checkmarkIf(state.pcset.isEqualTo(reduced)) + pcsetHyperlink(reduced, {copy: true, op: ["T", 12-normal.head]})
+    //     + addEquivIf(!state.pcset.isEqualTo(reduced), `T<sub>${12-normal.head}</sub>`)
+    // );
 
     document.getElementById("prime-form").setHTMLUnsafe(
         checkmarkIf(state.pcset.isEqualTo(prime)) + pcsetHyperlink(prime, {copy: true})
@@ -194,20 +205,25 @@ function showPcset(options = {}) {
         (zcorrespondent) ? `${pcsetHyperlink(zcorrespondent)} (${zcorrespondent.forte_name})` : "-"
     );
 
-    document.getElementById("forte-name").setHTMLUnsafe(strWithCopyLink(reduced.forte_name));
+    operationUpdate();
 
-    document.getElementById("carter-name").setHTMLUnsafe(strWithCopyLink(parseInt(reduced.carter_number.toString())));
+    document.getElementById("forte-name").setHTMLUnsafe(strWithCopyLink(prime.forte_name));
 
-    document.getElementById("transpositions").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(transpositions, "T")));
+    document.getElementById("carter-name").setHTMLUnsafe(strWithCopyLink(prime.carter_number.toString()));
 
-    document.getElementById("inversions").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(inversions, "I")));
+    document.getElementById("rotations").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(rotations)));
+    
+    document.getElementById("transpositions").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(transpositions, "Tn")));
+
+    document.getElementById("inversions").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(inversions, config.inversion_format)));
     
     document.getElementById("symmetries").setHTMLUnsafe(textOrDash(
-        [setCollectionToStrWithLinks(inversional_symmetries, "I"), setCollectionToStrWithLinks(transpositional_symmetries, "T")]
+        [setCollectionToStrWithLinks(inversional_symmetries, config.inversion_format), 
+         setCollectionToStrWithLinks(transpositional_symmetries, "Tn")]
             .filter((s) => s != "").join(", ")
     ));
     
-    document.getElementById("multiples").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(multiples, "M")));
+    document.getElementById("multiples").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(multiples, "Mn")));
 
     //document.getElementById("subsets").setHTMLUnsafe(
     //    `Show <a href="javascript:showSubsets()">all subsets</a> | <a href="javascript:showSubsetsPrimes()">prime subsets</a>`
@@ -226,21 +242,121 @@ function showPcset(options = {}) {
 
     const ruler_view = new StaticRulerPcSetView(
         state.pcset, 
-        { scale: 1, note_names: config.note_names, fn: adaptRulerView }, 
+        { scale: 1, start: state.ruler.start, note_names: config.note_names, fn: adaptRulerView }, 
         (getCurrentTheme() == "dark") ? "basic-dark" : "basic-light"
     );
     document.getElementById("ruler-view").setHTMLUnsafe(ruler_view.svg.outerHTML);
 
     // staff view
 
+    function adaptStaffView(elm, type, index) {
+        switch ( type ) {
+            case "clef":
+                elm.style.cursor = "pointer";
+                elm.style.pointerEvents = "bounding-box";
+                elm.setAttribute("onclick", "staffClefClick()");
+                break;
+            case "note":
+                elm.style.cursor = "pointer";
+                elm.style.pointerEvents = "bounding-box";
+                elm.setAttribute("onclick", `staffNoteClick(${index})`);
+                break;
+        }
+    }
+
+    function reduceSwappedAccidentalsCallback(a, x, i, s) {
+        if ( x ) {
+            if ( state.pcset.has(i) )
+                a.push(i);
+            else
+                s[i] = false;
+        }
+        return a;
+    }
+
     const staff_view = new StaticStaffPcSetView(
-        state.pcset, { scale: 0.2, clef: "g" },
+        state.pcset, 
+        { 
+            scale: 0.2, 
+            clef: config.staff_clef,
+            accidental_swap: state.staff_accidental_swap.reduce(reduceSwappedAccidentalsCallback, []),
+            fn: adaptStaffView
+        },
         (getCurrentTheme() == "dark") ? "basic-dark" : "basic-light"
     );
     document.getElementById("staff-view").setHTMLUnsafe(staff_view.svg.outerHTML);
 
     drawVisualization(options);
 
+}
+
+
+function operationUpdate(reset = false) {
+    const op = document.getElementById("operation-selector").value;
+    const index_element = document.getElementById("operation-index");
+    const previous = parseInt(index_element.getAttribute("previous-value"));
+    let index = parseInt(index_element.value);
+    switch ( op ) {
+        case "Rn":
+            index_element.setAttribute("max", state.pcset.size);
+            index_element.setAttribute("min", -state.pcset.size);
+            if ( reset ) index = 1;
+            if ( index == 0 ) index = -Math.sign(previous);
+            if ( Math.abs(index) >= state.pcset.size ) index = 0;
+            break;
+        case "Tn":
+            index_element.setAttribute("max", 12);
+            index_element.setAttribute("min", -12);
+            if ( reset ) index = 1;
+            if ( index == 0 ) index = -Math.sign(previous);
+            if ( Math.abs(index) >= 12 ) index = Math.sign(index);
+            break;
+        default:
+            index_element.setAttribute("max", 12);
+            index_element.setAttribute("min", -1);
+            if ( reset || index >= 12 ) index = 0;
+            if ( index < 0 ) index += 12;
+    }
+    index_element.value = index.toString();
+    index_element.setAttribute("previous-value", index.toString());
+
+    let result;
+    switch ( op ) {
+        case "Rn": result = state.pcset.shift(index); break;
+        case "Tn": result = state.pcset.transpose(index); break;
+        case "In": result = state.pcset.invert(index); break;
+        case "Mn": result = state.pcset.multiply(index); break;
+        default: result = state.pcset;
+    }
+    document.getElementById("operation-result").setHTMLUnsafe(pcsetHyperlink(result, {op: [op,index]}));
+}
+
+
+function pcsetRotate(amount) {
+    state.pcset = state.pcset.shift(amount);
+    input_main.value = state.pcset.toString(config.set_format, false);
+    showPcset({ no_history: false, keep_polygon: true });
+}
+
+
+function rulerShift(amount) {
+    state.ruler.start += amount;
+    while ( state.ruler.start > 11 ) state.ruler.start -= 12;
+    while ( state.ruler.start < 0  ) state.ruler.start += 12;
+    showPcset({ no_history: false, keep_polygon: true });
+}
+
+
+function staffClefClick() {
+    config.staff_clef = nextOf(config.staff_clef, STAFF_CLEFS);
+    saveConfig();
+    showPcset({ no_history: true, keep_polygon: true });
+}
+
+
+function exportStaffNoteClick(pc) {
+    state.staff_accidental_swap[pc] = !state.staff_accidental_swap[pc];
+    showPcset({ no_history: true, keep_polygon: true });
 }
 
 
@@ -277,7 +393,7 @@ function pcsetGetDescriptiveNames(pcset) {
 function setCollectionToStrWithLinks(sets, op = null) {
     const strings = (op)
         ? sets.map( (item) =>
-            `${op}<sub>${item[0].join(",")}</sub>&nbsp;=&nbsp;${pcsetHyperlink(item[1], { op: [op,item[0][0]] })}`
+            `${op.replace('n', "<sub>" + item[0].join(",") + "</sub>")}&nbsp;=&nbsp;${pcsetHyperlink(item[1], { op: [op,item[0][0]] })}`
         )
         : sets.map( (item) =>
             pcsetHyperlink(item)
@@ -376,12 +492,14 @@ function populatePopupConfigVisibleData() {
     document.getElementById("visible-data-checkboxes-area").setHTMLUnsafe(checkboxes.join(" "));
 }
 
-
-function toggleVisibleData(id) {
+function toggleVisibleData(id, checked = null) {
     const checkbox = document.getElementById(id);
     const target_id = checkbox.getAttribute("target");
     const target_elm = document.getElementById(target_id);
-    target_elm.toggleAttribute("hidden");
+    if ( checked == null )
+        target_elm.toggleAttribute("hidden");
+    else
+        target_elm.setAttribute("hidden", !checked);
     saveConfig();
 }
 
@@ -389,6 +507,7 @@ function updateInterfaceFromConfig() {
     document.querySelector(`input[name="div-layout"][value="${config.layout}"]`).checked = true;
     document.querySelector(`input[name="set-format"][value="${config.set_format}"]`).checked = true;
     document.querySelector(`input[name="vector-format"][value="${config.vector_format}"]`).checked = true;
+    document.querySelector(`input[name="inversion-format"][value="${config.inversion_format}"]`).checked = true;
     document.getElementById("chk-note-names").checked = config.note_names;
     document.getElementById("chk-polygon").checked = config.polygon;
     document.getElementById("chk-sym-axes").checked = config.symmetry_axes;
@@ -404,6 +523,7 @@ function updateConfigFromInterface() {
         input_main.value = state.pcset.toString(new_set_format, false);
     config.set_format = new_set_format;
     config.vector_format = document.querySelector(`input[name="vector-format"]:checked`).value;
+    config.inversion_format = document.querySelector(`input[name="inversion-format"]:checked`).value;
     config.note_names = document.getElementById("chk-note-names").checked;
     config.polygon = document.getElementById("chk-polygon").checked;
     config.symmetry_axes = document.getElementById("chk-sym-axes").checked;
@@ -420,12 +540,14 @@ function updateConfigFromInterface() {
 
 function readConfig() {
     config.layout = config_storage.readString("layout", "svg-first");
-    config.set_format = config_storage.readString("set-format", "short-ab");
-    config.vector_format = config_storage.readString("vector-format", "short");
+    config.set_format = config_storage.readString("set-format", SET_FORMATS[0]);
+    config.vector_format = config_storage.readString("vector-format", VECTOR_FORMATS[0]);
+    config.inversion_format = config_storage.readString("inversion-format", INVERSION_FORMATS[0]);
     config.last_set = config_storage.readString("last-set", "");
     config.note_names = config_storage.readBool("note_names", false);
     config.polygon = config_storage.readBool("polygon", true);
-    config.symmetry_axes = config_storage.readBool("symmetry_axes", false);
+    config.symmetry_axes = config_storage.readBool("symmetry-axes", false);
+    config.staff_clef = config_storage.readString("staff-clef", STAFF_CLEFS[0]);
     const fifths = config_storage.readBool("fifths", false);
     if ( config.fifths != fifths ) {
         config.fifths = fifths;
@@ -441,11 +563,13 @@ function saveConfig() {
     config_storage.writeString("layout", config.layout);
     config_storage.writeString("set-format", config.set_format);
     config_storage.writeString("vector-format", config.vector_format);
+    config_storage.writeString("inversion-format", config.inversion_format);
     config_storage.writeBool("note_names", config.note_names);
     config_storage.writeBool("polygon", config.polygon);
-    config_storage.writeBool("symmetry_axes", config.symmetry_axes);
+    config_storage.writeBool("symmetry-axes", config.symmetry_axes);
     config_storage.writeBool("fifths", config.fifths);
     config_storage.writeString("theme", config.theme);
+    config_storage.writeString("staff-clef", config.staff_clef);
     for ( let row of data_rows )
         config_visible_data.writeBool(row.id, row.visible);
 }
@@ -528,6 +652,11 @@ function handleKeyboardShortcut(ev) {
             config.vector_format = nextOf(config.vector_format, VECTOR_FORMATS);
             onGeneralConfigChange(); 
             break;
+        case "alt+i":
+            ev.preventDefault();
+            config.inversion_format = nextOf(config.inversion_format, INVERSION_FORMATS);
+            onGeneralConfigChange(); 
+            break;
         case "alt+5":
             ev.preventDefault();
             config.fifths = !config.fifths;
@@ -567,4 +696,3 @@ enableKeyboardShortcuts();
     }
 
 }
-

@@ -187,6 +187,51 @@ function combinations(array = []) {
 
 
 /**
+ * Equivalent to Python's zip.
+ * @param {...Array}
+ * @returns {Array}
+ */
+function zip() {
+    // from https://stackoverflow.com/questions/4856717/javascript-equivalent-of-pythons-zip-function
+    var args = [].slice.call(arguments);
+    var shortest = args.length==0 ? [] : args.reduce(function(a,b){
+        return a.length<b.length ? a : b
+    });
+    return shortest.map(function(_,i){
+        return args.map(function(array){return array[i]})
+    });
+}
+
+
+/**
+ * Return successive overlapping pairs taken from an array.
+ * Equivalent to Python's pairwise.
+ * @param {Array} array 
+ * @returns {[any,any][]}
+ */
+function pairwise(array, last_first = false) {
+    const pairs = zip(array.slice(0,array.length-1), array.slice(1));
+    if ( last_first ) pairs.push([array[array.length-1],array[0]]);
+    return pairs;
+}
+
+
+/**
+ * Return all possible combinations of 2 elements taken from an array.
+ * @param {Array} array 
+ * @returns {[any,any][]}
+ */
+function pairs(array) {
+    const l = array.length;
+    const result = [];
+    for ( let i = 0; i < l; i++ )
+        for ( let j = i+1; j < l; j++ )
+            result.push([array[i], array[j]]);
+    return result;
+}
+
+
+/**
  * Count the number of occurrences of each value in an array.
  * @param {any[]} array 
  * @returns {Object} Returns an object where the keys are the array members,
@@ -292,3 +337,25 @@ function mergeObjects(souce_obj, dest_obj, merge_arrays = false, replace = true)
 function degToRad(deg) {
     return deg*(Math.PI/180);
 }
+
+
+/**
+ * Recreates a node.
+ * @param {Node} el Node to be replaced.
+ * @param {Boolean} with_children
+ * @returns {Node} The new node.
+ */
+function recreateNode(el, with_children = false) {
+    if (with_children) {
+        const newEl = el.cloneNode(true);
+        el.parentNode.replaceChild(newEl, el);
+        return newEl;
+    }
+    else {
+        const newEl = el.cloneNode(false);
+        while (el.hasChildNodes()) newEl.appendChild(el.firstChild);
+        el.parentNode.replaceChild(newEl, el);
+        return newEl;
+    }
+}
+

@@ -885,10 +885,6 @@ class PcSet {
         return sets;
     }
 
-    similar_sets_rp() {
-
-    }
-
 
     /**
      * Returns all possible combinations of elements from an array as subarrays.
@@ -1132,6 +1128,15 @@ function substr_found_in_str(str, sub_array) {
         if ( str.includes(sub) )
             return true;
     return false;
+}
+
+
+function isBlackKey(pc) {
+    return [1,3,6,8,10].includes(pc);
+}
+
+function isWhiteKey(pc) {
+    return [0,2,4,5,7,9,11].includes(pc);
 }
 
 

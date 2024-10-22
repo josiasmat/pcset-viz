@@ -18,20 +18,39 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 "use strict";
 
 
-var pcset_export = null;
+const POPUP_SET_SEPARATOR = "&nbsp;· ";
+
+var export_data = {
+    pcset: null,
+    staff: {
+        clef: "G2",
+        barline: "",
+        accidental_swap: Array(12).fill(false),
+    }
+}
 
 
 function showConfigPopup() {
+    updateConfigPopup();
+    showPopup("popup-config");
+    //document.getElementById("popup-config").style.display="flex";
+}
+
+
+function updateConfigPopup() {
     const checkboxes = document.querySelectorAll("#visible-data-checkboxes-area input");
     for ( let checkbox of checkboxes ) {
         const target_id = checkbox.getAttribute("target");
         const target_elm = document.getElementById(target_id);
         checkbox.checked = !(target_elm.hasAttribute("hidden"));
     }
-    showPopup("popup-config");
-    //document.getElementById("popup-config").style.display="flex";
 }
 
+function resetVisibleDataRows() {
+    data_rows.forEach( (row) => { row.visible = row.default } );
+    updateConfigPopup();
+    saveConfig();
+}
 
 function showAboutPopup() {
     document.getElementById("version-number").innerText = VERSION;
@@ -42,6 +61,7 @@ function showAboutPopup() {
 
 function showPrimeSelector() {
     document.getElementById("popup-set-selector-second-column-header").textContent = "Prime forms";
+    document.getElementById("table-set-row-filter").hidden = true;
 
     // set of cardinality 0, 1, 11 & 12
     const table_row_0 = document.getElementById("table-set-row0");
@@ -51,7 +71,7 @@ function showPrimeSelector() {
         makeSelectorSetLink("0", new PcSet("0").toString(config.set_format, true)),
         makeSelectorSetLink("0123456789A", new PcSet("0123456789A").toString(config.set_format, true)),
         makeSelectorSetLink("0123456789AB", new PcSet("0123456789AB").toString(config.set_format, true))
-    ].join(", ");
+    ].join(POPUP_SET_SEPARATOR);
 
     // remaining sets
     for ( let i = 2; i < 11; i++ ) {
@@ -64,7 +84,7 @@ function showPrimeSelector() {
         const id = `table-set-row${( i>1 && i<11 ) ? i : 0}`;
         const elm = document.getElementById(id);
         elm.parentElement.style.display = "table-row";
-        elm.innerHTML = links.join(", ");
+        elm.innerHTML = links.join(POPUP_SET_SEPARATOR);
     }
 
     showPopup("popup-set-selector");
@@ -73,6 +93,7 @@ function showPrimeSelector() {
 
 function showForteSelector() {
     document.getElementById("popup-set-selector-second-column-header").textContent = "Forte names";
+    document.getElementById("table-set-row-filter").hidden = true;
 
     // set of cardinality 0, 1, 11 & 12
     const table_row_0 = document.getElementById("table-set-row0");
@@ -82,7 +103,7 @@ function showForteSelector() {
         makeSelectorSetLink("0", "1-1"),
         makeSelectorSetLink("0123456789A", "11-1"),
         makeSelectorSetLink("0123456789AB", "12-1")
-    ].join(", ");
+    ].join(POPUP_SET_SEPARATOR);
 
     // remaining sets
     for ( let i = 2; i < 11; i++ ) {
@@ -95,7 +116,7 @@ function showForteSelector() {
         const id = `table-set-row${( i>1 && i<11 ) ? i : 0}`;
         const elm = document.getElementById(id);
         elm.parentElement.style.display = "table-row";
-        elm.innerHTML = links.join(", ");
+        elm.innerHTML = links.join(POPUP_SET_SEPARATOR);
     }
 
     showPopup("popup-set-selector");
@@ -104,6 +125,7 @@ function showForteSelector() {
 
 function showCarterSelector() {
     document.getElementById("popup-set-selector-second-column-header").textContent = "Carter numbers";
+    document.getElementById("table-set-row-filter").hidden = true;
 
     // no carter numbers for cardinality 0, 1, 11 & 12
     const table_row_0 = document.getElementById("table-set-row0");
@@ -120,7 +142,7 @@ function showCarterSelector() {
         const id = `table-set-row${( i>1 && i<11 ) ? i : 0}`;
         const elm = document.getElementById(id);
         elm.parentElement.style.display = "table-row";
-        elm.innerHTML = sets.map((set) => makeSelectorSetLink(set[0], parseInt(set[1]))).join(", ");
+        elm.innerHTML = sets.map((set) => makeSelectorSetLink(set[0], parseInt(set[1]))).join(POPUP_SET_SEPARATOR);
     }
 
     showPopup("popup-set-selector");
@@ -129,43 +151,76 @@ function showCarterSelector() {
 
 function showDescriptionSelector() {
     document.getElementById("popup-set-selector-second-column-header").textContent = "Descriptive names";
+    document.getElementById("table-set-row-filter").hidden = false;
 
-    // collect names
-    let sets = Array(13);
-    for ( let i = 0; i < 13; i++ ) sets[i] = [];
-    for ( let entry of Object.entries(string_data["sets"]) ) {
-        const len = entry[0].length-2;
-        const set = entry[0].substring(1,len+1);
-        for ( let name of entry[1]["names"] ) {
-            const link = makeSelectorSetLink(set,name);
-            sets[len].push({name:name,set:set,link:link});
+    const input_filter = recreateNode(document.getElementById("input-set-filter"));
+    input_filter.value = "";
+
+    function updateDescriptionSelector() {
+
+        let filter_str = input_filter.value;
+        const filters = filter_str.trim().toLowerCase().split(" ");
+
+        function filterName(name) {
+            if ( !filter_str ) return true;
+            name = name.toLowerCase();
+            for ( const filter of filters ) {
+                if ( !name.includes(filter) )
+                    return false;
+            }
+            return true;
+        }
+
+        // collect names
+        let sets = Array(13);
+        for ( let i = 0; i < 13; i++ ) sets[i] = [];
+        for ( let entry of Object.entries(string_data["sets"]) ) {
+            const set = new PcSet(entry[0]);
+            const len = set.size; //entry[0].length-2;
+            const str_short = set.toString("short-ab", false);// entry[0].substring(1,len+1);
+            const str_full = set.toString(config.set_format, true);
+            const hint = `${str_full} (${set.forte_name})\n${entry[1]["names"].join("\n")}`;
+            for ( let name of entry[1]["names"] ) {
+                if ( filterName(name) ) {
+                    const link = makeSelectorSetLink(str_short,name, {hint:hint,nosetfont:true});
+                    sets[len].push({name:name,set:str_short,link:link});
+                } else {
+                    sets[len].push({name:name,set:str_short,link:`<span class="disabled-link">${name}</span>`});
+                }
+            }
+        }
+        for ( let i of [1,11,12] ) {
+            sets[0].push(...sets[i]);
+            sets[i] = [];
+        }
+        for ( let array of sets )
+            if ( array.length > 1 )
+                array.sort((a,b) => a.name.localeCompare(b.name));
+
+        document.getElementById("table-set-row0").parentElement.style.display = "table-row";
+
+        for ( let i of [0,2,3,4,5,6,7,8,9,10] ) {
+            let links = sets[i].map((x) => x.link);
+            const id = `table-set-row${i}`;
+            const elm = document.getElementById(id);
+            elm.parentElement.style.display = "table-row";
+            elm.innerHTML = links.join("&nbsp;· ");
         }
     }
-    for ( let i of [1,11,12] ) {
-        sets[0].push(...sets[i]);
-        sets[i] = [];
-    }
-    for ( let array of sets )
-        if ( array.length > 1 )
-            array.sort((a,b) => a.name.localeCompare(b.name));
 
-    document.getElementById("table-set-row0").parentElement.style.display = "table-row";
-
-    for ( let i of [0,2,3,4,5,6,7,8,9,10] ) {
-        let links = sets[i].map((x) => x.link);
-        const id = `table-set-row${i}`;
-        const elm = document.getElementById(id);
-        elm.parentElement.style.display = "table-row";
-        elm.innerHTML = links.join(", ");
-    }
-
+    updateDescriptionSelector();
     showPopup("popup-set-selector");
+    input_filter.focus();
+    input_filter.addEventListener("input", updateDescriptionSelector);
+
 }
 
 
 function showSubsetSelector() {
     const superset = state.pcset.normal;
-    document.getElementById("popup-set-selector-second-column-header").textContent = `Subsets of ${superset.toString(config.set_format, true)}`;
+    document.getElementById("popup-set-selector-second-column-header").setHTMLUnsafe( 
+        `Subsets of <span class="setfont">${superset.toString(config.set_format, true)}</span>`);
+    document.getElementById("table-set-row-filter").hidden = true;
 
     const subsets = superset.subsets();
     subsets.sort((a,b) => a.binary_value - b.binary_value);
@@ -182,14 +237,14 @@ function showSubsetSelector() {
     // set of cardinality 0, 1, 11 & 12
     const table_row_0 = document.getElementById("table-set-row0");
     table_row_0.parentElement.style.display = "table-row";
-    table_row_0.innerHTML = links[0].concat(links[1]).concat(links[11]).concat(links[12]).join(", ");
+    table_row_0.innerHTML = links[0].concat(links[1]).concat(links[11]).concat(links[12]).join(POPUP_SET_SEPARATOR);
 
     // remaining sets
     for ( let i = 2; i < 11; i++ ) {
         const id = `table-set-row${( i>1 && i<11 ) ? i : 0}`;
         const elm = document.getElementById(id);
         elm.parentElement.style.display = (links[i].length == 0) ? "none" : "table-row";
-        elm.innerHTML = links[i].join(", ");
+        elm.innerHTML = links[i].join(POPUP_SET_SEPARATOR);
     }
 
     showPopup("popup-set-selector");
@@ -198,7 +253,9 @@ function showSubsetSelector() {
 
 function showPrimeSubsetSelector() {
     const superset = state.pcset.prime;
-    document.getElementById("popup-set-selector-second-column-header").textContent = `Prime subsets of ${superset.toString(config.set_format, true)}`;
+    document.getElementById("popup-set-selector-second-column-header").setHTMLUnsafe( 
+        `Prime subsets of <span class="setfont">${superset.toString(config.set_format, true)}</span>`);
+    document.getElementById("table-set-row-filter").hidden = true;
 
     const subsets = superset.prime_subsets();
     //subsets.sort((a,b) => a.binary_value - b.binary_value);
@@ -215,14 +272,14 @@ function showPrimeSubsetSelector() {
     // set of cardinality 0, 1, 11 & 12
     const table_row_0 = document.getElementById("table-set-row0");
     table_row_0.parentElement.style.display = "table-row";
-    table_row_0.innerHTML = links[0].concat(links[1]).concat(links[11]).concat(links[12]).join(", ");
+    table_row_0.innerHTML = links[0].concat(links[1]).concat(links[11]).concat(links[12]).join(POPUP_SET_SEPARATOR);
 
     // remaining sets
     for ( let i = 2; i < 11; i++ ) {
         const id = `table-set-row${( i>1 && i<11 ) ? i : 0}`;
         const elm = document.getElementById(id);
         elm.parentElement.style.display = (links[i].length == 0) ? "none" : "table-row";
-        elm.innerHTML = links[i].join(", ");
+        elm.innerHTML = links[i].join(POPUP_SET_SEPARATOR);
     }
 
     showPopup("popup-set-selector");
@@ -245,7 +302,8 @@ function showSetSelector(type = null) {
 
 
 function showExportImagePopup() {
-    pcset_export = state.pcset;
+    export_data.pcset = state.pcset.clone();
+    export_data.staff_accidental_swap = Array.from(state.staff_accidental_swap);
     loadImageExportPopupSettings();
     showPopup("popup-export-image");
     updateImageExportPopup();
@@ -277,12 +335,20 @@ function updateImageExportPopup() {
                 + '-' + document.getElementById("expimg-select-theme-bg").value
                 + document.getElementById("expimg-select-theme-color").value;
     
+    function exportStaffPreviewClick(elm, type, index) {
+        if ( type == "note" ) {
+            elm.style.cursor = "pointer";
+            elm.style.pointerEvents = "bounding-box";
+            elm.setAttribute("onclick", `exportStaffNoteClick(${index})`);
+        }
+    }
+    
     let preview;
     switch ( graphics_type ) {
         case "clockface-set": preview = makeClockfaceSvgFromParams(theme); break;
         case "clockface-intervals": preview = makeClockfaceIntervalsSvgFromParams(theme); break;
         case "ruler-set": preview = makeRulerSvgFromParams(theme); break;
-        case "staff-set": preview = makeStaffSvgFromParams(theme); break;
+        case "staff-set": preview = makeStaffSvgFromParams(theme, exportStaffPreviewClick); break;
     }
     preview.svg.setAttribute("width", "100%");
     preview.svg.setAttribute("height", "100%");
@@ -299,8 +365,14 @@ function updateImageExportPopup() {
 }
 
 
-function staffShiftNotes(amount) {
-    pcset_export = pcset_export.shift(amount);
+function exportStaffShiftNotes(amount) {
+    export_data.pcset = export_data.pcset.shift(amount);
+    updateImageExportPopup();
+}
+
+
+function exportStaffNoteClick(pc) {
+    export_data.staff.accidental_swap[pc] = !export_data.staff.accidental_swap[pc];
     updateImageExportPopup();
 }
 
@@ -321,7 +393,7 @@ function loadImageExportPopupSettings() {
     document.getElementById("expimg-select-theme-bg").value = config_export_image.readString("theme-bg", "light");
     document.getElementById("expimg-select-staff-clef").value = config_export_image.readString("staff-clef", "G2");
     document.getElementById("expimg-select-staff-notehead").value = config_export_image.readString("staff-notehead", "q");
-    document.getElementById("chk-export-staff-flats").value = config_export_image.readBool("staff-flats", false);
+    document.getElementById("expimg-select-staff-barline").value = config_export_image.readString("staff-barline", "");
     document.getElementById("expimg-scale").value = config_export_image.readNumber("scale", 1.15);
     document.getElementById("expimg-stroke").value = config_export_image.readNumber("stroke-width", 2.0);
     document.querySelector(`input[name="export-file-type"][value="${config_export_image.readString("format", "svg")}"]`).checked = true;
@@ -345,7 +417,7 @@ function saveImageExportPopupSettings() {
     config_export_image.writeString("theme-bg", document.getElementById("expimg-select-theme-bg").value);
     config_export_image.writeString("staff-clef", document.getElementById("expimg-select-staff-clef").value);
     config_export_image.writeString("staff-notehead", document.getElementById("expimg-select-staff-notehead").value);
-    config_export_image.writeBool("staff-flats", document.getElementById("chk-export-staff-flats").checked);
+    config_export_image.writeString("staff-barline", document.getElementById("expimg-select-staff-barline").value);
     config_export_image.writeNumber("scale", document.getElementById("expimg-scale").value);
     config_export_image.writeNumber("stroke-width", document.getElementById("expimg-stroke").value);
     config_export_image.writeString("format", document.querySelector('input[name="export-file-type"]:checked').value);
@@ -355,7 +427,7 @@ function saveImageExportPopupSettings() {
 
 function makeClockfaceSvgFromParams(theme) {
     return new StaticClockfaceView(
-        pcset_export.normal, 
+        export_data.pcset.normal, 
         {
             note_names: document.getElementById("chk-export-note-names").checked,
             polygon: document.getElementById("chk-export-polygon").checked, 
@@ -377,7 +449,7 @@ function makeClockfaceIntervalsSvgFromParams(theme) {
     if ( document.getElementById("chk-export-ic5").checked ) interval_classes.push(5);
     if ( document.getElementById("chk-export-ic6").checked ) interval_classes.push(6);
     return new StaticClockfaceView(
-        pcset_export.normal, 
+        export_data.pcset.normal, 
         {
             note_names: document.getElementById("chk-export-note-names").checked,
             fifths: document.getElementById("chk-export-fifths").checked,
@@ -391,7 +463,7 @@ function makeClockfaceIntervalsSvgFromParams(theme) {
 
 function makeRulerSvgFromParams(theme) {
     return new StaticRulerPcSetView(
-        pcset_export.normal, 
+        export_data.pcset.normal, 
         {
             note_names: document.getElementById("chk-export-note-names").checked,
             symmetry_axes: document.getElementById("chk-export-sym-axes").checked,
@@ -403,14 +475,18 @@ function makeRulerSvgFromParams(theme) {
     );
 }
 
-function makeStaffSvgFromParams(theme) {
+function makeStaffSvgFromParams(theme, callback = null) {
     return new StaticStaffPcSetView(
-        pcset_export, 
+        export_data.pcset, 
         {
             clef: document.getElementById("expimg-select-staff-clef").value,
             notehead: document.getElementById("expimg-select-staff-notehead").value,
-            flats: document.getElementById("chk-export-staff-flats").checked,
+            barline: document.getElementById("expimg-select-staff-barline").value,
+            accidental_swap: export_data.staff.accidental_swap.reduce(
+                (a, x, i) => {if (x) a.push(i); return a;}, []
+            ),
             stroke_width: parseFloat(document.getElementById("expimg-stroke").value),
+            fn: ( callback ) ? callback : null
         },
         theme
     );
@@ -457,20 +533,39 @@ function copyImageToClipboard() {
     }
 }
 
-
-function showPopup(id) {
-    document.getElementById(id).style.display = "flex";
+function elementDisableFocus(elm) {
+    elm.setAttribute("tabindex", "-1");
+    for ( const child of elm.children ) elementDisableFocus(child);
 }
 
-function hidePopup(id) {
+function elementEnableFocus(elm) {
+    elm.removeAttribute("tabindex");
+    for ( const child of elm.children ) elementEnableFocus(child);
+}
+
+function showPopup(id) {
+    const popup = document.getElementById(id);
+    popup.style.display = "flex";
+    elementDisableFocus(document.getElementById("data-area"));
+}
+
+function hidePopup(id, update_main = true) {
     document.getElementById(id).style.display = "none";
+    if ( update_main ) {
+        elementEnableFocus(document.getElementById("data-area"));
+        showPcset({ no_history: true, keep_polygon: true });
+    }
 }
 
 function hideAllPopups() {
     for ( let popup of document.querySelectorAll(".popup-outer-container") )
-        hidePopup(popup.id);
+        hidePopup(popup.id, false);
+    elementEnableFocus(document.getElementById("data-area"));
+    showPcset({ no_history: true, keep_polygon: true });
 }
 
-function makeSelectorSetLink(set, text) {
-    return `<a class="monofont" href="javascript:goto('${set}')">${text}</a>`;
+function makeSelectorSetLink(set, text, options = {}) {
+    const attr_class = options.nosetfont ? '' : ' class="setfont"';
+    const attr_title = options.hint ? ` title="${options.hint}"` : '';
+    return `<a${attr_class} href="javascript:goto('${set}')"${attr_title}>${text}</a>`;    
 }

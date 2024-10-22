@@ -169,23 +169,18 @@ class StaticClockfaceView extends PcSetBaseView {
 
         // draw polygon
         if ( options.polygon && pcset.size > 1 ) {
-            const polygon = document.createElementNS(SVGNS, "path");
+            const points = pcset.to_array().map( (x) => getPoint(x, pc_polygon_distance) );
+            const polygon_attrs = { 
+                "fill": color(theme.polygon_fill), 
+                "fill-opacity": opacity(theme.polygon_fill)
+            };
             if ( opacity(theme.polygon_stroke) > 0 ) {
-                polygon.setAttribute("stroke", color(theme.polygon_stroke));
-                polygon.setAttribute("stroke-opacity", opacity(theme.polygon_stroke));
-                polygon.setAttribute("stroke-width", stroke_width);
+                polygon_attrs["stroke"] = color(theme.polygon_stroke);
+                polygon_attrs["stroke-opacity"] = opacity(theme.polygon_stroke);
+                polygon_attrs["stroke-width"] = stroke_width;
             }
-            polygon.setAttribute("fill", color(theme.polygon_fill));
-            polygon.setAttribute("fill-opacity", opacity(theme.polygon_fill));
-            const points = pcset.to_array().map(
-                (x) => getPoint(x, pc_polygon_distance));
-            let d = `M ${points[0].x} ${points[0].y}`;
-            for ( let i = 1; i < points.length; i++ )
-                d += `L ${points[i].x} ${points[i].y}`;
-            if ( pcset.size > 2 ) d += " Z";
-            polygon.setAttribute("d", d);
+            const polygon = makeSvgPolygon(points, polygon_attrs);
             this.svg.appendChild(polygon);
-
         }
 
         // draw intervals
@@ -242,12 +237,10 @@ class StaticClockfaceView extends PcSetBaseView {
                 // set line properties
                 const p1 = getPoint(symmetry.a, distance);
                 const p2 = getPoint(symmetry.b, distance);
-                const line = document.createElementNS(SVGNS, "path");
-                line.setAttribute("stroke", color(theme.axis));
-                line.setAttribute("stroke-opacity", opacity(theme.axis));
-                line.setAttribute("stroke-width", stroke_width);
-                line.setAttribute("stroke-dasharray", `${dash_width} ${space_width}`);
-                line.setAttribute("d", `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y}`);
+                const line = makeSvgLine(p1.x, p1.y, p2.x, p2.y, { 
+                    "stroke": color(theme.axis), "stroke-opacity": opacity(theme.axis),
+                    "stroke-width": stroke_width, "stroke-dasharray": `${dash_width} ${space_width}` 
+                });
                 g_axes.appendChild(line);
             }
             this.svg.appendChild(g_axes);
@@ -343,13 +336,6 @@ class StaticRulerPcSetView extends PcSetBaseView {
 
         theme = PcSetBaseView.getTheme(theme);
 
-        function isAltered(pc) {
-            return [1,3,6,8,10].includes(pc);
-        }
-        function isNatural(pc) {
-            return !isAltered(pc);
-        }
-
         const v_center = row_height/2;
         const pc_diameter = row_height;
         const pc_radius = pc_diameter / 2;
@@ -360,7 +346,7 @@ class StaticRulerPcSetView extends PcSetBaseView {
         const last_pc = mod12(first_pc+11);
         const total_width = (options.double_row) 
                 ? (7*pc_diameter) + (6*pc_gap) + 
-                    ( isAltered(first_pc) || isAltered(last_pc) ? pc_diameter/2 : 0)
+                    ( isBlackKey(first_pc) || isBlackKey(last_pc) ? pc_diameter/2 : 0)
                 : (12*pc_diameter) + (11*pc_gap);
         const total_height = row_height + row_diff;
 
@@ -382,7 +368,7 @@ class StaticRulerPcSetView extends PcSetBaseView {
             const pc = mod12(first_pc+i);
             const g_pc = document.createElementNS(SVGNS, "g");
             const py = (options.double_row) 
-                ? ( isNatural(pc) ? v_center + row_diff : v_center )
+                ? ( isWhiteKey(pc) ? v_center + row_diff : v_center )
                 : v_center;
             const px = pc_radius + ( (options.double_row) 
                 ? ( double_row_factors_shifted[pc] * (pc_diameter+pc_gap) )
@@ -447,86 +433,6 @@ class StaticRulerPcSetView extends PcSetBaseView {
 }
 
 
-class MusicalNote {
-
-    #pitch = 0;
-    #accidental = 0;
-
-    constructor(pitch) { 
-        this.pitch = pitch;
-    }
-    get pitch() { return this.#pitch; }
-    set pitch(pitch) { 
-        if ( MusicalNote.#isNatural(MusicalNote.#class(pitch)) ) 
-            this.#accidental = 0;
-        else if ( pitch > this.#pitch )
-            this.#accidental = 1;
-        else
-            this.#accidental = -1;
-        this.#pitch = pitch;
-    }
-    static #class(pitch) { return pitch % 12; }
-    get class() { return MusicalNote.#class(this.#pitch); };
-    set class(pc) { this.pitch = pc + (12*this.octave); }
-    get accidental() { return this.#accidental; }
-    static #octave(pitch) { return Math.floor(pitch / 12); }
-    get octave() { return MusicalNote.#octave(this.#pitch); }
-    set octave(oct) { this.transposeOctaves(oct - this.octave); }
-    get note() {
-        if ( this.#accidental == 0 )
-            return ['C',null,'D',null,'E','F',null,'G',null,'A',null,'B'][this.class];
-        if ( this.#accidental == 1 )
-            return ["B♯","C♯","D","D♯","E","E♯","F♯","G","G♯","A","A♯","B"][this.class];
-        if ( this.#accidental == -1 )
-            return ["C","D♭","D","E♭","F♭","F","G♭","G","A♭","A","B♭","C♭"][this.class];
-    }
-    static #diatonicIndex(pitch, accidental = 0) {
-        const pc = MusicalNote.#class(pitch);
-        const octave_offset = 7 * MusicalNote.#octave(pitch);
-        if ( accidental == 1 )
-            return [-1,0,1,1,2,2,3,4,4,5,5,6][pc] + octave_offset;
-        if ( accidental == -1 )
-            return [0,1,1,2,3,3,4,4,5,5,6,7][pc] + octave_offset;
-        return [0,0,1,1,2,3,3,4,4,5,5,6][pc] + octave_offset;
-    }
-    get diatonicIndex() {
-        return MusicalNote.#diatonicIndex(this.#pitch, this.#accidental);
-    }
-    transpose(semitones) { this.pitch += semitones; }
-    transposeOctaves(octaves) { this.pitch += 12*octaves; }
-    static #isNatural(pc) { return [0,2,4,5,7,9,11].includes(pc); }
-    isNatural() { return MusicalNote.#isNatural(this.class); }
-    makeNatural() {
-        if ( this.isNatural() )
-            this.#accidental = 0;
-        else
-            this.transpose(-this.#accidental);
-    }
-    swapAccidental() {
-        if ( this.#accidental == 0 )
-            this.#accidental = [1,0,0,0,-1,1,0,0,0,0,0,-1];
-        else
-            this.#accidental *= -1;
-    }
-    staffPosition(clef = "G2") {
-        clef = clef.toUpperCase();
-        if ( clef == "G" ) clef = "G2";
-        if ( clef == "F" ) clef = "F4";
-        if ( clef == "C" ) clef = "C3";
-        const clef_line = parseInt(clef[1]);
-        let clef_index;
-        switch ( clef[0] ) {
-            case "G": clef_index = MusicalNote.#diatonicIndex(67); break;
-            case "F": clef_index = MusicalNote.#diatonicIndex(53); break;
-            case "C": clef_index = MusicalNote.#diatonicIndex(60);
-        }
-        const delta = this.diatonicIndex - clef_index;
-        return (clef_line*2) + delta;
-    }
-
-}
-
-
 class StaticStaffPcSetView extends PcSetBaseView {
 
     /**
@@ -548,11 +454,9 @@ class StaticStaffPcSetView extends PcSetBaseView {
         
         theme = PcSetBaseView.getTheme(theme);
 
-        const notes = pcset.to_array().map((x) =>
+        let notes = pcset.to_array().map((x) =>
             new MusicalNote( (x >= pcset.head) ? x : x+12 ));
-
-        function isAltered(pc) { return [1,3,6,8,10].includes(pc) }
-        function isNatural(pc) { return !isAltered(pc) }
+        const size = pcset.size;
 
         const clef_str = (options.clef) ? options.clef : "G2";
         const clef_type = clef_str[0].toUpperCase();
@@ -565,30 +469,29 @@ class StaticStaffPcSetView extends PcSetBaseView {
         const note_height = scale * notehead.h;
         const staff_spacing = scale * 44.646;
         const staff_line_width = scale * 4.910;
+        const supplemental_line_width = staff_line_width * 1.5;
         const staff_height = staff_spacing * 5;
-        const staff_min_y_margin = note_height * 2;
+        const staff_min_y_margin = note_height * 3;
         const clef_margin_left = staff_spacing;
         const clef_margin_right = clef_margin_left * 2;
         const clef_width = scale * clef_data.w;
         const clef_height = scale * clef_data.h;
         const note_margin = staff_spacing*1.3;
-        const accidental_margin = note_width / 4;
+        const accidental_margin = note_width / 3;
         const clef_y_offset = (scale * clef_data.y) + (staff_spacing * clef_translate);
         const staff_y_offset = Math.max((staff_spacing/2) - clef_y_offset, staff_min_y_margin);
         const clef_y = clef_y_offset + staff_y_offset;
         const staff_bottom_margin = Math.max(staff_min_y_margin - staff_spacing, clef_height - staff_height + clef_y_offset);
         const height = staff_height + staff_y_offset + staff_bottom_margin;
-        const accidentals_count = notes.reduce((sum,x) => sum + (x.isNatural() ? 0 : 1), 0);
+        const black_key_count = notes.reduce((sum,note) => sum + (note.isBlackKey() ? 1 : 0), 0);
         let width = clef_margin_left + clef_width + clef_margin_right 
-                + (pcset.size * (note_width + note_margin)) + note_margin
-                + (accidentals_count * (scale * SVG_PATHS_ACCIDENTALS["s"].w + accidental_margin - (note_margin/3)));
+                + (size * (note_width + note_margin)) + note_margin
+                + (black_key_count * (scale * SVG_PATHS_ACCIDENTALS["s"].w + accidental_margin - (note_margin/3)));
 
         // create root svg element
         this.svg = document.createElementNS(SVGNS, "svg");
         this.svg.setAttribute("version", "1.1");
-        //this.svg.setAttribute("width", width.toString());
         this.svg.setAttribute("height", height.toString());
-        //this.svg.setAttribute("viewbox", [0,0,width,height].join(" "));
         this.svg.setAttribute("xmlns", SVGNS);
 
         if ( options.fn ) options.fn(this.svg, "svg", 0);
@@ -596,17 +499,13 @@ class StaticStaffPcSetView extends PcSetBaseView {
         // draw staff
         const staff_g = document.createElementNS(SVGNS, "g");
         for ( let i = 0; i < 5; i++ ) {
-            const line = document.createElementNS(SVGNS, "line");
             const y = staff_y_offset + (staff_spacing * i);
-            line.setAttribute("x1", 0);
-            line.setAttribute("y1", y);
-            //line.setAttribute("x2", width);
-            line.setAttribute("y2", y);
-            line.setAttribute("stroke", theme.fg);
-            line.setAttribute("stroke-width", staff_line_width);
+            const line = makeSvgLine(0, y, 0, y, {"stroke-width": staff_line_width, "stroke": color(theme.axis)});
             staff_g.appendChild(line);
+            if ( options.fn ) options.fn(line, "staff_line", i);
         }
         this.svg.appendChild(staff_g);
+        if ( options.fn ) options.fn(staff_g, "staff", 0);
 
         // draw clef
         const clef = document.createElementNS(SVGNS, "path");
@@ -614,16 +513,170 @@ class StaticStaffPcSetView extends PcSetBaseView {
         clef.setAttribute("d", clef_data.d);
         clef.setAttribute("transform", `translate(${clef_margin_left} ${clef_y}),scale(${scale})`);
         this.svg.appendChild(clef);
+        if ( options.fn ) options.fn(clef, "clef", 0);
 
-        if ( pcset.size > 0 ) {
+        if ( size > 0 ) {
 
-            // calculate notes
-            while ( notes[0].staffPosition(clef_str) < 0 )
-                notes[0].transposeOctaves(1);
+            // Compute best note distribution.
+            // The algorithms here are a real mess... but they work.
+
+            const BCEF = [0,4,5,11];
+            const last = size-1;
+
+            function makeIntervalGood(note, other) {
+                const interval = new Interval(note, other);
+                if ( ! ['P','M','m'].includes(interval.quality) )
+                    note.swapAccidental();
+                if ( size < 7 && ! ['P','M','m'].includes(interval.quality) )
+                    other.swapAccidental();
+            }
+
+            function makeIntervalGoodExceptBCEF(note, other, try_other = false) {
+                const interval = new Interval(note, other);
+                if ( !BCEF.includes(note.class) || note.isAltered() )
+                    if ( ! ['P','M','m'].includes(interval.quality) )
+                        note.swapAccidental();
+                if ( try_other )
+                    if ( !BCEF.includes(other.class) || other.isAltered() )
+                        if ( ! ['P','M','m'].includes(interval.quality) )
+                            other.swapAccidental();
+            }
+
+            function makeNotesDifferent(note, other) {
+                if ( note.diatonic_class == other.diatonic_class )
+                    note.swapAccidental();
+            }
+
+            function makeNoteBeAbove(note, other) {
+                if ( note.pitch > other.pitch && note.diatonic_index < other.diatonic_index )
+                    note.swapAccidental();
+            }
+
+            function getBestNotesVersion(v1, v2) {
+                // Avoid repeated notes
+                let same_note_count1 = pairwise(v1, true).filter(
+                    (pair) => ( pair[1].diatonic_class == pair[0].diatonic_class )
+                ).length;
+                let same_note_count2 = pairwise(v2, true).filter(
+                    (pair) => ( pair[1].diatonic_class == pair[0].diatonic_class )
+                ).length;
+                // Avoid augmented and diminished intervals
+                let aug_dim_count1 = pairwise(v1).filter(
+                    (pair) => ( ! new Interval(pair[0], pair[1]).isPMm() )
+                ).length;
+                let aug_dim_count2 = pairwise(v2).filter(
+                    (pair) => ( ! new Interval(pair[0], pair[1]).isPMm() )
+                ).length;
+                // Avoid unnecessary accidentals
+                const acc_count1 = v1.filter( (note) => note.isAltered() ).length;
+                const acc_count2 = v2.filter( (note) => note.isAltered() ).length;
+                // Avoid explicit naturals
+                const nat_count1 = pairwise(v1).filter(
+                    (pair) => pair[0].diatonic_index == pair[1].diatonic_index
+                        && pair[0].isAltered() && pair[1].isNatural()
+                ).length;
+                const nat_count2 = pairwise(v2).filter(
+                    (pair) => pair[0].diatonic_index == pair[1].diatonic_index
+                        && pair[0].isAltered() && pair[1].isNatural()
+                ).length;
+                // Avoid altered BCEF
+                let alt_bcef_count1 = v1.filter(
+                    (note) => BCEF.includes(note.class) && note.isAltered()
+                ).length;
+                let alt_bcef_count2 = v2.filter(
+                    (note) => BCEF.includes(note.class) && note.isAltered()
+                ).length;
+
+                // Change weights in some cases
+                if ( size < 8 ) {
+                    same_note_count1 *= 6;
+                    same_note_count2 *= 6;
+                }
+                if ( size < 7 ) {
+                    aug_dim_count1 *= 3;
+                    aug_dim_count2 *= 3;
+                    if ( size > 4 ) {
+                        alt_bcef_count1 *= 3;
+                        alt_bcef_count2 *= 3;
+                    }
+                }
+
+                const total1 = same_note_count1 + aug_dim_count1 + acc_count1 + nat_count1 + alt_bcef_count1;
+                const total2 = same_note_count2 + aug_dim_count2 + acc_count2 + nat_count2 + alt_bcef_count2;
+                return ( total1 <= total2 ) ? v1 : v2;
+            }
+
+            const hasTwoConsecutiveSemitones = pairwise(pairwise(notes)).some(
+                (pair) => new Interval(pair[0][0], pair[0][1]).semitones == 1
+                       && new Interval(pair[1][0], pair[1][1]).semitones == 1
+            );
+
+            if ( !hasTwoConsecutiveSemitones && size < 8 ) {
+
+                const notesv1 = cloneMusicalNoteArray(notes);
+                for ( const pair of pairwise(notesv1) )
+                    makeIntervalGood(pair[1], pair[0]);
+                makeNotesDifferent(notesv1[last], notesv1[0]);
+                notesv1[last].lock();
+                for ( const pair of pairwise(notesv1).reverse() ) {
+                    makeNotesDifferent(pair[1], pair[0]);
+                    makeNoteBeAbove(pair[1], pair[0]);
+                }
+                makeNotesDifferent(notesv1[last], notesv1[0]);
+
+                const notesv2 = cloneMusicalNoteArray(notesv1);
+                notesv2.forEach( (note) => note.swapAccidental() );
+                for ( const pair of pairwise(notesv2) )
+                    makeIntervalGood(pair[1], pair[0]);
+                makeNotesDifferent(notesv2[0], notesv2[last]);
+                for ( const pair of pairwise(notesv2.slice(1)).reverse() ) {
+                    makeNotesDifferent(pair[1], pair[0]);
+                    makeNoteBeAbove(pair[1], pair[0]);
+                }
+                makeNotesDifferent(notesv2[last], notesv2[0]);
+
+                const notesv3 = cloneMusicalNoteArray(notes);
+                for ( const pair of pairwise(notesv3) )
+                    makeIntervalGoodExceptBCEF(pair[1], pair[0], true);
+                makeNotesDifferent(notesv3[last], notesv3[0]);
+                notesv3[last].lock();
+                for ( const pair of pairwise(notesv3).reverse() ) {
+                    makeIntervalGoodExceptBCEF(pair[0], pair[1]);
+                    makeNotesDifferent(pair[1], pair[0]);
+                    makeNoteBeAbove(pair[1], pair[0]);
+                }
+                makeNotesDifferent(notesv3[last], notesv3[0]);
+
+                notes = getBestNotesVersion(notesv1, notesv2);
+                notes = getBestNotesVersion(notes, notesv3);;
+
+            } else {
+
+                // Algorithm : try to avoid aug/dim intervals while
+                // keeping BCEF intact.
+                if ( BCEF.includes(notes[0].class) ) notes[0].lock();
+                for ( const pair of pairwise(notes) )
+                    makeIntervalGoodExceptBCEF(pair[1], pair[0]);
+                for ( const pair of pairwise(notes).reverse() )
+                    makeIntervalGoodExceptBCEF(pair[0], pair[1]);
+
+            }
+
+            const staff_center = ( clef_str == "G2" ) ? 5.5 : 6;
+            function computeMean() {
+                return (notes[0].staffPosition(clef_str) + notes[last].staffPosition(clef_str)) / 2;
+            }
+            let mean = Math.abs(staff_center - computeMean());
+            let min = mean;
+            notes.forEach( (note) => note.unlock() );
+            while ( mean <= min ) {
+                min = mean;
+                notes.forEach( (note) => note.transposeOctaves(1) );
+                mean = Math.abs(staff_center - computeMean());
+            }
             for ( const note of notes ) {
-                while ( note.pitch < notes[0].pitch )
-                    note.transposeOctaves(1);
-                if ( options.flats && note.accidental == 1 )
+                note.transposeOctaves(-1);
+                if ( options.accidental_swap && options.accidental_swap.includes(note.class) )
                     note.swapAccidental();
             }
 
@@ -633,40 +686,46 @@ class StaticStaffPcSetView extends PcSetBaseView {
             let x = clef_margin_left + clef_width + clef_margin_right;
             let previous_note = notes[0];
             for ( const note of notes ) {
+                const this_note_g = document.createElementNS(SVGNS, "g");
                 const note_element = document.createElementNS(SVGNS, "path");
                 note_element.setAttribute("fill", theme.fg);
                 note_element.setAttribute("d", notehead.d);
                 const pos = note.staffPosition(clef_str) / 2;
                 const y = staff_y_offset + staff_height - (pos * staff_spacing) - (note_height / 2);
-                if ( note.accidental != 0 || (previous_note.diatonicIndex == note.diatonicIndex && previous_note.accidental != 0) ) {
+                if ( note.isAltered() || (previous_note.diatonic_index == note.diatonic_index && previous_note.isAltered() ) ) {
                     // draw accidental
                     x -= (note_margin/3);
                     const acc_data = SVG_PATHS_ACCIDENTALS[note.accidental == 1 ? "s" : note.accidental == -1 ? "f" : "n"];
-                    const accidental = document.createElementNS(SVGNS, "path");
-                    accidental.setAttribute("fill", theme.fg);
-                    accidental.setAttribute("d", acc_data.d);
+                    const acc_symbol = document.createElementNS(SVGNS, "path");
+                    acc_symbol.setAttribute("fill", theme.fg);
+                    acc_symbol.setAttribute("d", acc_data.d);
                     const acc_y = staff_y_offset + staff_height - (pos * staff_spacing) - (acc_data.h * scale / 2) + (acc_data.y * scale);
-                    accidental.setAttribute("transform", `translate(${x} ${acc_y}),scale(${scale})`);
+                    acc_symbol.setAttribute("transform", `translate(${x} ${acc_y}),scale(${scale})`);
                     x += (acc_data.w * scale) + accidental_margin;
-                    notes_g.appendChild(accidental);
+                    this_note_g.appendChild(acc_symbol);
                     previous_note = note;
+                    if ( options.fn ) options.fn(acc_symbol, "accidental", note.accidental);
                 }
                 if ( pos <= 0 || pos >= 6 ) {
                     for ( let j = (pos <= 0 ? 0 : 6); pos <= 0 ? j >= pos : j <= pos; pos <= 0 ? j-- : j++ ) {
                         // draw supplemental line
-                        const line = document.createElementNS(SVGNS, "line");
                         const y = staff_y_offset + (staff_spacing * (5-j));
-                        line.setAttribute("x1", x - (note_margin/4));
-                        line.setAttribute("y1", y);
-                        line.setAttribute("x2", x + (notehead.w*scale) + (note_margin/4));
-                        line.setAttribute("y2", y);
-                        line.setAttribute("stroke", theme.fg);
-                        line.setAttribute("stroke-width", staff_line_width);
-                        notes_g.appendChild(line);
+                        const line = makeSvgLine(
+                            x - (note_margin/4), y, 
+                            x + (notehead.w*scale) + (note_margin/4), y,
+                            { "stroke": color(theme.axis), "stroke-width": supplemental_line_width }
+                        );
+                        this_note_g.appendChild(line);
                     }
                 }
                 note_element.setAttribute("transform", `translate(${x} ${y}),scale(${scale})`);
-                notes_g.appendChild(note_element);
+                this_note_g.appendChild(note_element);
+                notes_g.appendChild(this_note_g);
+                if ( options.fn ) {
+                    options.fn(note_element, "notehead", note.class);
+                    options.fn(this_note_g, "note", note.class);
+                }
+
                 x += note_width + note_margin;
                 width = x + (staff_spacing / 2);
             }
@@ -674,6 +733,42 @@ class StaticStaffPcSetView extends PcSetBaseView {
             this.svg.appendChild(notes_g);
 
         }    
+
+        // draw barline
+        if ( options.barline && options.barline != "none" ) {
+            width += staff_spacing / 2;
+            const barline_g = document.createElementNS(SVGNS, "g");
+            const thin_barline_width = staff_spacing * 0.18;
+            const barline_gap = staff_spacing * 0.37;
+            //width += note_margin / 2;
+
+            function drawBarline(x, stroke_width) {
+                const barline = makeSvgLine(
+                    x, staff_y_offset - (staff_line_width / 2), 
+                    x, staff_y_offset + (staff_spacing * 4) + (staff_line_width / 2), 
+                    { "stroke": color(theme.fg), "stroke-width": stroke_width }
+                );
+                barline_g.appendChild(barline);
+            }
+
+            switch ( options.barline ) {
+                case "single":
+                    drawBarline(width - (thin_barline_width / 2), thin_barline_width);
+                    break;
+                case "double":
+                    drawBarline(width - (thin_barline_width / 2), thin_barline_width);
+                    width += barline_gap + thin_barline_width;
+                    drawBarline(width - (thin_barline_width / 2), thin_barline_width);
+                    break;
+                case "final":
+                    drawBarline(width - (thin_barline_width / 2), thin_barline_width);
+                    const strong_barline_width = staff_spacing * 0.55;
+                    width += barline_gap + strong_barline_width;
+                    drawBarline(width - (strong_barline_width / 2), strong_barline_width);
+                    break;                
+            }
+            this.svg.appendChild(barline_g);
+        }
         
         // adjust width
         for ( const line of staff_g.childNodes )
@@ -699,6 +794,34 @@ class StaticStaffPcSetView extends PcSetBaseView {
 
 
 // UTILITY FUNCTIONS
+
+
+function makeSvgLine(x1, y1, x2, y2, attributes) {
+    const line = document.createElementNS(SVGNS, "line");
+    line.setAttribute("x1", x1);
+    line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", y2);
+    for ( const attr of Object.entries(attributes) )
+        line.setAttribute(attr[0], attr[1]);
+    return line;
+}
+
+
+function makeSvgPolygon(points, attributes) {
+    const count = points.length;
+    const polygon = document.createElementNS(SVGNS, "path");
+    let d = `M ${points[0].x} ${points[0].y}`;
+    if ( count > 1 ) {
+        for ( let i = 1; i < count; i++ )
+            d += ` L ${points[i].x} ${points[i].y}`;
+        if ( count > 2 ) d += " Z";
+        polygon.setAttribute("d", d);
+        for ( const attr of Object.entries(attributes) )
+            polygon.setAttribute(attr[0], attr[1]);
+    }
+    return polygon;
+}
 
 
 function decodeNamedColor(str) {

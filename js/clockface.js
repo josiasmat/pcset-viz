@@ -296,21 +296,35 @@ function drawPolygon() {
         state.polygon = normal_array;
     } else if ( state.last_op == null ) {
         // No operation
+        const size = state.pcset.size;
         let array = Array.from(normal_array);
-        let new_polygon = [];
-        for ( let pc of state.polygon ) {
-            const next = nearest_index(pc, array);
-            new_polygon.push(array[next]);
-            array.splice(next, 1)
+        let new_polygon = Array(size).fill(null);
+        // Keep same pcs
+        for ( let i = 0; i < size; i++ ) {
+            const pc = state.polygon[i];
+            const found = array.indexOf(pc);
+            if ( found != -1 ) {
+                new_polygon[i] = pc;
+                array.splice(found, 1);
+            }
+        }
+        // Move different pcs
+        for ( let i = 0; i < size; i++ ) {
+            if ( new_polygon[i] == null ) {
+                const pc = normal_array[i];
+                const next = nearest_index(pc, array);
+                new_polygon[i] = array[next];
+                array.splice(next, 1);
+            }
         }
         state.polygon = new_polygon;
-    } else if ( state.last_op[0] == "T" ) {
+    } else if ( state.last_op[0] == "Tn" ) {
         // Transposition operation
         const tr = (state.last_op[1] <= 6) 
             ? state.last_op[1] 
             : state.last_op[1]-12;
         state.polygon = state.polygon.map((x) => mod12(x+tr));
-    } else if ( state.last_op[0] == "I" ) {
+    } else if ( ["In","TnI"].includes(state.last_op[0]) ) {
         // Inversion operation
         const ix = state.last_op[1];
         state.polygon = state.polygon.map((x) => mod12(ix-x));
