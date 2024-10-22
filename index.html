@@ -165,418 +165,410 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                     </tbody>
                 </table>
             </div>
-            <div id="popup-about" class="popup-outer-container" style="display: none;">
-                <div class="popup-inner-container">
-                    <div class="popup-header">
-                        <span class="popup-title">ABOUT</span>
-                        <a class="close-button" href="javascript:hidePopup('popup-about')">&#128473;</a>
-                    </div>
-                    <div class="popup-main">
-                        <b>Pitch-Class Set Visualizer, version <span id="version-number"></span></b>.<br />
-                        Licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">GNU Affero General Public License version 3</a>.<br />
-                        &#169;&nbsp;2024 Josias Matschulat.<br /><br />
-                        Descriptive names by Larry Solomon, &#169;&nbsp;1997, 2005.
-                    </div>
+            <dialog id="popup-about" class="popup-container">
+                <div class="popup-header">
+                    <span class="popup-title">ABOUT</span>
+                    <a class="close-button" href="javascript:hidePopup('popup-about')" autofocus>&#128473;</a>
                 </div>
-            </div>
-            <div id="popup-set-selector" class="popup-outer-container" style="display: none;">
-                <div class="popup-inner-container">
-                    <div class="popup-header">
-                        <span class="popup-title">SET SELECTOR</span>
-                        <a class="close-button" href="javascript:hidePopup('popup-set-selector')">&#128473;</a>
+                <div class="popup-main">
+                    <b>Pitch-Class Set Visualizer, version <span id="version-number"></span></b>.<br />
+                    Licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">GNU Affero General Public License version 3</a>.<br />
+                    &#169;&nbsp;2024 Josias Matschulat.<br /><br />
+                    Descriptive names by Larry Solomon, &#169;&nbsp;1997, 2005.
+                </div>
+            </dialog>
+            <dialog id="popup-set-selector" class="popup-container">
+                <div class="popup-header">
+                    <span class="popup-title">SET SELECTOR</span>
+                    <a class="close-button" href="javascript:hidePopup('popup-set-selector')">&#128473;</a>
+                </div>
+                <div class="popup-main">
+                    <table id="table-set-selector">
+                        <tbody>
+                            <tr>
+                                <th>Type</th>
+                                <th id="popup-set-selector-second-column-header">Sets</th>
+                            </tr>
+                            <tr id="table-set-row-filter">
+                                <td><label for="input-set-filter" i18n="input-set-filter">Filter:</label></td>
+                                <td><input id="input-set-filter" type="text" autofocus></td>
+                            </tr>
+                            <tr>
+                                <td>Dyads:</td>
+                                <td id="table-set-row2"></td>
+                            </tr>
+                            <tr>
+                                <td>Trichords:</td>
+                                <td id="table-set-row3"></td>
+                            </tr>
+                            <tr>
+                                <td>Tetrachords:</td>
+                                <td id="table-set-row4"></td>
+                            </tr>
+                            <tr>
+                                <td>Pentachords:</td>
+                                <td id="table-set-row5"></td>
+                            </tr>
+                            <tr>
+                                <td>Hexachords:</td>
+                                <td id="table-set-row6"></td>
+                            </tr>
+                            <tr>
+                                <td>Heptachords:</td>
+                                <td id="table-set-row7"></td>
+                            </tr>
+                            <tr>
+                                <td>Octachords:</td>
+                                <td id="table-set-row8"></td>
+                            </tr>
+                            <tr>
+                                <td>Nonachords:</td>
+                                <td id="table-set-row9"></td>
+                            </tr>
+                            <tr>
+                                <td>Decachords:</td>
+                                <td id="table-set-row10"></td>
+                            </tr>
+                            <tr>
+                                <td>Others:</td>
+                                <td id="table-set-row0"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </dialog>
+            <dialog id="popup-config" class="popup-container">
+                <div class="popup-header">
+                    <span class="popup-title">OPTIONS</span>
+                    <a class="close-button" href="javascript:hidePopup('popup-config')">&#128473;</a>
+                </div>
+                <div class="popup-main">
+                    <table id="popup-config-table">
+                        <tbody>
+                            <tr>
+                                <td>Visible data:<br />
+                                    (<a href="javascript:resetVisibleDataRows()" autofocus>Reset</a>)
+                                </td>
+                                <td id="visible-data-checkboxes-area"></td>
+                            </tr>
+                            <tr>
+                                <td>Set format:</td>
+                                <td>
+                                    <span>
+                                        <input id="radio-setformat-short-ab" type="radio" name="set-format" value="short-ab" onchange="onChange()" checked>
+                                        <label for="radio-setformat-short-ab">[012…9AB]</label>
+                                    </span>
+                                    <span>
+                                        <input id="radio-setformat-short-te" type="radio" name="set-format" value="short-te" onchange="onChange()">
+                                        <label for="radio-setformat-short-te">[012…9TE]</label>
+                                    </span>
+                                    <span>
+                                        <input id="radio-setformat-numbers" type="radio" name="set-format" value="numbers" onchange="onChange()">
+                                        <label for="radio-setformat-numbers">[0,1,2,…,9,10,11]</label>
+                                    </span>
+                                    <span>
+                                        <input id="radio-setformat-notes-sharps" type="radio" name="set-format" value="notes-sharps" onchange="onChange()">
+                                        <label for="radio-setformat-notes-sharps">[C,C&#9839;,D,…,A,A&#9839;,B]</label>
+                                    </span>
+                                    <span>
+                                        <input id="radio-setformat-notes-flats" type="radio" name="set-format" value="notes-flats" onchange="onChange()">
+                                        <label for="radio-setformat-notes-flats">[C,D&#9837;,D,…,A,B&#9837;,B]</label>
+                                    </span>
+                                    <span class="keyboard-shortcut" style="float: inline-end;">(Alt+F)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Vector format:</td>
+                                <td>
+                                    <span>
+                                        <input id="radio-vectorformat-short" type="radio" name="vector-format" value="short" onchange="onChange()" checked>
+                                        <label for="radio-vectorformat-short">&lt;254361&gt;</label>
+                                    </span>
+                                    <span>
+                                        <input id="radio-vectorformat-long" type="radio" name="vector-format" value="long" onchange="onChange()">
+                                        <label for="radio-vectorformat-long">&lt;2,5,4,3,6,1&gt;</label>
+                                    </span>
+                                    <span class="keyboard-shortcut" style="float: inline-end;">(Alt+V)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Inversion format:</td>
+                                <td>
+                                    <span>
+                                        <input id="radio-inversionformat-in" type="radio" name="inversion-format" value="In" onchange="onChange()" checked>
+                                        <label for="radio-inversionformat-in">Simple (I<sub>n</sub>)</label>
+                                    </span>
+                                    <span>
+                                        <input id="radio-inversionformat-tni" type="radio" name="inversion-format" value="TnI" onchange="onChange()">
+                                        <label for="radio-inversionformat-tni">Compound (T<sub>n</sub>I)</label>
+                                    </span>
+                                    <span class="keyboard-shortcut" style="float: inline-end;">(Alt+I)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Clockface visualization:</td>
+                                <td>
+                                    <span>
+                                        <input id="chk-note-names" type="checkbox" onchange="onChange()">
+                                        <label for="chk-note-names">Show note names instead of numbers <span class="keyboard-shortcut">(Alt+N)<span></label>
+                                    </span>
+                                    <span>
+                                        <input id="chk-polygon" type="checkbox" onchange="onChange()">
+                                        <label for="chk-polygon">Show set geometry <span class="keyboard-shortcut">(Alt+G)</span></label>
+                                    </span>
+                                    <span>
+                                        <input id="chk-sym-axes" type="checkbox" onchange="onChange()">
+                                        <label for="chk-sym-axes">Show symmetry axes <span class="keyboard-shortcut">(Alt+S)</span></label>
+                                    </span>
+                                    <span>
+                                        <input id="chk-fifths" type="checkbox" onchange="onChange()">
+                                        <label for="chk-fifths">Circle of fifths <span class="keyboard-shortcut">(Alt+5)</span></label>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>App layout:</td>
+                                <td>
+                                    <span>
+                                        <input id="radio-svg-first" type="radio" name="div-layout" value="svg-first" onchange="onChange()" checked>
+                                        <label for="radio-svg-first">Clockface visualization first</label>
+                                    </span>
+                                    <span>
+                                        <input id="radio-data-first" type="radio" name="div-layout" value="data-first" onchange="onChange()">
+                                        <label for="radio-data-first">Data table first</label>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Theme:</td>
+                                <td>
+                                    <span>
+                                        <input id="radio-theme-auto" type="radio" name="theme" value="auto" onchange="onChange()" checked>
+                                        <label for="radio-theme-auto">Use system theme</label>
+                                    </span>
+                                    <span>
+                                        <input id="radio-theme-light" type="radio" name="theme" value="light" onchange="onChange()">
+                                        <label for="radio-theme-light">Light theme</label>
+                                    </span>
+                                    <span>
+                                        <input id="radio-theme-dark" type="radio" name="theme" value="dark" onchange="onChange()">
+                                        <label for="radio-theme-dark">Dark theme</label>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </dialog>
+            <dialog id="popup-export-image" class="popup-container">
+                <div class="popup-header">
+                    <span class="popup-title">EXPORT IMAGE</span>
+                    <a class="close-button" href="javascript:hidePopup('popup-export-image')">&#128473;</a>
+                </div>
+                <div class="popup-main">
+                    <div id="popup-export-preview">
+                        <span></span>
                     </div>
-                    <div class="popup-main">
-                        <table id="table-set-selector">
+                    <div id="popup-export-options">
+                        <table>
                             <tbody>
                                 <tr>
-                                    <th>Type</th>
-                                    <th id="popup-set-selector-second-column-header">Sets</th>
-                                </tr>
-                                <tr id="table-set-row-filter">
-                                    <td><label for="input-set-filter" i18n="input-set-filter">Filter:</label></td>
-                                    <td><input id="input-set-filter" type="text""></td>
-                                </tr>
-                                <tr>
-                                    <td>Dyads:</td>
-                                    <td id="table-set-row2"></td>
+                                    <td><label for="expimg-select-type">Type:</label></td>
+                                    <td><select name="expimg-type" id="expimg-select-type" onchange="updateImageExportPopup()" autofocus>
+                                        <option value="clockface-set">Clockface (set)</option>
+                                        <option value="clockface-intervals">Clockface (intervals)</option>
+                                        <option value="ruler-set">Ruler (set)</option>
+                                        <option value="staff-set">Staff (set)</option>
+                                    </select></td>
                                 </tr>
                                 <tr>
-                                    <td>Trichords:</td>
-                                    <td id="table-set-row3"></td>
+                                    <td>Elements:</td>
+                                    <td id="expimg-elements-area">
+                                        <span includetype="clockface-intervals">
+                                            <input id="chk-export-ic1" type="checkbox" onchange="updateImageExportPopup()">
+                                            <label for="chk-export-ic1">IC1</label>
+                                        </span>
+                                        <span includetype="clockface-intervals">
+                                            <input id="chk-export-ic2" type="checkbox" onchange="updateImageExportPopup()">
+                                            <label for="chk-export-ic2">IC2</label>
+                                        </span>
+                                        <span includetype="clockface-intervals">
+                                            <input id="chk-export-ic3" type="checkbox" onchange="updateImageExportPopup()">
+                                            <label for="chk-export-ic3">IC3</label>
+                                        </span>
+                                        <span includetype="clockface-intervals">
+                                            <input id="chk-export-ic4" type="checkbox" onchange="updateImageExportPopup()">
+                                            <label for="chk-export-ic4">IC4</label>
+                                        </span>
+                                        <span includetype="clockface-intervals">
+                                            <input id="chk-export-ic5" type="checkbox" onchange="updateImageExportPopup()">
+                                            <label for="chk-export-ic5">IC5</label>
+                                        </span>
+                                        <span includetype="clockface-intervals">
+                                            <input id="chk-export-ic6" type="checkbox" onchange="updateImageExportPopup()">
+                                            <label for="chk-export-ic6">IC6</label>
+                                        </span>
+                                        <span includetype="clockface-set clockface-intervals ruler-set">
+                                            <input id="chk-export-note-names" type="checkbox" onchange="updateImageExportPopup()">
+                                            <label for="chk-export-note-names">Note names instead of numbers</label>
+                                        </span>
+                                        <span includetype="clockface-set">
+                                            <input id="chk-export-polygon" type="checkbox" onchange="updateImageExportPopup()">
+                                            <label for="chk-export-polygon">Set geometry</label>
+                                        </span>
+                                        <span includetype="clockface-set">
+                                            <input id="chk-export-sym-axes" type="checkbox" onchange="updateImageExportPopup()">
+                                            <label for="chk-export-sym-axes">Symmetry axes</label>
+                                        </span>
+                                        <span includetype="clockface-set clockface-intervals">
+                                            <input id="chk-export-fifths" type="checkbox" onchange="updateImageExportPopup()">
+                                            <label for="chk-export-fifths">Circle of fifths</label>
+                                        </span>
+                                        <span includetype="ruler-set">
+                                            <input id="chk-export-double-row" type="checkbox" onchange="updateImageExportPopup()">
+                                            <label for="chk-export-double-row">Double row (as in a keyboard)</label>
+                                        </span>
+                                        <span includetype="staff-set" style="padding-right: 0.5ch;">
+                                            <label for="expimg-select-staff-clef">Clef:</label>
+                                            <select name="expimg-staff-clef" id="expimg-select-staff-clef" onchange="updateImageExportPopup()">
+                                                <option value="G2">Treble</option>
+                                                <option value="C3">Alto</option>
+                                                <option value="C4">Tenor</option>
+                                                <option value="F4">Bass</option>
+                                            </select> 
+                                        </span>
+                                        <span includetype="staff-set" style="padding-right: 0.5ch;">
+                                            <label for="expimg-select-staff-notehead">Notehead:</label>
+                                            <select name="expimg-staff-notehead" id="expimg-select-staff-notehead" onchange="updateImageExportPopup()">
+                                                <option value="q">Quarter</option>
+                                                <option value="h">Half</option>
+                                                <option value="w">Whole</option>
+                                            </select> 
+                                        </span>
+                                        <span includetype="staff-set">
+                                            <label for="expimg-select-staff-barline">Barline:</label>
+                                            <select name="expimg-staff-barline" id="expimg-select-staff-barline" onchange="updateImageExportPopup()">
+                                                <option value="">None</option>
+                                                <option value="single">Single</option>
+                                                <option value="double">Double</option>
+                                                <option value="final">Final</option>
+                                            </select> 
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr includetype="staff-set">
+                                    <td><label for="expimg-select-staff-clef">Shift:</label></td>
+                                    <td>
+                                        <a id="expimg-staff-shiftup-link" href="javascript:exportStaffShiftNotes(-1)">▼ Down</a> • 
+                                        <a id="expimg-staff-shiftdown-link" href="javascript:exportStaffShiftNotes(1)">Up ▲</a>
+                                    </td>
+                                </tr>                                    
+                                <tr>
+                                    <td><label for="expimg-select-theme">Theme:</label></td>
+                                    <td>
+                                        <span excludetype="staff-set" style="padding-right: 0.5ch;">
+                                            <select name="expimg-theme" id="expimg-select-theme" onchange="updateImageExportPopup()">
+                                                <option value="basic">Basic</option>
+                                                <option value="hard">Hard</option>
+                                                <option value="soft">Soft</option>
+                                            </select> 
+                                        </span>
+                                        <span style="padding-right: 0.5ch;">
+                                            <label for="expimg-select-theme-color">Color:</label>
+                                            <select name="expimg-theme-color" id="expimg-select-theme-color" onchange="updateImageExportPopup()">
+                                                <option value="">None</option>
+                                                <option value="-red">Red</option>
+                                                <option value="-green">Green</option>
+                                                <option value="-blue">Blue</option>
+                                            </select>
+                                        </span>
+                                        <span>
+                                            <label for="expimg-select-theme-bg">Background:</label>
+                                            <select name="expimg-theme-bg" id="expimg-select-theme-bg" onchange="updateImageExportPopup()">
+                                                <option value="light">Light</option>
+                                                <option value="dark">Dark</option>
+                                            </select>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr includetype="ruler-set">
+                                    <td><label for="expimg-first-pc">Start at:</label></td>
+                                    <td>
+                                        <span class="range-label">0</span>
+                                        <input type="range" id="expimg-first-pc" name="expimg-first-pc" oninput="updateImageExportPopup()" 
+                                        value="0" min="0" max="11" step="1" list="expimg-first-pc-list"/>
+                                        <span class="range-label">11</span>
+                                    </td>
+                                    <datalist id="expimg-first-pc-list">
+                                        <option value="0"></option><option value="1"></option>
+                                        <option value="2"></option><option value="3"></option>
+                                        <option value="4"></option><option value="5"></option>
+                                        <option value="6"></option><option value="7"></option>
+                                        <option value="8"></option><option value="9"></option>
+                                        <option value="10"></option><option value="11"></option>
+                                    </datalist>
+                                </tr>
+                                <tr includetype="clockface-set clockface-intervals">
+                                    <td><label for="expimg-scale">Scaling:</label></td>
+                                    <td>
+                                        <span class="range-label">Small</span>
+                                        <input type="range" id="expimg-scale" name="expimg-scale" oninput="updateImageExportPopup()" 
+                                        value="1.15" min="1.0" max="1.3" step="0.15" list="expimg-scale-list"/>
+                                        <span class="range-label">Large</span>
+                                    </td>
+                                    <datalist id="expimg-scale-list">
+                                        <option value="1.0" ></option>
+                                        <option value="1.15"></option>
+                                        <option value="1.3" ></option>
+                                    </datalist>
+                                </tr>
+                                <tr excludetype="staff-set">
+                                    <td><label for="expimg-stroke">Strokes:</label></td>
+                                    <td>
+                                        <span class="range-label">Thin</span>
+                                        <input type="range" id="expimg-stroke" name="expimg-stroke" oninput="updateImageExportPopup()" 
+                                        value="2.0" min="1.25" max="4.25" step="0.75" list="expimg-stroke-list"/>
+                                        <span class="range-label">Thick</span>
+                                    </td>
+                                    <datalist id="expimg-stroke-list">
+                                        <option value="1.25"></option>
+                                        <option value="2.0" ></option>
+                                        <option value="2.75"></option>
+                                        <option value="3.5" ></option>
+                                        <option value="4.25"></option>
+                                    </datalist>
                                 </tr>
                                 <tr>
-                                    <td>Tetrachords:</td>
-                                    <td id="table-set-row4"></td>
+                                    <td>Format:</td>
+                                    <td>
+                                        <span>
+                                            <input id="radio-export-file-svg" type="radio" name="export-file-type" value="svg" onchange="updateImageExportPopup()" checked>
+                                            <label for="radio-export-file-svg">SVG image</label>
+                                        </span>
+                                        <span>
+                                            <input id="radio-export-file-png" type="radio" name="export-file-type" value="png" onchange="updateImageExportPopup()">
+                                            <label for="radio-export-file-png">PNG image</label>
+                                        </span>
+                                        <span id="span-input-export-file-png-size" hidden>
+                                            <label for="input-export-file-png-size">Width:</label>
+                                            <input id="input-export-file-png-size" type="number" value="1000" step="100" min="100" max="10000" onchange="updateImageExportPopup()"/>
+                                            <label for="input-export-file-png-size"> pixels</label>
+                                        </span>
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td>Pentachords:</td>
-                                    <td id="table-set-row5"></td>
-                                </tr>
-                                <tr>
-                                    <td>Hexachords:</td>
-                                    <td id="table-set-row6"></td>
-                                </tr>
-                                <tr>
-                                    <td>Heptachords:</td>
-                                    <td id="table-set-row7"></td>
-                                </tr>
-                                <tr>
-                                    <td>Octachords:</td>
-                                    <td id="table-set-row8"></td>
-                                </tr>
-                                <tr>
-                                    <td>Nonachords:</td>
-                                    <td id="table-set-row9"></td>
-                                </tr>
-                                <tr>
-                                    <td>Decachords:</td>
-                                    <td id="table-set-row10"></td>
-                                </tr>
-                                <tr>
-                                    <td>Others:</td>
-                                    <td id="table-set-row0"></td>
+                                    <td>Export:</td>
+                                    <td>
+                                        <a id="export-image-download-svg-link" href="javascript:downloadImage('svg')">Save SVG file</a>
+                                        <a id="export-image-download-png-link" href="javascript:downloadImage('png')" hidden>Save PNG file</a>
+                                        <span id="export-image-copy-link"> • <a href="javascript:copyImageToClipboard()">Copy image to clipboard</a></span>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-            </div>
-            <div id="popup-config" class="popup-outer-container" style="display: none;">
-                <div class="popup-inner-container">
-                    <div class="popup-header">
-                        <span class="popup-title">OPTIONS</span>
-                        <a class="close-button" href="javascript:hidePopup('popup-config')">&#128473;</a>
-                    </div>
-                    <div class="popup-main">
-                        <table id="popup-config-table">
-                            <tbody>
-                                <tr>
-                                    <td>Visible data:<br />
-                                        (<a href="javascript:resetVisibleDataRows()">Reset</a>)
-                                    </td>
-                                    <td id="visible-data-checkboxes-area"></td>
-                                </tr>
-                                <tr>
-                                    <td>Set format:</td>
-                                    <td>
-                                        <span>
-                                            <input id="radio-setformat-short-ab" type="radio" name="set-format" value="short-ab" onchange="onChange()" checked>
-                                            <label for="radio-setformat-short-ab">[012…9AB]</label>
-                                        </span>
-                                        <span>
-                                            <input id="radio-setformat-short-te" type="radio" name="set-format" value="short-te" onchange="onChange()">
-                                            <label for="radio-setformat-short-te">[012…9TE]</label>
-                                        </span>
-                                        <span>
-                                            <input id="radio-setformat-numbers" type="radio" name="set-format" value="numbers" onchange="onChange()">
-                                            <label for="radio-setformat-numbers">[0,1,2,…,9,10,11]</label>
-                                        </span>
-                                        <span>
-                                            <input id="radio-setformat-notes-sharps" type="radio" name="set-format" value="notes-sharps" onchange="onChange()">
-                                            <label for="radio-setformat-notes-sharps">[C,C&#9839;,D,…,A,A&#9839;,B]</label>
-                                        </span>
-                                        <span>
-                                            <input id="radio-setformat-notes-flats" type="radio" name="set-format" value="notes-flats" onchange="onChange()">
-                                            <label for="radio-setformat-notes-flats">[C,D&#9837;,D,…,A,B&#9837;,B]</label>
-                                        </span>
-                                        <span class="keyboard-shortcut" style="float: inline-end;">(Alt+F)</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Vector format:</td>
-                                    <td>
-                                        <span>
-                                            <input id="radio-vectorformat-short" type="radio" name="vector-format" value="short" onchange="onChange()" checked>
-                                            <label for="radio-vectorformat-short">&lt;254361&gt;</label>
-                                        </span>
-                                        <span>
-                                            <input id="radio-vectorformat-long" type="radio" name="vector-format" value="long" onchange="onChange()">
-                                            <label for="radio-vectorformat-long">&lt;2,5,4,3,6,1&gt;</label>
-                                        </span>
-                                        <span class="keyboard-shortcut" style="float: inline-end;">(Alt+V)</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Inversion format:</td>
-                                    <td>
-                                        <span>
-                                            <input id="radio-inversionformat-in" type="radio" name="inversion-format" value="In" onchange="onChange()" checked>
-                                            <label for="radio-inversionformat-in">Simple (I<sub>n</sub>)</label>
-                                        </span>
-                                        <span>
-                                            <input id="radio-inversionformat-tni" type="radio" name="inversion-format" value="TnI" onchange="onChange()">
-                                            <label for="radio-inversionformat-tni">Compound (T<sub>n</sub>I)</label>
-                                        </span>
-                                        <span class="keyboard-shortcut" style="float: inline-end;">(Alt+I)</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Clockface visualization:</td>
-                                    <td>
-                                        <span>
-                                            <input id="chk-note-names" type="checkbox" onchange="onChange()">
-                                            <label for="chk-note-names">Show note names instead of numbers <span class="keyboard-shortcut">(Alt+N)<span></label>
-                                        </span>
-                                        <span>
-                                            <input id="chk-polygon" type="checkbox" onchange="onChange()">
-                                            <label for="chk-polygon">Show set geometry <span class="keyboard-shortcut">(Alt+G)</span></label>
-                                        </span>
-                                        <span>
-                                            <input id="chk-sym-axes" type="checkbox" onchange="onChange()">
-                                            <label for="chk-sym-axes">Show symmetry axes <span class="keyboard-shortcut">(Alt+S)</span></label>
-                                        </span>
-                                        <span>
-                                            <input id="chk-fifths" type="checkbox" onchange="onChange()">
-                                            <label for="chk-fifths">Circle of fifths <span class="keyboard-shortcut">(Alt+5)</span></label>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>App layout:</td>
-                                    <td>
-                                        <span>
-                                            <input id="radio-svg-first" type="radio" name="div-layout" value="svg-first" onchange="onChange()" checked>
-                                            <label for="radio-svg-first">Clockface visualization first</label>
-                                        </span>
-                                        <span>
-                                            <input id="radio-data-first" type="radio" name="div-layout" value="data-first" onchange="onChange()">
-                                            <label for="radio-data-first">Data table first</label>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Theme:</td>
-                                    <td>
-                                        <span>
-                                            <input id="radio-theme-auto" type="radio" name="theme" value="auto" onchange="onChange()" checked>
-                                            <label for="radio-theme-auto">Use system theme</label>
-                                        </span>
-                                        <span>
-                                            <input id="radio-theme-light" type="radio" name="theme" value="light" onchange="onChange()">
-                                            <label for="radio-theme-light">Light theme</label>
-                                        </span>
-                                        <span>
-                                            <input id="radio-theme-dark" type="radio" name="theme" value="dark" onchange="onChange()">
-                                            <label for="radio-theme-dark">Dark theme</label>
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div id="popup-export-image" class="popup-outer-container" style="display: none;">
-                <div class="popup-inner-container">
-                    <div class="popup-header">
-                        <span class="popup-title">EXPORT IMAGE</span>
-                        <a class="close-button" href="javascript:hidePopup('popup-export-image')">&#128473;</a>
-                    </div>
-                    <div class="popup-main">
-                        <div id="popup-export-preview">
-                            <span></span>
-                        </div>
-                        <div id="popup-export-options">
-                            <table>
-                                <tbody>
-                                    <tr>
-                                        <td><label for="expimg-select-type">Type:</label></td>
-                                        <td><select name="expimg-type" id="expimg-select-type" onchange="updateImageExportPopup()">
-                                            <option value="clockface-set">Clockface (set)</option>
-                                            <option value="clockface-intervals">Clockface (intervals)</option>
-                                            <option value="ruler-set">Ruler (set)</option>
-                                            <option value="staff-set">Staff (set)</option>
-                                        </select></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Elements:</td>
-                                        <td id="expimg-elements-area">
-                                            <span includetype="clockface-intervals">
-                                                <input id="chk-export-ic1" type="checkbox" onchange="updateImageExportPopup()">
-                                                <label for="chk-export-ic1">IC1</label>
-                                            </span>
-                                            <span includetype="clockface-intervals">
-                                                <input id="chk-export-ic2" type="checkbox" onchange="updateImageExportPopup()">
-                                                <label for="chk-export-ic2">IC2</label>
-                                            </span>
-                                            <span includetype="clockface-intervals">
-                                                <input id="chk-export-ic3" type="checkbox" onchange="updateImageExportPopup()">
-                                                <label for="chk-export-ic3">IC3</label>
-                                            </span>
-                                            <span includetype="clockface-intervals">
-                                                <input id="chk-export-ic4" type="checkbox" onchange="updateImageExportPopup()">
-                                                <label for="chk-export-ic4">IC4</label>
-                                            </span>
-                                            <span includetype="clockface-intervals">
-                                                <input id="chk-export-ic5" type="checkbox" onchange="updateImageExportPopup()">
-                                                <label for="chk-export-ic5">IC5</label>
-                                            </span>
-                                            <span includetype="clockface-intervals">
-                                                <input id="chk-export-ic6" type="checkbox" onchange="updateImageExportPopup()">
-                                                <label for="chk-export-ic6">IC6</label>
-                                            </span>
-                                            <span includetype="clockface-set clockface-intervals ruler-set">
-                                                <input id="chk-export-note-names" type="checkbox" onchange="updateImageExportPopup()">
-                                                <label for="chk-export-note-names">Note names instead of numbers</label>
-                                            </span>
-                                            <span includetype="clockface-set">
-                                                <input id="chk-export-polygon" type="checkbox" onchange="updateImageExportPopup()">
-                                                <label for="chk-export-polygon">Set geometry</label>
-                                            </span>
-                                            <span includetype="clockface-set">
-                                                <input id="chk-export-sym-axes" type="checkbox" onchange="updateImageExportPopup()">
-                                                <label for="chk-export-sym-axes">Symmetry axes</label>
-                                            </span>
-                                            <span includetype="clockface-set clockface-intervals">
-                                                <input id="chk-export-fifths" type="checkbox" onchange="updateImageExportPopup()">
-                                                <label for="chk-export-fifths">Circle of fifths</label>
-                                            </span>
-                                            <span includetype="ruler-set">
-                                                <input id="chk-export-double-row" type="checkbox" onchange="updateImageExportPopup()">
-                                                <label for="chk-export-double-row">Double row (as in a keyboard)</label>
-                                            </span>
-                                            <span includetype="staff-set" style="padding-right: 0.5ch;">
-                                                <label for="expimg-select-staff-clef">Clef:</label>
-                                                <select name="expimg-staff-clef" id="expimg-select-staff-clef" onchange="updateImageExportPopup()">
-                                                    <option value="G2">Treble</option>
-                                                    <option value="C3">Alto</option>
-                                                    <option value="C4">Tenor</option>
-                                                    <option value="F4">Bass</option>
-                                                </select> 
-                                            </span>
-                                            <span includetype="staff-set" style="padding-right: 0.5ch;">
-                                                <label for="expimg-select-staff-notehead">Notehead:</label>
-                                                <select name="expimg-staff-notehead" id="expimg-select-staff-notehead" onchange="updateImageExportPopup()">
-                                                    <option value="q">Quarter</option>
-                                                    <option value="h">Half</option>
-                                                    <option value="w">Whole</option>
-                                                </select> 
-                                            </span>
-                                            <span includetype="staff-set">
-                                                <label for="expimg-select-staff-barline">Barline:</label>
-                                                <select name="expimg-staff-barline" id="expimg-select-staff-barline" onchange="updateImageExportPopup()">
-                                                    <option value="">None</option>
-                                                    <option value="single">Single</option>
-                                                    <option value="double">Double</option>
-                                                    <option value="final">Final</option>
-                                                </select> 
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    <tr includetype="staff-set">
-                                        <td><label for="expimg-select-staff-clef">Shift:</label></td>
-                                        <td>
-                                            <a id="expimg-staff-shiftup-link" href="javascript:exportStaffShiftNotes(-1)">▼ Down</a> • 
-                                            <a id="expimg-staff-shiftdown-link" href="javascript:exportStaffShiftNotes(1)">Up ▲</a>
-                                        </td>
-                                    </tr>                                    
-                                    <tr>
-                                        <td><label for="expimg-select-theme">Theme:</label></td>
-                                        <td>
-                                            <span excludetype="staff-set" style="padding-right: 0.5ch;">
-                                                <select name="expimg-theme" id="expimg-select-theme" onchange="updateImageExportPopup()">
-                                                    <option value="basic">Basic</option>
-                                                    <option value="hard">Hard</option>
-                                                    <option value="soft">Soft</option>
-                                                </select> 
-                                            </span>
-                                            <span style="padding-right: 0.5ch;">
-                                                <label for="expimg-select-theme-color">Color:</label>
-                                                <select name="expimg-theme-color" id="expimg-select-theme-color" onchange="updateImageExportPopup()">
-                                                    <option value="">None</option>
-                                                    <option value="-red">Red</option>
-                                                    <option value="-green">Green</option>
-                                                    <option value="-blue">Blue</option>
-                                                </select>
-                                            </span>
-                                            <span>
-                                                <label for="expimg-select-theme-bg">Background:</label>
-                                                <select name="expimg-theme-bg" id="expimg-select-theme-bg" onchange="updateImageExportPopup()">
-                                                    <option value="light">Light</option>
-                                                    <option value="dark">Dark</option>
-                                                </select>
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    <tr includetype="ruler-set">
-                                        <td><label for="expimg-first-pc">Start at:</label></td>
-                                        <td>
-                                            <span class="range-label">0</span>
-                                            <input type="range" id="expimg-first-pc" name="expimg-first-pc" oninput="updateImageExportPopup()" 
-                                            value="0" min="0" max="11" step="1" list="expimg-first-pc-list"/>
-                                            <span class="range-label">11</span>
-                                        </td>
-                                        <datalist id="expimg-first-pc-list">
-                                            <option value="0"></option><option value="1"></option>
-                                            <option value="2"></option><option value="3"></option>
-                                            <option value="4"></option><option value="5"></option>
-                                            <option value="6"></option><option value="7"></option>
-                                            <option value="8"></option><option value="9"></option>
-                                            <option value="10"></option><option value="11"></option>
-                                        </datalist>
-                                    </tr>
-                                    <tr includetype="clockface-set clockface-intervals">
-                                        <td><label for="expimg-scale">Scaling:</label></td>
-                                        <td>
-                                            <span class="range-label">Small</span>
-                                            <input type="range" id="expimg-scale" name="expimg-scale" oninput="updateImageExportPopup()" 
-                                            value="1.15" min="1.0" max="1.3" step="0.15" list="expimg-scale-list"/>
-                                            <span class="range-label">Large</span>
-                                        </td>
-                                        <datalist id="expimg-scale-list">
-                                            <option value="1.0" ></option>
-                                            <option value="1.15"></option>
-                                            <option value="1.3" ></option>
-                                        </datalist>
-                                    </tr>
-                                    <tr excludetype="staff-set">
-                                        <td><label for="expimg-stroke">Strokes:</label></td>
-                                        <td>
-                                            <span class="range-label">Thin</span>
-                                            <input type="range" id="expimg-stroke" name="expimg-stroke" oninput="updateImageExportPopup()" 
-                                            value="2.0" min="1.25" max="4.25" step="0.75" list="expimg-stroke-list"/>
-                                            <span class="range-label">Thick</span>
-                                        </td>
-                                        <datalist id="expimg-stroke-list">
-                                            <option value="1.25"></option>
-                                            <option value="2.0" ></option>
-                                            <option value="2.75"></option>
-                                            <option value="3.5" ></option>
-                                            <option value="4.25"></option>
-                                        </datalist>
-                                    </tr>
-                                    <tr>
-                                        <td>Format:</td>
-                                        <td>
-                                            <span>
-                                                <input id="radio-export-file-svg" type="radio" name="export-file-type" value="svg" onchange="updateImageExportPopup()" checked>
-                                                <label for="radio-export-file-svg">SVG image</label>
-                                            </span>
-                                            <span>
-                                                <input id="radio-export-file-png" type="radio" name="export-file-type" value="png" onchange="updateImageExportPopup()">
-                                                <label for="radio-export-file-png">PNG image</label>
-                                            </span>
-                                            <span id="span-input-export-file-png-size" hidden>
-                                                <label for="input-export-file-png-size">Width:</label>
-                                                <input id="input-export-file-png-size" type="number" value="1000" step="100" min="100" max="10000" onchange="updateImageExportPopup()"/>
-                                                <label for="input-export-file-png-size"> pixels</label>
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Export:</td>
-                                        <td>
-                                            <a id="export-image-download-svg-link" href="javascript:downloadImage('svg')">Save SVG file</a>
-                                            <a id="export-image-download-png-link" href="javascript:downloadImage('png')" hidden>Save PNG file</a>
-                                            <span id="export-image-copy-link"> • <a href="javascript:copyImageToClipboard()">Copy image to clipboard</a></span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </dialog>
         </main>
     </body>
 </html>

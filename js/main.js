@@ -365,7 +365,7 @@ function staffClefClick() {
 }
 
 
-function exportStaffNoteClick(pc) {
+function staffNoteClick(pc) {
     state.staff_accidental_swap[pc] = !state.staff_accidental_swap[pc];
     showPcset({ no_history: true, keep_polygon: true });
 }
@@ -674,9 +674,9 @@ function handleKeyboardShortcut(ev) {
             createSvg(document.getElementById("visualization-svg"));
             onVisualizationConfigChange(); 
             break;
-        case "escape":
-            hideAllPopups();
-            break;
+        // case "escape":
+        //     hideAllPopups();
+        //     break;
     }
 }
 

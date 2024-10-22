@@ -58,7 +58,6 @@ function showAboutPopup() {
     //document.getElementById("popup-about").style.display="flex";
 }
 
-
 function showPrimeSelector() {
     document.getElementById("popup-set-selector-second-column-header").textContent = "Prime forms";
     document.getElementById("table-set-row-filter").hidden = true;
@@ -210,7 +209,7 @@ function showDescriptionSelector() {
 
     updateDescriptionSelector();
     showPopup("popup-set-selector");
-    input_filter.focus();
+    // input_filter.focus();
     input_filter.addEventListener("input", updateDescriptionSelector);
 
 }
@@ -303,7 +302,7 @@ function showSetSelector(type = null) {
 
 function showExportImagePopup() {
     export_data.pcset = state.pcset.clone();
-    export_data.staff_accidental_swap = Array.from(state.staff_accidental_swap);
+    export_data.staff.accidental_swap = Array.from(state.staff_accidental_swap);
     loadImageExportPopupSettings();
     showPopup("popup-export-image");
     updateImageExportPopup();
@@ -545,23 +544,32 @@ function elementEnableFocus(elm) {
 }
 
 function showPopup(id) {
-    const popup = document.getElementById(id);
-    popup.style.display = "flex";
-    elementDisableFocus(document.getElementById("data-area"));
+    const elm = document.getElementById(id);
+    //elm.showPopover();
+    elm.showModal();
+    //const popup = document.getElementById(id);
+    //popup.style.display = "flex";
+    //elementDisableFocus(document.getElementById("data-area"));
 }
 
 function hidePopup(id, update_main = true) {
-    document.getElementById(id).style.display = "none";
+    document.getElementById(id).close();
+    // document.getElementById(id).hidePopover();
     if ( update_main ) {
-        elementEnableFocus(document.getElementById("data-area"));
+        // elementEnableFocus(document.getElementById("data-area"));
         showPcset({ no_history: true, keep_polygon: true });
     }
+    //document.getElementById(id).style.display = "none";
+    //if ( update_main ) {
+    //    elementEnableFocus(document.getElementById("data-area"));
+    //    showPcset({ no_history: true, keep_polygon: true });
+    //}
 }
 
 function hideAllPopups() {
-    for ( let popup of document.querySelectorAll(".popup-outer-container") )
+    for ( let popup of document.querySelectorAll(".popup-container") )
         hidePopup(popup.id, false);
-    elementEnableFocus(document.getElementById("data-area"));
+    // elementEnableFocus(document.getElementById("data-area"));
     showPcset({ no_history: true, keep_polygon: true });
 }
 
@@ -569,4 +577,16 @@ function makeSelectorSetLink(set, text, options = {}) {
     const attr_class = options.nosetfont ? '' : ' class="setfont"';
     const attr_title = options.hint ? ` title="${options.hint}"` : '';
     return `<a${attr_class} href="javascript:goto('${set}')"${attr_title}>${text}</a>`;    
+}
+
+function handleDialogClick(e) {
+    if ( this != e.target ) return;
+    const rect = this.getBoundingClientRect();
+    if ( !isInsideRect(rect, e.clientX, e.clientY) )
+        hidePopup(this.id);
+}
+
+// Make all popups close when clicked outside them
+for ( const dg of document.querySelectorAll("dialog.popup-container") ) {
+    dg.addEventListener("click", handleDialogClick, { passive: true });
 }

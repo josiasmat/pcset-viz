@@ -359,3 +359,16 @@ function recreateNode(el, with_children = false) {
     }
 }
 
+
+/**
+ * Test if coordinates are inside a rect.
+ * @param {DOMRect} rect 
+ * @param {Number} x 
+ * @param {Number} y 
+ * @returns {Boolean}
+ */
+function isInsideRect(rect, x, y) {
+    return ( x >= rect.left ) && ( x <= rect.right  )
+        && ( y >= rect.top  ) && ( y <= rect.bottom );
+}
+
