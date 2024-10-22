@@ -52,6 +52,12 @@ function resetVisibleDataRows() {
     saveConfig();
 }
 
+function setAllDataRowsVisible() {
+    data_rows.forEach( (row) => { row.show() } );
+    updateConfigPopup();
+    saveConfig();
+}
+
 function showAboutPopup() {
     document.getElementById("version-number").innerText = VERSION;
     showPopup("popup-about");
