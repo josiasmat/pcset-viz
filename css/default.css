@@ -392,10 +392,10 @@ main {
                 &:last-child {
                     line-height: 200%;
                 }
-                /* span {
+                span {
                     text-wrap: nowrap;
                     margin-right: 10px;
-                } */
+                }
             }
         }
     }
