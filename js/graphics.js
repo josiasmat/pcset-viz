@@ -436,8 +436,8 @@ class StaticRulerPcSetView extends PcSetBaseView {
 class StaticStaffPcSetView extends PcSetBaseView {
 
     /**
-     * Creates a static ruler-type PcSet representation.
-     * @param {PcSet} pcset a pitch-class set object.
+     * Creates a music score representation of a Pcset.
+     * @param {MusicalScale} notes a MusicalScale object;
      * @param {Object} options optional; accepts the following properties:
      *      * _height_ (Number) - Default is _70_;
      *      * _scale_ (Number) - Default is _1.0_;
@@ -447,16 +447,16 @@ class StaticStaffPcSetView extends PcSetBaseView {
      *          number; for "svg" is zero).
      * @param {String} theme optional; name of a theme.
      */
-    constructor(pcset, options = {}, theme = "basic-light") {
+    constructor(notes, options = {}, theme = "basic-light") {
         super();
 
-        this.pcset_str = pcset.toString("short-ab", false);
+        //this.pcset_str = pcset.toString("short-ab", false);
         
         theme = PcSetBaseView.getTheme(theme);
 
-        let notes = pcset.to_array().map((x) =>
-            new MusicalNote( (x >= pcset.head) ? x : x+12 ));
-        const size = pcset.size;
+        // let notes = pcset.to_array().map((x) =>
+        //     new MusicalNote( (x >= pcset.head) ? x : x+12 ));
+        const size = notes.size;
 
         const clef_str = (options.clef) ? options.clef : "G2";
         const clef_type = clef_str[0].toUpperCase();
@@ -483,7 +483,7 @@ class StaticStaffPcSetView extends PcSetBaseView {
         const clef_y = clef_y_offset + staff_y_offset;
         const staff_bottom_margin = Math.max(staff_min_y_margin - staff_spacing, clef_height - staff_height + clef_y_offset);
         const height = staff_height + staff_y_offset + staff_bottom_margin;
-        const black_key_count = notes.reduce((sum,note) => sum + (note.isBlackKey() ? 1 : 0), 0);
+        const black_key_count = notes.notes.reduce((sum,note) => sum + (note.isBlackKey() ? 1 : 0), 0);
         let width = clef_margin_left + clef_width + clef_margin_right 
                 + (size * (note_width + note_margin)) + note_margin
                 + (black_key_count * (scale * SVG_PATHS_ACCIDENTALS["s"].w + accidental_margin - (note_margin/3)));
@@ -517,174 +517,19 @@ class StaticStaffPcSetView extends PcSetBaseView {
 
         if ( size > 0 ) {
 
-            // Compute best note distribution.
-            // The algorithms here are a real mess... but they work.
+            notes.makeIdealDistribution();
+            notes.adjustToClef(clef_str);
 
-            const BCEF = [0,4,5,11];
-            const last = size-1;
-
-            function makeIntervalGood(note, other) {
-                const interval = new Interval(note, other);
-                if ( ! ['P','M','m'].includes(interval.quality) )
-                    note.swapAccidental();
-                if ( size < 7 && ! ['P','M','m'].includes(interval.quality) )
-                    other.swapAccidental();
-            }
-
-            function makeIntervalGoodExceptBCEF(note, other, try_other = false) {
-                const interval = new Interval(note, other);
-                if ( !BCEF.includes(note.class) || note.isAltered() )
-                    if ( ! ['P','M','m'].includes(interval.quality) )
+            if ( options.accidental_swap )
+                for ( const note of notes )
+                    if ( options.accidental_swap.includes(note.class) )
                         note.swapAccidental();
-                if ( try_other )
-                    if ( !BCEF.includes(other.class) || other.isAltered() )
-                        if ( ! ['P','M','m'].includes(interval.quality) )
-                            other.swapAccidental();
-            }
-
-            function makeNotesDifferent(note, other) {
-                if ( note.diatonic_class == other.diatonic_class )
-                    note.swapAccidental();
-            }
-
-            function makeNoteBeAbove(note, other) {
-                if ( note.pitch > other.pitch && note.diatonic_index < other.diatonic_index )
-                    note.swapAccidental();
-            }
-
-            function getBestNotesVersion(v1, v2) {
-                // Avoid repeated notes
-                let same_note_count1 = pairwise(v1, true).filter(
-                    (pair) => ( pair[1].diatonic_class == pair[0].diatonic_class )
-                ).length;
-                let same_note_count2 = pairwise(v2, true).filter(
-                    (pair) => ( pair[1].diatonic_class == pair[0].diatonic_class )
-                ).length;
-                // Avoid augmented and diminished intervals
-                let aug_dim_count1 = pairwise(v1).filter(
-                    (pair) => ( ! new Interval(pair[0], pair[1]).isPMm() )
-                ).length;
-                let aug_dim_count2 = pairwise(v2).filter(
-                    (pair) => ( ! new Interval(pair[0], pair[1]).isPMm() )
-                ).length;
-                // Avoid unnecessary accidentals
-                const acc_count1 = v1.filter( (note) => note.isAltered() ).length;
-                const acc_count2 = v2.filter( (note) => note.isAltered() ).length;
-                // Avoid explicit naturals
-                const nat_count1 = pairwise(v1).filter(
-                    (pair) => pair[0].diatonic_index == pair[1].diatonic_index
-                        && pair[0].isAltered() && pair[1].isNatural()
-                ).length;
-                const nat_count2 = pairwise(v2).filter(
-                    (pair) => pair[0].diatonic_index == pair[1].diatonic_index
-                        && pair[0].isAltered() && pair[1].isNatural()
-                ).length;
-                // Avoid altered BCEF
-                let alt_bcef_count1 = v1.filter(
-                    (note) => BCEF.includes(note.class) && note.isAltered()
-                ).length;
-                let alt_bcef_count2 = v2.filter(
-                    (note) => BCEF.includes(note.class) && note.isAltered()
-                ).length;
-
-                // Change weights in some cases
-                if ( size < 8 ) {
-                    same_note_count1 *= 6;
-                    same_note_count2 *= 6;
-                }
-                if ( size < 7 ) {
-                    aug_dim_count1 *= 3;
-                    aug_dim_count2 *= 3;
-                    if ( size > 4 ) {
-                        alt_bcef_count1 *= 3;
-                        alt_bcef_count2 *= 3;
-                    }
-                }
-
-                const total1 = same_note_count1 + aug_dim_count1 + acc_count1 + nat_count1 + alt_bcef_count1;
-                const total2 = same_note_count2 + aug_dim_count2 + acc_count2 + nat_count2 + alt_bcef_count2;
-                return ( total1 <= total2 ) ? v1 : v2;
-            }
-
-            const hasTwoConsecutiveSemitones = pairwise(pairwise(notes)).some(
-                (pair) => new Interval(pair[0][0], pair[0][1]).semitones == 1
-                       && new Interval(pair[1][0], pair[1][1]).semitones == 1
-            );
-
-            if ( !hasTwoConsecutiveSemitones && size < 8 ) {
-
-                const notesv1 = cloneMusicalNoteArray(notes);
-                for ( const pair of pairwise(notesv1) )
-                    makeIntervalGood(pair[1], pair[0]);
-                makeNotesDifferent(notesv1[last], notesv1[0]);
-                notesv1[last].lock();
-                for ( const pair of pairwise(notesv1).reverse() ) {
-                    makeNotesDifferent(pair[1], pair[0]);
-                    makeNoteBeAbove(pair[1], pair[0]);
-                }
-                makeNotesDifferent(notesv1[last], notesv1[0]);
-
-                const notesv2 = cloneMusicalNoteArray(notesv1);
-                notesv2.forEach( (note) => note.swapAccidental() );
-                for ( const pair of pairwise(notesv2) )
-                    makeIntervalGood(pair[1], pair[0]);
-                makeNotesDifferent(notesv2[0], notesv2[last]);
-                for ( const pair of pairwise(notesv2.slice(1)).reverse() ) {
-                    makeNotesDifferent(pair[1], pair[0]);
-                    makeNoteBeAbove(pair[1], pair[0]);
-                }
-                makeNotesDifferent(notesv2[last], notesv2[0]);
-
-                const notesv3 = cloneMusicalNoteArray(notes);
-                for ( const pair of pairwise(notesv3) )
-                    makeIntervalGoodExceptBCEF(pair[1], pair[0], true);
-                makeNotesDifferent(notesv3[last], notesv3[0]);
-                notesv3[last].lock();
-                for ( const pair of pairwise(notesv3).reverse() ) {
-                    makeIntervalGoodExceptBCEF(pair[0], pair[1]);
-                    makeNotesDifferent(pair[1], pair[0]);
-                    makeNoteBeAbove(pair[1], pair[0]);
-                }
-                makeNotesDifferent(notesv3[last], notesv3[0]);
-
-                notes = getBestNotesVersion(notesv1, notesv2);
-                notes = getBestNotesVersion(notes, notesv3);;
-
-            } else {
-
-                // Algorithm : try to avoid aug/dim intervals while
-                // keeping BCEF intact.
-                if ( BCEF.includes(notes[0].class) ) notes[0].lock();
-                for ( const pair of pairwise(notes) )
-                    makeIntervalGoodExceptBCEF(pair[1], pair[0]);
-                for ( const pair of pairwise(notes).reverse() )
-                    makeIntervalGoodExceptBCEF(pair[0], pair[1]);
-
-            }
-
-            const staff_center = ( clef_str == "G2" ) ? 5.5 : 6;
-            function computeMean() {
-                return (notes[0].staffPosition(clef_str) + notes[last].staffPosition(clef_str)) / 2;
-            }
-            let mean = Math.abs(staff_center - computeMean());
-            let min = mean;
-            notes.forEach( (note) => note.unlock() );
-            while ( mean <= min ) {
-                min = mean;
-                notes.forEach( (note) => note.transposeOctaves(1) );
-                mean = Math.abs(staff_center - computeMean());
-            }
-            for ( const note of notes ) {
-                note.transposeOctaves(-1);
-                if ( options.accidental_swap && options.accidental_swap.includes(note.class) )
-                    note.swapAccidental();
-            }
 
             // draw notes
             const notes_g = document.createElementNS(SVGNS, "g");
 
             let x = clef_margin_left + clef_width + clef_margin_right;
-            let previous_note = notes[0];
+            let previous_note = notes.note(0);
             for ( const note of notes ) {
                 const this_note_g = document.createElementNS(SVGNS, "g");
                 const note_element = document.createElementNS(SVGNS, "path");

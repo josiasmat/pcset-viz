@@ -216,6 +216,213 @@ class Interval {
 
 }
 
+class MusicalScale {
+
+    #notes = [];
+
+    constructor(notes) { this.#notes = notes; }
+    
+    static fromPcset(pcset) {
+        const notes = pcset.to_array().map((x) =>
+            new MusicalNote( (x >= pcset.head) ? x : x+12 ));
+        return new MusicalScale(notes);
+    }
+
+    [Symbol.iterator]() {
+        let index = 0;
+        return {
+            next: () => {
+                if ( index == this.#notes.length )
+                    return { done: true };
+                return { value: this.#notes[index++], done: false };
+            },
+        }
+    }
+
+    get size() { return this.#notes.length; }
+    note(index) { return this.#notes[index]; }
+    get notes() { return this.#notes; }
+    clone() { return new MusicalScale(this.#notes); }
+
+    adjustToClef(clef_str) {
+        const staff_center = ( clef_str == "G2" ) ? 5.5 : 6;
+        function computeMean(notes) {
+            return (notes[0].staffPosition(clef_str) + notes[notes.length-1].staffPosition(clef_str)) / 2;
+        }
+        let mean = Math.abs(staff_center - computeMean(this.#notes));
+        let min = mean;
+        this.#notes.forEach( (note) => note.unlock() );
+        while ( mean <= min ) {
+            min = mean;
+            this.#notes.forEach( (note) => note.transposeOctaves(1) );
+            mean = Math.abs(staff_center - computeMean(this.#notes));
+        }
+        this.#notes.forEach( (note) => note.transposeOctaves(-1) );
+    }
+
+    makeOnlySharps() {
+        this.#notes.forEach( (note) => { note.accidental = ( note.isWhiteKey() ) ? 0 : 1 } );
+    }
+
+    makeOnlyFlats() {
+        this.#notes.forEach( (note) => { note.accidental = ( note.isWhiteKey() ) ? 0 : -1 } );
+    }
+
+    makeIdealDistribution() {
+        const size = this.size;
+
+        if ( size > 0 ) {
+
+            // Compute best note distribution.
+            // The algorithms here are a real mess... but they work.
+
+            const BCEF = [0,4,5,11];
+            const last = size-1;
+
+            function makeIntervalGood(note, other) {
+                const interval = new Interval(note, other);
+                if ( ! ['P','M','m'].includes(interval.quality) )
+                    note.swapAccidental();
+                if ( size < 7 && ! ['P','M','m'].includes(interval.quality) )
+                    other.swapAccidental();
+            }
+
+            function makeIntervalGoodExceptBCEF(note, other, try_other = false) {
+                const interval = new Interval(note, other);
+                if ( !BCEF.includes(note.class) || note.isAltered() )
+                    if ( ! ['P','M','m'].includes(interval.quality) )
+                        note.swapAccidental();
+                if ( try_other )
+                    if ( !BCEF.includes(other.class) || other.isAltered() )
+                        if ( ! ['P','M','m'].includes(interval.quality) )
+                            other.swapAccidental();
+            }
+
+            function makeNotesDifferent(note, other) {
+                if ( note.diatonic_class == other.diatonic_class )
+                    note.swapAccidental();
+            }
+
+            function makeNoteBeAbove(note, other) {
+                if ( note.pitch > other.pitch && note.diatonic_index < other.diatonic_index )
+                    note.swapAccidental();
+            }
+
+            function getBestNotesVersion(v1, v2) {
+                // Avoid repeated notes
+                let same_note_count1 = pairwise(v1, true).filter(
+                    (pair) => ( pair[1].diatonic_class == pair[0].diatonic_class )
+                ).length;
+                let same_note_count2 = pairwise(v2, true).filter(
+                    (pair) => ( pair[1].diatonic_class == pair[0].diatonic_class )
+                ).length;
+                // Avoid augmented and diminished intervals
+                let aug_dim_count1 = pairwise(v1).filter(
+                    (pair) => ( ! new Interval(pair[0], pair[1]).isPMm() )
+                ).length;
+                let aug_dim_count2 = pairwise(v2).filter(
+                    (pair) => ( ! new Interval(pair[0], pair[1]).isPMm() )
+                ).length;
+                // Avoid unnecessary accidentals
+                const acc_count1 = v1.filter( (note) => note.isAltered() ).length;
+                const acc_count2 = v2.filter( (note) => note.isAltered() ).length;
+                // Avoid explicit naturals
+                const nat_count1 = pairwise(v1).filter(
+                    (pair) => pair[0].diatonic_index == pair[1].diatonic_index
+                        && pair[0].isAltered() && pair[1].isNatural()
+                ).length;
+                const nat_count2 = pairwise(v2).filter(
+                    (pair) => pair[0].diatonic_index == pair[1].diatonic_index
+                        && pair[0].isAltered() && pair[1].isNatural()
+                ).length;
+                // Avoid altered BCEF
+                let alt_bcef_count1 = v1.filter(
+                    (note) => BCEF.includes(note.class) && note.isAltered()
+                ).length;
+                let alt_bcef_count2 = v2.filter(
+                    (note) => BCEF.includes(note.class) && note.isAltered()
+                ).length;
+
+                // Change weights in some cases
+                if ( size < 8 ) {
+                    same_note_count1 *= 6;
+                    same_note_count2 *= 6;
+                }
+                if ( size < 7 ) {
+                    aug_dim_count1 *= 3;
+                    aug_dim_count2 *= 3;
+                    if ( size > 4 ) {
+                        alt_bcef_count1 *= 3;
+                        alt_bcef_count2 *= 3;
+                    }
+                }
+
+                const total1 = same_note_count1 + aug_dim_count1 + acc_count1 + nat_count1 + alt_bcef_count1;
+                const total2 = same_note_count2 + aug_dim_count2 + acc_count2 + nat_count2 + alt_bcef_count2;
+                return ( total1 <= total2 ) ? v1 : v2;
+            }
+
+            const hasTwoConsecutiveSemitones = pairwise(pairwise(this.#notes)).some(
+                (pair) => new Interval(pair[0][0], pair[0][1]).semitones == 1
+                       && new Interval(pair[1][0], pair[1][1]).semitones == 1
+            );
+
+            if ( !hasTwoConsecutiveSemitones && size < 8 ) {
+
+                const notesv1 = cloneMusicalNoteArray(this.#notes);
+                for ( const pair of pairwise(notesv1) )
+                    makeIntervalGood(pair[1], pair[0]);
+                makeNotesDifferent(notesv1[last], notesv1[0]);
+                notesv1[last].lock();
+                for ( const pair of pairwise(notesv1).reverse() ) {
+                    makeNotesDifferent(pair[1], pair[0]);
+                    makeNoteBeAbove(pair[1], pair[0]);
+                }
+                makeNotesDifferent(notesv1[last], notesv1[0]);
+
+                const notesv2 = cloneMusicalNoteArray(notesv1);
+                notesv2.forEach( (note) => note.swapAccidental() );
+                for ( const pair of pairwise(notesv2) )
+                    makeIntervalGood(pair[1], pair[0]);
+                makeNotesDifferent(notesv2[0], notesv2[last]);
+                for ( const pair of pairwise(notesv2.slice(1)).reverse() ) {
+                    makeNotesDifferent(pair[1], pair[0]);
+                    makeNoteBeAbove(pair[1], pair[0]);
+                }
+                makeNotesDifferent(notesv2[last], notesv2[0]);
+
+                const notesv3 = cloneMusicalNoteArray(this.#notes);
+                for ( const pair of pairwise(notesv3) )
+                    makeIntervalGoodExceptBCEF(pair[1], pair[0], true);
+                makeNotesDifferent(notesv3[last], notesv3[0]);
+                notesv3[last].lock();
+                for ( const pair of pairwise(notesv3).reverse() ) {
+                    makeIntervalGoodExceptBCEF(pair[0], pair[1]);
+                    makeNotesDifferent(pair[1], pair[0]);
+                    makeNoteBeAbove(pair[1], pair[0]);
+                }
+                makeNotesDifferent(notesv3[last], notesv3[0]);
+
+                this.#notes = getBestNotesVersion(notesv1, notesv2);
+                this.#notes = getBestNotesVersion(this.#notes, notesv3);;
+
+            } else {
+
+                // Algorithm : try to avoid aug/dim intervals while
+                // keeping BCEF intact.
+                if ( BCEF.includes(this.#notes[0].class) ) this.#notes[0].lock();
+                for ( const pair of pairwise(this.#notes) )
+                    makeIntervalGoodExceptBCEF(pair[1], pair[0]);
+                for ( const pair of pairwise(this.#notes).reverse() )
+                    makeIntervalGoodExceptBCEF(pair[0], pair[1]);
+
+            }
+
+        }
+    }
+
+}
+
 /**
  * Clones an array of MusicalNote objects.
  * @param {MusicalNote[]} source 

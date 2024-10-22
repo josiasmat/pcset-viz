@@ -819,6 +819,19 @@ class PcSet {
         return sets;
     }
 
+    ctts(include_zero = true) {
+        let sets = this.transpositions(include_zero)
+            .map( (item) => [item[0],item[1].intersection(this)] );
+        return sets;
+    }
+
+    ctts_unique(include_zero = true) {
+        let sets = this.ctts(include_zero);
+        PcSet.#filter_unique_tagged(sets);
+        // if ( !include_zero ) sets.shift();
+        return sets;
+    }
+
     transpositionally_symmetric_sets(include_zero = true) {
         let sets = this.transpositional_symmetries(include_zero).map((n) => [[n], this.transpose(n)]);
         PcSet.#filter_unique_tagged(sets);
@@ -838,6 +851,18 @@ class PcSet {
         return sets;
     }
     
+    ctis() {
+        let sets = this.inversions()
+            .map( (item) => [item[0],item[1].intersection(this)] );
+        return sets;
+    }
+
+    ctis_unique() {
+        let sets = this.ctis();
+        PcSet.#filter_unique_tagged(sets);
+        return sets;
+    }
+
     inversionally_symmetric_sets() {
         let sets = this.inversional_symmetries().map((n) => [[n], this.invert(n)]);
         PcSet.#filter_unique_tagged(sets);

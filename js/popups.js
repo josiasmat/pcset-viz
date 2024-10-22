@@ -476,8 +476,9 @@ function makeRulerSvgFromParams(theme) {
 }
 
 function makeStaffSvgFromParams(theme, callback = null) {
+    const scale = MusicalScale.fromPcset(export_data.pcset);
     return new StaticStaffPcSetView(
-        export_data.pcset, 
+        scale, 
         {
             clef: document.getElementById("expimg-select-staff-clef").value,
             notehead: document.getElementById("expimg-select-staff-notehead").value,
