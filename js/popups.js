@@ -189,9 +189,9 @@ function showDescriptionSelector() {
                 if ( filterName(name) ) {
                     const link = makeSelectorSetLink(str_short,name, {hint:hint,nosetfont:true});
                     sets[len].push({name:name,set:str_short,link:link});
-                } else {
-                    sets[len].push({name:name,set:str_short,link:`<span class="disabled-link">${name}</span>`});
-                }
+                } //else {
+                //    sets[len].push({name:name,set:str_short,link:`<span class="disabled-link">${name}</span>`});
+                //}
             }
         }
         for ( let i of [1,11,12] ) {
@@ -212,6 +212,11 @@ function showDescriptionSelector() {
             elm.innerHTML = links.join("&nbsp;· ");
         }
     }
+
+    const popup_elm = document.getElementById("popup-set-selector");
+    const popup_style = getComputedStyle(popup_elm);
+    popup_elm.style.width = popup_style.maxWidth;
+    popup_elm.style.height = popup_style.maxHeight;
 
     updateDescriptionSelector();
     showPopup("popup-set-selector");
@@ -550,33 +555,22 @@ function elementEnableFocus(elm) {
 }
 
 function showPopup(id) {
-    const elm = document.getElementById(id);
-    //elm.showPopover();
-    elm.showModal();
-    //const popup = document.getElementById(id);
-    //popup.style.display = "flex";
-    //elementDisableFocus(document.getElementById("data-area"));
+    const popup_elm = document.getElementById(id);
+    popup_elm.addEventListener("close", (e) => {
+        e.currentTarget.style.removeProperty("width");
+        e.currentTarget.style.removeProperty("height");
+    });
+    popup_elm.showModal();
 }
 
-function hidePopup(id, update_main = true) {
-    document.getElementById(id).close();
-    // document.getElementById(id).hidePopover();
-    if ( update_main ) {
-        // elementEnableFocus(document.getElementById("data-area"));
-        showPcset({ no_history: true, keep_polygon: true });
-    }
-    //document.getElementById(id).style.display = "none";
-    //if ( update_main ) {
-    //    elementEnableFocus(document.getElementById("data-area"));
-    //    showPcset({ no_history: true, keep_polygon: true });
-    //}
+function hidePopup(id) {
+    const popup_elm = document.getElementById(id);
+    popup_elm.close();
 }
 
 function hideAllPopups() {
     for ( let popup of document.querySelectorAll(".popup-container") )
-        hidePopup(popup.id, false);
-    // elementEnableFocus(document.getElementById("data-area"));
-    showPcset({ no_history: true, keep_polygon: true });
+        hidePopup(popup.id);
 }
 
 function makeSelectorSetLink(set, text, options = {}) {

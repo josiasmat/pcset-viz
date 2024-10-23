@@ -229,12 +229,20 @@ class PcSet {
         return this.#data.indexOf(pc);
     }
 
+    /**
+     * Returns the interval class vector of the set.
+     * @returns {IntervalClassVector}
+     */
     icvector() {
         const cached = PcSet.#cacheRead(this.binary_value, "icv");
         return cached ? cached 
             : PcSet.#cacheWrite(this.binary_value, "icv", IntervalClassVector.from_pcset(this));
     }
 
+    /**
+     * Returns the common-tone vector of the set.
+     * @returns {CommonToneVector}
+     */
     ctvector() {
         const cached = PcSet.#cacheRead(this.binary_value, "ctv");
         return cached ? cached 
@@ -637,15 +645,17 @@ class PcSet {
         const icvec = this.icvector();
         const pcslen = this.size;
         let sym = [];
-        if ( include_zero ) sym.push(0);
-        for ( let i = 1; i < 6; i++ ) {
-            if ( icvec.at(i) == pcslen )
-                for ( let n = i; n < 12; n+=i )
-                    if ( !sym.includes(n) )
-                        sym.push(n);
+        if ( this.size > 0 ) {
+            if ( include_zero ) sym.push(0);
+            for ( let i = 1; i < 6; i++ ) {
+                if ( icvec.at(i) == pcslen )
+                    for ( let n = i; n < 12; n+=i )
+                        if ( !sym.includes(n) )
+                            sym.push(n);
+            }
+            if ( 2*icvec.at(6) == pcslen && !sym.includes(6)) sym.push(6);
+            sym.sort((a,b) => a-b);
         }
-        if ( 2*icvec.at(6) == pcslen && !sym.includes(6)) sym.push(6);
-        sym.sort((a,b) => a-b);
         return sym;
     }
 
@@ -676,7 +686,7 @@ class PcSet {
      * @return {Number} Returns the number of levels of transpositional symmetry of the set.
      */
     transpositional_symmetry_degree(include_zero = true) {
-        return this.icvector().count_value(this.size);
+        return this.icvector().count_value(this.size, true);
         //return this.t_symmetries(include_zero).length;
     }
 
@@ -684,9 +694,10 @@ class PcSet {
         const ctvec = this.ctvector();
         const pcslen = this.size;
         let sym = [];
-        for ( let i = 0; i < 12; i++ ) {
-            if ( ctvec.at(i) == pcslen )
-                sym.push(i);
+        if ( this.size > 0 ) {
+            for ( let i = 0; i < 12; i++ )
+                if ( ctvec.at(i) == pcslen )
+                    sym.push(i);
         }
         return sym;
     }
@@ -813,9 +824,8 @@ class PcSet {
     }
 
     transpositions_unique(include_zero = true) {
-        let sets = this.transpositions(true);
+        let sets = this.transpositions(include_zero);
         PcSet.#filter_unique_tagged(sets);
-        if ( !include_zero ) sets.shift();
         return sets;
     }
 
@@ -908,6 +918,19 @@ class PcSet {
         PcSet.#filter_unique(sets, false);
         sets.sort((a,b) => a.size - b.size);
         return sets;
+    }
+
+    hexachordalCombinatorials() {
+        if ( this.size != 6 ) return { i: [], p: [], ri: [], r: [] };
+        const comb = {};
+        const complement = this.complement.normal;
+        const inversions = this.inversions_unique();
+        const transpositions = this.transpositions_unique(false);
+        comb.i  = inversions.filter( (item) => item[1].is_superset_of(complement) ).map( (item) => item[0] );
+        comb.p  = transpositions.filter( (item) => item[1].is_superset_of(complement) ).map( (item) => item[0] );
+        comb.ri = inversions.filter( (item) => item[1].is_superset_of(this) ).map( (item) => item[0] );
+        comb.r  = transpositions.filter( (item) => item[1].is_superset_of(this) ).map( (item) => item[0] );
+        return comb;
     }
 
 
@@ -1009,11 +1032,11 @@ class IntervalClassVector {
         return ( ic == 0 ) ? 0 : this.#data[ic-1];
     }
 
-    count_value(value) {
-        let count = ( 2*this.#data[5] == value ) ? 1 : 0;
-        for ( let i = 0; i < 5; i++ )
-            if ( this.#data[i] == value ) count++;
-        return count;
+    count_value(value, double6 = false) {
+        if ( !double6 ) 
+            return this.#data.filter((x)=>x==value).length;
+        return this.#data.slice(0,5).filter( (x) => x == value ).lenth 
+            + ( 2*this.#data[5] == value ) ? 1 : 0;
     }
 
     sum() {
@@ -1086,10 +1109,7 @@ class CommonToneVector {
     }
 
     count_value(value) {
-        let count = 0;
-        for ( let i = 0; i < 12; i++ )
-            if ( this.#data[i] == value ) count++;
-        return count;
+        return this.#data.filter( (x) => x == value ).length;
     }
 
     sum() {

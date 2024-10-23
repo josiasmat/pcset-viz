@@ -240,6 +240,35 @@ function showPcset(options = {}) {
 
     document.getElementById("descriptive-name").setHTMLUnsafe(textOrDash(pcsetGetDescriptiveNames(reduced).join(", ")));
 
+
+    // Hexacordal combinatorials
+
+    const combs = normal.hexachordalCombinatorials();
+    let comb_count = 0;
+    function getCombinatorialsStr(combs, type_str) {
+        if ( combs.length == 0) return '';
+        comb_count += 1;
+        return `${type_str}<sub>${combs.join(',')}</sub>`;
+    }
+    let combs_str = [
+        getCombinatorialsStr(combs.i, 'I'),
+        getCombinatorialsStr(combs.p, 'P'),
+        getCombinatorialsStr(combs.ri, 'RI'),
+        getCombinatorialsStr(combs.r, 'R')
+    ].filter( (s) => s ).join("&nbsp;");
+
+    // Collect set features
+
+    const features = [];
+    //features.push([
+    //    "Null set","Singleton","Dyad","Trichord","Tetrachord","Pentachord","Hexachord","Heptachord",
+    //    "Octachord","Nonachord","Decachord","Undecachord","Dodechachord"][state.pcset.size]);
+    if ( icvector.count_value(1) == 6 ) features.push("All-interval");
+    if ( inversional_symmetries.length > 0 ) features.push("Mirror");
+    if ( zcorrespondent ) features.push("Z-set");
+    if ( comb_count > 0 ) features.push(( comb_count >= 3 ? "All&#8209;combinatorial&nbsp;(" : "Combinatorial&nbsp;(" ) + combs_str + ")");
+    document.getElementById("features").setHTMLUnsafe(textOrDash(features.join(", ")));
+
     // ruler views
 
     function adaptRulerView(elm, type, index) {
@@ -402,15 +431,31 @@ function pcsetGetDescriptiveNames(pcset) {
 
 
 function setCollectionToStrWithLinks(sets, op = null, sep = " = ", include_op_in_link = true) {
-    const strings = (op)
-        ? sets.map( (item) =>
-            `${op.replace('n', "<sub>" + item[0].join(",") + "</sub>")}${sep.replace(' ',"&nbsp;")}${
-                include_op_in_link ? pcsetHyperlink(item[1], { op: [op,item[0][0]] }) : pcsetHyperlink(item[1])}`
-        )
-        : sets.map( (item) =>
-            pcsetHyperlink(item)
-        );
-    return strings.join(", ");
+    if ( op ) {
+        let strings = [];
+        for ( const item of sets ) {
+            const ranges = [];
+            let start = item[0][0];
+            for ( const pair of pairwise(item[0], true) ) {
+                if ( pair[1] != pair[0] + 1 ) {
+                    if ( pair[0] == start )
+                        ranges.push(start.toString());
+                    else if ( pair[0] == start + 1 )
+                        ranges.push([start,pair[0]].join(','))
+                    else
+                        ranges.push([start,pair[0]].join('-'))
+                    start = pair[1];
+                }
+            }
+            strings.push(
+                `${op.replace('n', "<sub>" + ranges.join(",") + "</sub>")}${sep.replaceAll(' ',"&nbsp;")}${
+                    include_op_in_link ? pcsetHyperlink(item[1], { op: [op,item[0][0]] }) : pcsetHyperlink(item[1])}`
+            )
+        }
+        return strings.join(", ");
+    } else {
+        return sets.map( (item) => pcsetHyperlink(item) ).join(", ");
+    }
 }
 
 
@@ -495,9 +540,9 @@ function populatePopupConfigVisibleData() {
     let checkboxes = [];
     for ( let row of data_rows ) {
         let label = row.label;
-        label.replace(" ", "&nbsp;");
+        label.replaceAll(" ", "&nbsp;");
         let checkbox_id = "chk-visible-data-" + label.toLowerCase();
-        checkbox_id.replace(" ", "-");
+        checkbox_id.replaceAll(" ", "-");
         checkboxes.push(`<span><input id="${checkbox_id}" type="checkbox" target="${row.id}" onchange="toggleVisibleData('${checkbox_id}')">`+
                         `&nbsp;<label for="${checkbox_id}">${label}</label></span>`)
     }

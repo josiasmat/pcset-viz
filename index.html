@@ -100,6 +100,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                             <td>Z-correspondent:</td>
                             <td id="zcorrespondent"></td>
                         </tr>
+                        <tr id="row-features">
+                            <td i18n="row-features">Set features: <a href="javascript:showFeaturesSelector()" hidden>&#128269;</a></td>
+                            <td id="features"></td>
+                        </tr>
                         <tr id="row-operations">
                             <td i18n="row-operations">Operation:</td>
                             <td id="operations">
@@ -119,7 +123,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                             <td id="rotations"></td>
                         </tr>
                         <tr id="row-symmetries" hidden>
-                            <td>Symmetries:</td>
+                            <td>Symmetries/Equivalences:</td>
                             <td id="symmetries"></td>
                         </tr>
                         <tr id="row-transposition" hidden>
@@ -174,7 +178,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                     <b>Pitch-Class Set Visualizer, version <span id="version-number"></span></b>.<br />
                     Licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">GNU Affero General Public License version 3</a>.<br />
                     &#169;&nbsp;2024 Josias Matschulat.<br /><br />
-                    Descriptive names by Larry Solomon, &#169;&nbsp;1997, 2005.
+                    Descriptive names adapted from Larry Solomon, &#169;&nbsp;1997, 2005,<br />with additions from Straus, 2016..
                 </div>
             </dialog>
             <dialog id="popup-set-selector" class="popup-container">
@@ -319,7 +323,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     </span>
                                     <span>
                                         <input id="chk-sym-axes" type="checkbox" onchange="onChange()">
-                                        <label for="chk-sym-axes">Show symmetry axes <span class="keyboard-shortcut">(Alt+S)</span></label>
+                                        <label for="chk-sym-axes">Show axes of symmetry <span class="keyboard-shortcut">(Alt+S)</span></label>
                                     </span>
                                     <span>
                                         <input id="chk-fifths" type="checkbox" onchange="onChange()">
@@ -419,7 +423,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                         </span>
                                         <span includetype="clockface-set">
                                             <input id="chk-export-sym-axes" type="checkbox" onchange="updateImageExportPopup()">
-                                            <label for="chk-export-sym-axes">Symmetry axes</label>
+                                            <label for="chk-export-sym-axes">Axes of symmetry</label>
                                         </span>
                                         <span includetype="clockface-set clockface-intervals">
                                             <input id="chk-export-fifths" type="checkbox" onchange="updateImageExportPopup()">
