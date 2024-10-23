@@ -17,37 +17,82 @@
             "names": ["Null set"]
         },
         "[0]": {
-            "names": ["Singleton", "Note", "Unison"]
+            "names": [
+                "Singleton", 
+                "Unison"
+            ]
         },
         "[01]": {
-            "names": ["Interval-class 1", "Semitone", "Minor second", "Major seventh", "Chromatic dyad"]
+            "names": [
+                "Interval-class 1", 
+                "Semitone", 
+                "Minor second", 
+                "Major seventh", 
+                "Chromatic dyad"
+            ]
         },
         "[02]": {
-            "names": ["Interval-class 2", "Whole-tone", "Major second", "Minor seventh"]
+            "names": [
+                "Interval-class 2", 
+                "Whole-tone", 
+                "Major second", 
+                "Minor seventh"
+        ]
         },
         "[03]": {
-            "names": ["Interval-class 3", "Minor third", "Major sixth", "Augmented second", "Diminished seventh"]
+            "names": [
+                "Interval-class 3", 
+                "Minor third", 
+                "Major sixth", 
+                "Augmented second", 
+                "Diminished seventh"
+            ]
         },
         "[04]": {
-            "names": ["Interval-class 4", "Major third", "Minor sixth", "Diminished fourth", "Augmented fifth"]
+            "names": [
+                "Interval-class 4", 
+                "Major third", 
+                "Minor sixth", 
+                "Diminished fourth", 
+                "Augmented fifth"
+            ]
         },
         "[05]": {
-            "names": ["Interval-class 5", "Perfect fourth", "Perfect fifth"]
+            "names": [
+                "Interval-class 5", 
+                "Perfect fourth", 
+                "Perfect fifth"
+            ]
         },
         "[06]": {
-            "names": ["Interval-class 6", "Tritone", "Augmented fourth", "Diminished fifth", "Maximally even dyad"]
+            "names": [
+                "Interval-class 6", 
+                "Tritone", 
+                "Augmented fourth", 
+                "Diminished fifth", 
+                "Maximally even dyad"
+            ]
         },
         "[012]": {
-            "names": ["Chromatic trichord", "BACH trichord", "Chromatic trimirror"]
+            "names": [
+                "BACH trimirror", 
+                "Chromatic trimirror"
+            ]
         },
         "[013]": {
-            "names": ["Phrygian trichord", "Octatonic segment"]
+            "names": [
+                "Phrygian trichord",
+                "Octatonic segment"
+            ]
         },
         "[023]": {
             "names": ["Minor trichord"]
         },
         "[014]": {
-            "names": ["Major-minor trichord 1", "Hexatonic segment"]
+            "names": [
+                "Major-minor trichord 1",
+                "Hexatonic segment"
+            ]
         },
         "[034]": {
             "names": ["Major-minor trichord 2"]
@@ -59,13 +104,21 @@
             "names": ["Incomplete major-seventh chord 2"]
         },
         "[016]": {
-            "names": ["Rite chord 1"]
+            "names": [
+                "Rite chord 1", 
+                "Tritone-fourth 1"
+            ]
         },
         "[056]": {
-            "names": ["Rite chord 2"]
+            "names": [
+                "Rite chord 2", 
+                "Tritone-fourth 2"
+            ]
         },
         "[024]": {
-            "names": ["Whole-tone trichord"]
+            "names": [
+                "Whole-tone trichord"
+            ]
         },
         "[025]": {
             "names": ["Incomplete minor-seventh chord"]
@@ -74,28 +127,40 @@
             "names": ["Incomplete dominant-seventh chord 2"]
         },
         "[026]": {
-            "names": ["Incomplete dominant-seventh chord 1", "Italian sixth"]
+            "names": [
+                "Incomplete dominant-seventh chord 1", 
+                "Italian-sixth chord"
+            ]
         },
         "[046]": {
             "names": ["Incomplete half-diminished-seventh chord"]
         },
         "[027]": {
-            "names": ["Quartal trichord"]
+            "names": [
+                "Quartal trichord",
+                "Stack of fourths/fifths"
+            ]
         },
         "[036]": {
-            "names": ["Diminished triad", "Diminished chord"]
+            "names": ["Diminished chord/triad"]
         },
         "[037]": {
-            "names": ["Minor triad", "Minor chord"]
+            "names": ["Minor chord/triad"]
         },
         "[047]": {
-            "names": ["Major triad", "Major chord"]
+            "names": ["Major chord/triad"]
         },
         "[048]": {
-            "names": ["Augmented triad", "Augmented chord"]
+            "names": [
+                "Augmented chord/triad",
+                "Maximally even trichord"
+            ]
         },
         "[0123]": {
-            "names": ["Chromatic tetrachord", "BACH tetrachord"]
+            "names": [
+                "BACH tetramirror", 
+                "Chromatic tetramirror"
+            ]
         },
         "[0124]": {
             "names": ["Major-second tetracluster 2"]
@@ -104,34 +169,44 @@
             "names": ["Major-second tetracluster 1"]
         },
         "[0134]": {
-            "names": []
+            "names": [
+                "Alternating tetramirror",
+                "Octatonic segment 1"
+            ]
         },
         "[0125]": {
-            "names": []
+            "names": ["Minor-third tetracluster 2"]
         },
         "[0345]": {
-            "names": []
+            "names": ["Minor-third tetracluster 1"]
         },
         "[0126]": {
-            "names": []
+            "names": ["Major-third tetracluster 2"]
         },
         "[0456]": {
-            "names": []
+            "names": ["Major-third tetracluster 1"]
         },
         "[0127]": {
-            "names": []
+            "names": ["Perfect fourth tetramirror"]
         },
         "[0145]": {
-            "names": ["Arabian tetrachord"]
+            "names": [
+                "Arabian tetramirror",
+                "Hexatonic segment"
+            ]
         },
         "[0156]": {
-            "names": []
+            "names": ["Double fourth tetramirror"]
         },
         "[0167]": {
-            "names": []
+            "names": ["Double tritone tetramirror"]
         },
         "[0235]": {
-            "names": ["Minor tetrachord", "Dorian tetrachord"]
+            "names": [
+                "Minor tetramirror", 
+                "Dorian tetramirror",
+                "Octatonic segment 2"
+            ]
         },
         "[0135]": {
             "names": ["Phrygian tetrachord"]
@@ -143,19 +218,19 @@
             "names": ["Harmonic-minor tetrachord"]
         },
         "[0346]": {
-            "names": []
+            "names": ["Major-third diminished tetrachord"]
         },
         "[0136]": {
-            "names": []
+            "names": ["Minor-second diminished tetrachord"]
         },
         "[0356]": {
-            "names": []
+            "names": ["Perfect-fourth diminished tetrachord"]
         },
         "[0237]": {
-            "names": []
+            "names": ["Major-second minor tetrachord"]
         },
         "[0457]": {
-            "names": []
+            "names": ["Perfect-fourth major tetrachord"]
         },
         "[0146]": {
             "names": ["All-interval tetrachord 1"]
@@ -164,58 +239,70 @@
             "names": ["All-interval tetrachord 2"]
         },
         "[0157]": {
-            "names": []
+            "names": ["Minor-second quartal tetrachord"]
         },
         "[0267]": {
-            "names": []
+            "names": ["Tritone quartal tetrachord"]
         },
         "[0347]": {
-            "names": []
+            "names": ["Major-minor tetramirror"]
         },
         "[0147]": {
-            "names": []
+            "names": ["Major-diminished tetrachord"]
         },
         "[0367]": {
-            "names": []
+            "names": ["Minor-diminished tetrachord"]
         },
         "[0148]": {
-            "names": []
+            "names": ["Minor-augmented tetrachord"]
         },
         "[0348]": {
-            "names": []
+            "names": ["Augmented-major tetrachord"]
         },
         "[0158]": {
             "names": ["Major-seventh chord"]
         },
         "[0246]": {
-            "names": ["Whole-tone tetrachord"]
+            "names": ["Whole-tone tetramirror"]
         },
         "[0247]": {
-            "names": []
+            "names": ["Major-second major tetrachord"]
         },
         "[0357]": {
-            "names": []
+            "names": ["Perfect-fourth minor tetrachord"]
         },
         "[0257]": {
-            "names": []
+            "names": [
+                "Quartal tetramirror",
+                "Stack of fourths/fifths"
+            ]
         },
         "[0248]": {
-            "names": ["Augmented seventh chord"]
+            "names": [
+                "Augmented-seventh chord",
+                "Whole-tone subset"
+            ]
         },
         "[0268]": {
             "names": ["French-sixth chord"]
         },
         "[0358]": {
-            "names": ["Minor seventh chord"]
+            "names": ["Minor-seventh chord"]
         },
         "[0258]": {
             "names": ["Half-diminished seventh chord"]
         },
         "[0368]": {
-            "names": ["Dominant-seventh chord", "German-sixth chord"]
+            "names": [
+                "Dominant-seventh chord", 
+                "German-sixth chord"
+            ]
         },
         "[0369]": {
-            "names": ["Diminished-seventh chord", "Maximally even tetrachord"]
+            "names": [
+                "Diminished-seventh chord", 
+                "Maximally even tetrachord"
+            ]
         },
         "[0137]": {
             "names": ["All-interval tetrachord 3"]
@@ -225,43 +312,49 @@
         },
 
         "[01234]": {
-            "names": ["Chromatic pentachord"]
+            "names": ["Chromatic pentamirror"]
         },
         "[01235]": {
-            "names": []
+            "names": ["Major-second pentacluster 2"]
         },
         "[02345]": {
-            "names": []
+            "names": ["Major-second pentacluster 1"]
         },
         "[01245]": {
-            "names": []
+            "names": ["Minor-second major pentachord"]
         },
         "[01345]": {
-            "names": []
+            "names": ["Spanish pentacluster"]
         },
         "[01236]": {
-            "names": []
+            "names": ["Blues pentacluster"]
         },
         "[03456]": {
-            "names": []
+            "names": ["Minor-third pentacluster"]
         },
         "[01237]": {
-            "names": []
+            "names": ["Major-third pentacluster 2"]
         },
         "[04567]": {
-            "names": []
+            "names": ["Major-third pentacluster 1"]
         },
         "[01256]": {
-            "names": []
+            "names": [
+                "Oriental pentacluster 1", 
+                "Raga Megharanji"
+            ]
         },
         "[01456]": {
-            "names": []
+            "names": ["Oriental pentacluster 2"]
         },
         "[01267]": {
-            "names": []
+            "names": [
+                "Double pentacluster 1", 
+                "Raga Nabhomani"
+            ]
         },
         "[01567]": {
-            "names": []
+            "names": ["Double pentacluster 2"]
         },
         "[02346]": {
             "names": ["Tritone-symmetric pentamirror"]
@@ -299,20 +392,433 @@
         "[02567]": {
             "names": ["Double-seconds triple-fourth pentachord 2"]
         },
-        
+        "[01268]": {
+            "names": ["Assymetric pentamirror"]
+        },
+        "[01347]": {
+            "names": ["Major-minor-diminished pentachord 1"]
+        },
+        "[03467]": {
+            "names": ["Major-minor-diminished pentachord 2"]
+        },
+        "[01348]": {
+            "names": ["Minor-major ninth chord"]
+        },
+        "[01457]": {
+            "names": ["Gypsy pentachord 1"]
+        },
+        "[02367]": {
+            "names": ["Gypsy pentachord 2"]
+        },
+        "[01367]": {
+            "names": ["Javanese pentachord"]
+        },
+        "[01467]": {
+            "names": ["Balinese pentachord"]
+        },
+        "[01378]": {
+            "names": [
+                "Balinese Pelog pentatonic (12414)", 
+                "Raga Bhupala", 
+                "Raga Bibhas"]
+        },
+        "[01578]": {
+            "names": [
+                "Hirajoshi pentatonic (21414)", 
+                "Iwato pentatonic (14142)", 
+                "Sakura pentatonic (14214)", 
+                "Raga Saveri (14214)"
+            ]
+        },
+        "[01458]": {
+            "names": [
+                "Syrian pentatonic (13134)",
+                "Major-augmented ninth chord"
+            ]
+        },
+        "[03478]": {
+            "names": [
+                "Lebanese pentachord",
+                "Augmented-minor chord"
+            ]
+        },
+        "[01478]": {
+            "names": [
+                "Persian pentamirror",
+                "Raga Reva/Ramkali (13314)"
+            ]
+        },
+        "[02357]": {
+            "names": ["Minor pentachord"]
+        },
+        "[02457]": {
+            "names": ["Major pentachord"]
+        },
+        "[01357]": {
+            "names": ["Phrygian pentachord"]
+        },
+        "[02467]": {
+            "names": ["Lydian pentachord"]
+        },
+        "[02358]": {
+            "names": ["Diminished-major ninth chord"]
+        },
+        "[03568]": {
+            "names": ["Minor-diminished ninth chord"]
+        },
+        "[02458]": {
+            "names": ["Diminished-augmented ninth chord"]
+        },
+        "[03468]": {
+            "names": ["Augmented-diminished ninth chord"]
+        },
+        "[01358]": {
+            "names": ["Major-ninth chord"]
+        },
+        "[03578]": {
+            "names": ["Minor-ninth chord"]
+        },
+        "[02368]": {
+            "names": ["Augmented-sixth pentachord 1"]
+        },
+        "[02568]": {
+            "names": ["Augmented-sixth pentachord 2"]
+        },
+        "[01368]": {
+            "names": ["Kumoi pentachord 2"]
+        },
+        "[02578]": {
+            "names": ["Kumoi pentachord 1"]
+        },
+        "[01468]": {
+            "names": ["Enigmatic pentachord 1"]
+        },
+        "[02478]": {
+            "names": [
+                "Enigmatic pentachord 2",
+                "Altered pentatonic (14223)"
+            ]
+        },
+        "[01369]": {
+            "names": ["Diminished minor-ninth chord"]
+        },
+        "[02369]": {
+            "names": [
+                "Ranjaniraga pentachord",
+                "Flat-ninth pentachord"
+            ]
+        },
+        "[01469]": {
+            "names": ["Neapolitan pentachord 1"]
+        },
+        "[01479]": {
+            "names": ["Neapolitan pentachord 2"]
+        },
+        "[02468]": {
+            "names": ["Whole-tone pentamirror"]
+        },
+        "[02469]": {
+            "names": [
+                "Dominant-ninth pentamirror",
+                "Major-minor pentamirror",
+                "Prometheus pentamirror",
+                "Dominant pentatonic (22332)"
+            ]
+        },
         "[02479]": {
             "names": [
-                "Pentatonic anhemitonic scale", 
+                "Black-key pentatonic",
+                "Slendro pentamirror",
+                "Raga Bilahari",
+                "Anhemitonic pentatonic",
+                "Quartal pentamirror",
                 "Maximally even pentachord"
             ]
         },
+        "[01247]": {
+            "names": ["Major-seventh pentacluster"]
+        },
+        "[03567]": {
+            "names": ["Minor-seventh pentacluster"]
+        },
+        "[03458]": {
+            "names": ["Center-cluster pentamirror"]
+        },
+        "[01258]": {
+            "names": ["Diminished pentacluster 1"]
+        },
+        "[03678]": {
+            "names": ["Diminished pentacluster 2"]
+        },
+        "[012345]": {
+            "names": [
+                "Chromatic hexamirror",
+                "1st-order all-combinatorial 1"
+            ]
+        },
+        "[012478]": {
+            "names": ["All-trichord hexachord 1"]
+        },
+        "[014678]": {
+            "names": ["All-trichord hexachord 2"]
+        },
+        "[012567]": {
+            "names": ["Double-cluster hexamirror"]
+        },
+        "[012678]": {
+            "names": [
+                "Messiaen's mode 5 (114114)",
+                "2nd-order all-combinatorial"
+            ]
+        },
+        "[023457]": {
+            "names": ["1st-order all-combinatorial 2"]
+        },
+        "[013467]": {
+            "names": ["Alternating hexamirror"]
+        },
+        "[023478]": {
+            "names": ["Megha/\"Cloud\" Raga"]
+        },
+        "[014589]": {
+            "names": [
+                "Augmented scale",
+                "Genus tertium",
+                "Hexatonic collection",
+                "3rd-order all-combinatorial"
+            ]
+        },
+        "[023568]": {
+            "names": ["Super-locrian hexamirror"]
+        },
+        "[024578]": {
+            "names": ["Melodic-minor hexachord"]
+        },
+        "[013568]": {
+            "names": [
+                "Locrian hexachord",
+                "Suddha Saveri Raga"
+            ]
+        },
+        "[023578]": {
+            "names": ["Minor hexachord"]
+        },
+        "[013578]": {
+            "names": ["Phrygian hexachord"]
+        },
+        "[023569]": {
+            "names": ["Pyramid hexachord"]
+        },
+        "[013569]": {
+            "names": ["Double-phrygian hexachord"]
+        },
+        "[013679]": {
+            "names": ["Minor-bitonal hexachord"]
+        },
+        "[023689]": {
+            "names": [
+                "Petrushka chord",
+                "Major-bitonal hexachord"
+            ]
+        },
+        "[024579]": {
+            "names": [
+                "Arezzo major diatonic (221223)",
+                "Major hexamirror",
+                "Quartal hexamirror",
+                "1st-order all-combinatorial 3"
+            ]
+        },
+        "[023579]": {
+            "names": ["Dorian hexachord"]
+        },
+        "[024679]": {
+            "names": [
+                "Dominant-11th hexachord",
+                "Lydian hexachord"
+            ]
+        },
+        "[013579]": {
+            "names": ["Scriabin's Mystic/Prometheus chord"]
+        },
+        "[024689]": {
+            "names": [
+                "Harmonic hexachord",
+                "Augmented-11th hexachord"
+            ]
+        },
+        "[02468A]": {
+            "names": [
+                "Whole-tone scale/collection",
+                "Maximally even hexachord",
+                "6th-order all-combinatorial"
+            ]
+        },
+        "[012569]": {
+            "names": ["Schoenberg's anagram hexachord"]
+        },
+        "[012589]": {
+            "names": ["Bauli raga (133131)"]
+        },
+        "[023479]": {
+            "names": ["Blues mode 1"]
+        },
+        "[0123456]": {
+            "names": ["Chromatic heptamirror"]
+        },
+        "[0124789]": {
+            "names": ["Chromatic phrygian inverse (1123113)"]
+        },
+        "[0125789]": {
+            "names": [
+                "Pantuvarali raga (1321131)",
+                "Chromatic myxolydian (1131132)",
+                "Chromatic dorian (1132113)",
+                "Mela Kanakangi (1132113)"
+            ]
+        },
+        "[0134589]": {
+            "names": ["Gypsy heptatonic (1312113"]
+        },
+        "[0125689]": {
+            "names": [
+                "Persian, Major gypsy, Hungarian Minor, Double harmonic scale (1312131)",
+                "Bhairav That, Mayamdavagaula raga (1312131)",
+                "Oriental scale (1311312)"
+            ]
+        },
+        "[0245679]": {
+            "names": ["Tritone major heptachord"]
+        },
+        "[0246789]": {
+            "names": ["Enigmatic heptatonic (1322211"]
+        },
+        "[0124689]": {
+            "names": [
+                "Neapolitan-minor mode (1222131)",
+                "Mela Dhenuka raga"
+            ]
+        },
+        "[0134679]": {
+            "names": [
+                "Alternating heptachord 1",
+                "Hungarian major mode (3121212)"
+            ]
+        },
+        "[0235689]": {
+            "names": ["Alternating heptachord 2"]
+        },
+        "[0134689]": {
+            "names": [
+                "Harmonic-minor mode (2122131)",
+                "Spanish gypsy",
+                "Mela Kiravani",
+                "Pilu That"
+            ]
+        },
+        "[0135689]": {
+            "names": [
+                "Dharmavati scale (2131221)",
+                "Harmonic-minor inverse (1312212)",
+                "Mela Cakravana",
+                "Raga Ahir Bhairav"
+            ]
+        },
+        "[012468A]": {
+            "names": [
+                "Neapolitan-major mode (122221)",
+                "Leading-whole-tone mode (222211)"
+            ]
+        },
+        "[013468A]": {
+            "names": [
+                "Melodic-minor ascending (2122221)",
+                "Acoustic scale",
+                "Harmonic/Super-Locrian",
+                "Augmented-13th heptamirror",
+                "Jazz minor"
+            ]
+        },
         "[013568A]": {
-            "names": ["Diatonic heptachord"]
+            "names": [
+                "Diatonic collection",
+                "Major diatonic heptachord (2212221)",
+                "Dominant-13th",
+                "Locrian (1221222)",
+                "Phrygian (1222122)",
+                "Major inverse",
+                "Maximally even heptachord"
+            ]
+        },
+        "[01234567]": {
+            "names": ["Chromatic octamirror"]
+        },
+        "[01236789]": {
+            "names": ["Messiaen's mode 4 (11131113)"]
+        },
+        "[0123579A]": {
+            "names": ["Spanish octatonic scale (12111222)"]
+        },
+        "[0123578A]": {
+            "names": [
+                "Quartal octachord",
+                "Diatonic octad"
+            ]
+        },
+        "[0124678A]": {
+            "names": ["Messiaen's mode 6 (11221122)"]
+        },
+        "[0124579A]": {
+            "names": [
+                "Spanish Phrygian (12112112)",
+                "Blues mode 2 (21211212)"
+            ]
+        },
+        "[0134679A]": {
+            "names": [
+                "Alternating octatonic or diminished scale (12121212)",
+                "Maximally even octachord"
+            ]
+        },
+        "[012345678]": {
+            "names": ["Chromatic nonamirror"]
+        },
+        "[01234578A]": {
+            "names": ["Nonatonic blues scale (211111212)"]
+        },
+        "[01235678A]": {
+            "names": ["Raga Ramdasi Malhar (211122111)"]
+        },
+        "[01235689A]": {
+            "names": ["Diminishing nonachord"]
+        },
+        "[01245689A]": {
+            "names": [
+                "Tsjerepnin",
+                "Messiaen's mode 3 (112112112)",
+                "Maximally even nonachord",
+                "Enneatonic"
+            ]
+        },
+        "[0123456789]": {
+            "names": ["Chromatic decamirror"]
+        },
+        "[012345789A]": {
+            "names": ["Major-minor mixed"]
+        },
+        "[012346789A]": {
+            "names": [
+                "Messiaen's mode 7 (1111211112)",
+                "Maximally even decachord"
+            ]
+        },
+        "[0123456789A]": {
+            "names": ["Chromatic undecamirror"]
         },
         "[0123456789AB]": {
             "names": [
                 "Chromatic scale",
-                "Dodecachord"
+                "Dodecamirror"
             ]
         }
     }
