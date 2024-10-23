@@ -650,6 +650,7 @@
         "[02468A]": {
             "names": [
                 "Whole-tone scale/collection",
+                "Messiaen's mode 1 (222222)",
                 "Maximally even hexachord",
                 "6th-order all-combinatorial"
             ]
@@ -777,6 +778,7 @@
         "[0134679A]": {
             "names": [
                 "Alternating octatonic or diminished scale (12121212)",
+                "Messiaen's mode 2 (12121212)",
                 "Maximally even octachord"
             ]
         },
