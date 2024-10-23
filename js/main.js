@@ -215,24 +215,24 @@ function showPcset(options = {}) {
 
     document.getElementById("rotations").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(rotations)));
     
-    document.getElementById("transpositions").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(transpositions, "Tn =")));
+    document.getElementById("transpositions").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(transpositions, "Tn", " = ")));
 
-    document.getElementById("inversions").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(inversions, config.inversion_format + " =")));
+    document.getElementById("inversions").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(inversions, config.inversion_format, " = ")));
     
-    document.getElementById("ctt").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(ctts, "Tn:")));
+    document.getElementById("ctt").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(ctts, "Tn", ": ", false)));
 
     document.querySelector("#row-cti td span").setHTMLUnsafe(
         ( config.inversion_format == "In" ) ? "I<sub>n</sub>" : "T<sub>n</sub>I" );
 
-    document.getElementById("cti").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(ctis, config.inversion_format + ":")));
+    document.getElementById("cti").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(ctis, config.inversion_format, ": ", false)));
     
     document.getElementById("symmetries").setHTMLUnsafe(textOrDash(
-        [setCollectionToStrWithLinks(inversional_symmetries, config.inversion_format + " ="), 
-         setCollectionToStrWithLinks(transpositional_symmetries, "Tn =")]
+        [setCollectionToStrWithLinks(inversional_symmetries, config.inversion_format, " = "), 
+         setCollectionToStrWithLinks(transpositional_symmetries, "Tn", " = ")]
             .filter((s) => s != "").join(", ")
     ));
     
-    document.getElementById("multiples").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(multiples, "Mn =")));
+    document.getElementById("multiples").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(multiples, "Mn", " = ")));
 
     //document.getElementById("subsets").setHTMLUnsafe(
     //    `Show <a href="javascript:showSubsets()">all subsets</a> | <a href="javascript:showSubsetsPrimes()">prime subsets</a>`
@@ -401,10 +401,11 @@ function pcsetGetDescriptiveNames(pcset) {
 }
 
 
-function setCollectionToStrWithLinks(sets, op = null) {
+function setCollectionToStrWithLinks(sets, op = null, sep = " = ", include_op_in_link = true) {
     const strings = (op)
         ? sets.map( (item) =>
-            `${op.replace(' ',"&nbsp;").replace('n', "<sub>" + item[0].join(",") + "</sub>")}&nbsp;${pcsetHyperlink(item[1], { op: [op,item[0][0]] })}`
+            `${op.replace('n', "<sub>" + item[0].join(",") + "</sub>")}${sep.replace(' ',"&nbsp;")}${
+                include_op_in_link ? pcsetHyperlink(item[1], { op: [op,item[0][0]] }) : pcsetHyperlink(item[1])}`
         )
         : sets.map( (item) =>
             pcsetHyperlink(item)
