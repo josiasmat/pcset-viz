@@ -711,7 +711,7 @@ class PcSet {
         let new_array = Array.from(this.#data);
         for ( const pc of other )
             new_array.push(pc);
-        return new PcSet(new_array);
+        return new PcSet(new_array).normal;
     }
 
     /**
@@ -727,7 +727,7 @@ class PcSet {
         for ( const pc of this )
             if ( other.has(pc) )
                 new_array.push(pc);
-        return new PcSet(new_array);
+        return new PcSet(new_array).normal;
     }
 
     /**
@@ -746,7 +746,7 @@ class PcSet {
             if ( i != -1 )
                 new_array.splice(i, 1);
         }
-        return new PcSet(new_array);
+        return new PcSet(new_array).normal;
     }
 
     sym_difference(other) {
