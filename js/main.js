@@ -259,7 +259,7 @@ function showPcset(options = {}) {
         getCombinatorialsStr(combs.p, 'P'),
         getCombinatorialsStr(combs.ri, 'RI'),
         getCombinatorialsStr(combs.r, 'R')
-    ].filter( (s) => s ).join("&nbsp;");
+    ].filter( (s) => s ).join(' ');
 
     // Collect set features
 
