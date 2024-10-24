@@ -109,7 +109,7 @@ body {
     body {
         overflow: visible; 
         height: auto;
-        font-size: 3.8vw;
+        font-size: 16pt;
     }
 }
 
@@ -218,6 +218,7 @@ main {
                 width: 30%;
             }
         }
+        font-size: 3.7vw;
     }
 }
 
