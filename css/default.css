@@ -31,6 +31,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         --bg-border-color: gray;
         --bg-color: var(--bg-light);
         --fg-color: var(--fg-light);
+        --fg-same-set: #cc0000;
         --fg-dim-color: #444;
         --table-alternate-color: var(--bg-alternate-light);
         --hyperlink-fg-color: #0000dd;
@@ -60,9 +61,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         --bg-border-color: #333;
         --bg-color: var(--bg-dark);
         --fg-color: var(--bg-light);
+        --fg-same-set: #ffdddd;
         --fg-dim-color: #aaa;
         --table-alternate-color: var(--bg-alternate-dark);
-        --hyperlink-fg-color: #ccccff;
+        --hyperlink-fg-color: #ddffaa;
         --hyperlink-hover-bg-color: rgba(255,255,255,0.1);
         --hyperlink-hover-border-color: rgba(255,255,255,0.2);
         --button-bg-color: gray;
@@ -94,19 +96,20 @@ body {
     font-family: var(--serif-font);
     font-weight: 300;
     font-style: normal;
-    font-size: 12pt;
 }
 
 @media (orientation: landscape) {
     body {
         overflow: hidden; 
         height: 100%;
+        font-size: 12pt;
     }
 }
 @media (orientation: portrait) {
     body {
         overflow: visible; 
         height: auto;
+        font-size: 16pt;
     }
 }
 
@@ -164,11 +167,6 @@ main {
     color: var(--fg-color);
     overflow: auto;
     table {
-        th, td {
-            &:first-child {
-                width: 21ch;
-            }
-        }
         #input-main {
             appearance: none;
             color: var(--input-fg-color);
@@ -204,12 +202,22 @@ main {
     #data-area {
         width: 50%;
         height: 100%;
+        th, td {
+            &:first-child {
+                width: 21ch;
+            }
+        }
     }
 }
 @media (orientation: portrait) {
     #data-area {
         width: 100%;
         height: auto;
+        th, td {
+            &:first-child {
+                width: 30%;
+            }
+        }
     }
 }
 
@@ -414,12 +422,14 @@ table {
     }
 }
 
-a {
+a, span.same-set {
     text-decoration: none;
     border: 1px solid transparent;
     padding: 1px 1px;
     text-wrap: nowrap;
-    color: var(--hyperlink-fg-color);
+    user-select: none;
+    &:not(.same-set) { color: var(--hyperlink-fg-color); }
+    &.same-set { color: var(--fg-same-set); }
     &:hover {
         background-color: var(--hyperlink-hover-bg-color);
         border: 1px solid var(--hyperlink-hover-border-color);

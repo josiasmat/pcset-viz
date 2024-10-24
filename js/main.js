@@ -108,11 +108,15 @@ function textOrDash(s) {
  * @returns {String}
  */
 function pcsetHyperlink(pcset, options = {}) {
-    const ss = pcset.toString("short-ab", false);
-    const js = (options.op) ? `javascript:goto('${ss}', ['${options.op[0]}',${options.op[1]}])`: `javascript:goto('${ss}')`;
     const tx = (options.text) ? options.text : htmlEscape(pcset.toString(config.set_format, true));
-    //const tx = (options.text) ? options.text : htmlEscape(pcset.normal.toString(config.set_format, true));
-    const anchor = makeAnchorStr(js, { text: tx, classes: ["setfont"] });
+    let anchor;
+    if ( pcset.isEqualTo(state.pcset) )
+        anchor = `<span class="setfont same-set">${tx}</span>`;
+    else {
+        const ss = pcset.toString("short-ab", false);
+        const js = (options.op) ? `javascript:goto('${ss}', ['${options.op[0]}',${options.op[1]}])`: `javascript:goto('${ss}')`;
+        anchor = makeAnchorStr(js, { text: tx, classes: ["setfont"] });
+    }
     return ( options.copy ) ? [anchor, copyLink(tx)].join(" ") : anchor;
 }
 
@@ -158,7 +162,7 @@ function showPcset(options = {}) {
     const transpositions = state.pcset.transpositions_unique(false);
     const ctts = state.pcset.ctts_unique(false);
     const ctis = state.pcset.ctis_unique();
-    const rotations = state.pcset.rotations(false).map((x) => x[1]);
+    const rotations = state.pcset.rotations(true).map((x) => x[1]);
     const inversions = state.pcset.inversions_unique();
     const inversional_symmetries = state.pcset.inversionally_symmetric_sets();
     const transpositional_symmetries = state.pcset.transpositionally_symmetric_sets(false);
@@ -447,6 +451,7 @@ function setCollectionToStrWithLinks(sets, op = null, sep = " = ", include_op_in
                     start = pair[1];
                 }
             }
+            if ( item[0].length > 1 ) item[1] = item[1].normal;
             strings.push(
                 `${op.replace('n', "<sub>" + ranges.join(",") + "</sub>")}${sep.replaceAll(' ',"&nbsp;")}${
                     include_op_in_link ? pcsetHyperlink(item[1], { op: [op,item[0][0]] }) : pcsetHyperlink(item[1])}`
