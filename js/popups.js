@@ -580,10 +580,11 @@ function makeSelectorSetLink(set, text, options = {}) {
 }
 
 function handleDialogClick(e) {
-    if ( this != e.target ) return;
-    const rect = this.getBoundingClientRect();
-    if ( !isInsideRect(rect, e.clientX, e.clientY) )
-        hidePopup(this.id);
+    if ( this == e.target ) {
+        const rect = this.getBoundingClientRect();
+        if ( !isInsideRect(rect, e.clientX, e.clientY) )
+            hidePopup(this.id);
+    }
 }
 
 // Make all popups close when clicked outside them
