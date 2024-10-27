@@ -105,12 +105,14 @@ function textOrDash(s) {
  *          operation;
  *      * _text_ : a string containing the text to be printed; if ommitted,
  *          the set will be printed.
+ *      * _enable_ : set it to _true_ to make a link even if the set is
+ *          equal to the current set.
  * @returns {String}
  */
 function pcsetHyperlink(pcset, options = {}) {
     const tx = (options.text) ? options.text : htmlEscape(pcset.toString(config.set_format, true));
     let anchor;
-    if ( pcset.isEqualTo(state.pcset) )
+    if ( pcset.isEqualTo(state.pcset) && !options.enable )
         anchor = `<span class="setfont same-set">${tx}</span>`;
     else {
         const ss = pcset.toString("short-ab", false);
@@ -299,9 +301,11 @@ function showPcset(options = {}) {
                 elm.setAttribute("onclick", "staffClefClick()");
                 break;
             case "note":
-                elm.style.cursor = "pointer";
-                elm.style.pointerEvents = "bounding-box";
-                elm.setAttribute("onclick", `staffNoteClick(${index})`);
+                if ( ![2,7,9].includes(index) ) {
+                    elm.style.cursor = "pointer";
+                    elm.style.pointerEvents = "bounding-box";
+                    elm.setAttribute("onclick", `staffNoteClick(${index})`);
+                }
                 break;
         }
     }
@@ -372,7 +376,7 @@ function operationUpdate(reset = false) {
         case "Mn": result = state.pcset.multiply(index); break;
         default: result = state.pcset;
     }
-    document.getElementById("operation-result").setHTMLUnsafe(pcsetHyperlink(result, {op: [op,index]}));
+    document.getElementById("operation-result").setHTMLUnsafe(pcsetHyperlink(result, {op: [op,index], enable: true}));
 }
 
 
