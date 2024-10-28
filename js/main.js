@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 "use strict";
 
-const VERSION = "2024-10-22";
+const VERSION = "2024-10-28";
 
 const config_storage = new LocalStorageHandler("pcsetviz");
 const config_visible_data = new LocalStorageHandler("pcsetviz-visible-data");
