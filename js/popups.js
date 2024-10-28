@@ -44,7 +44,31 @@ function updateConfigPopup() {
         const target_elm = document.getElementById(target_id);
         checkbox.checked = !(target_elm.hasAttribute("hidden"));
     }
+    document.getElementById("select-midi-mode").value = midi.mode;
+    const midi_select_elm = document.getElementById("select-midi-device");
+    const midi_status_elm = document.getElementById("midi-connection-status");
+    clearSelectOptions(midi_select_elm);
+    const options = [addOptionToHtmlSelect(
+        midi_select_elm, "", "No device available"
+    )];
+    requestMidiInputs( (ports) => {
+        if ( ports.length > 0 )
+            options[0].setAttribute("label", "None");
+        for ( const port of ports ) {
+            options.push(addOptionToHtmlSelect(
+                midi_select_elm, port.id, port.name,
+                ( midi.dev && midi.dev.name == port.name )
+            ));
+        }
+        if ( options.length > 1 )
+            midi_select_elm.insertBefore(options[0], options[1]);
+        midi_status_elm.innerHTML = ( midi.dev ) ? "Connected" : "Disconnected";
+        //selectMidiDevice();
+    }, () => {
+        midi_status_elm.innerHTML = "MIDI access denied";
+    });
 }
+
 
 function resetVisibleDataRows() {
     data_rows.forEach( (row) => { row.visible = row.default } );
@@ -529,6 +553,13 @@ function downloadImage(type) {
 function copyImageToClipboard() {
     const type = document.querySelector('input[name="export-file-type"]:checked').value;
     const graphics_type = document.getElementById("expimg-select-type").value;
+    const theme = (graphics_type == "staff-set")
+        ? "basic-"
+                + document.getElementById("expimg-select-theme-bg").value
+                + document.getElementById("expimg-select-theme-color").value
+        : document.getElementById("expimg-select-theme").value 
+                + '-' + document.getElementById("expimg-select-theme-bg").value
+                + document.getElementById("expimg-select-theme-color").value;
     let svg;
     switch ( graphics_type ) {
         case "clockface-set"      : svg = makeClockfaceSvgFromParams(theme); break;

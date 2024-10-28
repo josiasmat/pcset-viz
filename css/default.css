@@ -343,6 +343,7 @@ dialog.popup-container[open] {
             &:first-child {
                 width: 15ch;
                 text-align: center;
+                font-weight: bold;
             }
             &:last-child {
                 line-height: 200%;
@@ -393,8 +394,9 @@ dialog.popup-container[open] {
         table {
             th, td {
                 &:first-child {
-                    width: 15ch;
+                    width: 10ch;
                     text-align: center;
+                    font-weight: bold;
                 }
                 &:last-child {
                     line-height: 200%;

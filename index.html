@@ -26,6 +26,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         <script type="text/javascript" src="js/storage-handler.js"></script>
         <script type="text/javascript" src="js/clockface.js"></script>
         <script type="text/javascript" src="js/popups.js" async></script>
+        <script type="text/javascript" src="js/midi.js" async></script>
         <script type="text/javascript" src="js/graphics.js" defer></script>
         <script type="text/javascript" src="js/utils.js"></script>
         <script type="text/javascript" src="js/i18n.js" defer></script>
@@ -250,14 +251,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                     <table id="popup-config-table">
                         <tbody>
                             <tr>
-                                <td>Visible data:<br />
+                                <td>Visible data<br />
                                     (<a href="javascript:resetVisibleDataRows()" autofocus>Reset</a> · 
                                      <a href="javascript:setAllDataRowsVisible()" autofocus>All</a>)
                                 </td>
                                 <td id="visible-data-checkboxes-area"></td>
                             </tr>
                             <tr>
-                                <td>Set format:</td>
+                                <td>Set format</td>
                                 <td>
                                     <span>
                                         <input id="radio-setformat-short-ab" type="radio" name="set-format" value="short-ab" onchange="onChange()" checked>
@@ -283,7 +284,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                 </td>
                             </tr>
                             <tr>
-                                <td>Vector format:</td>
+                                <td>Vector format</td>
                                 <td>
                                     <span>
                                         <input id="radio-vectorformat-short" type="radio" name="vector-format" value="short" onchange="onChange()" checked>
@@ -297,7 +298,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                 </td>
                             </tr>
                             <tr>
-                                <td>Inversion format:</td>
+                                <td>Inversion format</td>
                                 <td>
                                     <span>
                                         <input id="radio-inversionformat-in" type="radio" name="inversion-format" value="In" onchange="onChange()" checked>
@@ -311,7 +312,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                 </td>
                             </tr>
                             <tr>
-                                <td>Clockface visualization:</td>
+                                <td>Clockface visualization</td>
                                 <td>
                                     <span>
                                         <input id="chk-note-names" type="checkbox" onchange="onChange()">
@@ -332,7 +333,29 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                 </td>
                             </tr>
                             <tr>
-                                <td>App layout:</td>
+                                <td>MIDI input</td>
+                                <td>
+                                    <span>
+                                        <label for="">Mode:</label>
+                                        <select name="select-midi-mode" id="select-midi-mode" onchange="selectMidiMode()">
+                                            <option value="accumulate">Accumulate</option>
+                                            <option value="chord">Chord</option>
+                                            <option value="direct">Direct</option>
+                                            <option value="toggle">Toggle</option>
+                                        </select>
+                                    </span>
+                                    <span>
+                                        <label for="select-midi-device">Device:</label>
+                                        <select name="select-midi-device" id="select-midi-device" onchange="selectMidiDevice()">
+                                            <option value="">No device selected</option>
+                                        </select>
+                                    </span>
+                                →
+                                    <span id="midi-connection-status">Disconnected</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>App layout</td>
                                 <td>
                                     <span>
                                         <input id="radio-svg-first" type="radio" name="div-layout" value="svg-first" onchange="onChange()" checked>
@@ -345,7 +368,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                 </td>
                             </tr>
                             <tr>
-                                <td>Theme:</td>
+                                <td>Theme</td>
                                 <td>
                                     <span>
                                         <input id="radio-theme-auto" type="radio" name="theme" value="auto" onchange="onChange()" checked>

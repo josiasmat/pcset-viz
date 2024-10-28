@@ -372,3 +372,20 @@ function isInsideRect(rect, x, y) {
         && ( y >= rect.top  ) && ( y <= rect.bottom );
 }
 
+
+function addOptionToHtmlSelect(select_element, value, label, selected = false) {
+    const option = document.createElement("option");
+    option.setAttribute("value", value);
+    option.setAttribute("label", label);
+    if ( selected ) option.setAttribute("selected", true);
+    select_element.appendChild(option);
+    return option;
+}
+
+
+function clearSelectOptions(select_element) {
+    let L = select_element.options.length - 1;
+    for( let i = L; i >= 0; i-- )
+       select_element.remove(i);
+ }
+ 
