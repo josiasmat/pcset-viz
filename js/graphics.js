@@ -294,9 +294,9 @@ class StaticClockfaceView extends PcSetBaseView {
 
     }
 
-    downloadPng(width, filename = null) {
+    downloadPng(width_height, filename = null) {
         if ( !filename ) filename = this.getStandardFilename("png", "-clockface");
-        super.downloadPng(width, width, filename);
+        super.downloadPng(width_height, width_height, filename);
     }
     
     downloadSvg(filename = null) {
@@ -418,9 +418,9 @@ class StaticRulerPcSetView extends PcSetBaseView {
 
     }
 
-    downloadPng(width, filename = null) {
-        const height = Math.round(parseInt(this.svg.getAttribute("height")) 
-                        * width / parseInt(this.svg.getAttribute("width")));
+    downloadPng(height, filename = null) {
+        const width = Math.round(parseInt(this.svg.getAttribute("width")) 
+                        * height / parseInt(this.svg.getAttribute("height")));
         if ( !filename ) filename = this.getStandardFilename("png", "-ruler");
         super.downloadPng(width, height, filename);
     }
@@ -623,9 +623,9 @@ class StaticStaffPcSetView extends PcSetBaseView {
 
     }
 
-    downloadPng(width, filename = null) {
-        const height = Math.round(parseInt(this.svg.getAttribute("height")) 
-                        * width / parseInt(this.svg.getAttribute("width")));
+    downloadPng(height, filename = null) {
+        const width = Math.round(parseInt(this.svg.getAttribute("width")) 
+                        * height / parseInt(this.svg.getAttribute("height")));
         if ( !filename ) filename = this.getStandardFilename("png", "-staff");
         super.downloadPng(width, height, filename);
     }

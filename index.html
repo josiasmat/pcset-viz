@@ -401,7 +401,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                         <table>
                             <tbody>
                                 <tr>
-                                    <td><label for="expimg-select-type">Type:</label></td>
+                                    <td><label for="expimg-select-type">Type</label></td>
                                     <td><select name="expimg-type" id="expimg-select-type" onchange="updateImageExportPopup()" autofocus>
                                         <option value="clockface-set">Clockface (set)</option>
                                         <option value="clockface-intervals">Clockface (intervals)</option>
@@ -410,7 +410,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     </select></td>
                                 </tr>
                                 <tr>
-                                    <td>Elements:</td>
+                                    <td>Elements</td>
                                     <td id="expimg-elements-area">
                                         <span includetype="clockface-intervals">
                                             <input id="chk-export-ic1" type="checkbox" onchange="updateImageExportPopup()">
@@ -485,14 +485,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     </td>
                                 </tr>
                                 <tr includetype="staff-set">
-                                    <td><label for="expimg-select-staff-clef">Shift:</label></td>
+                                    <td><label for="expimg-select-staff-clef">Shift</label></td>
                                     <td>
                                         <a id="expimg-staff-shiftup-link" href="javascript:exportStaffShiftNotes(-1)">▼ Down</a> • 
                                         <a id="expimg-staff-shiftdown-link" href="javascript:exportStaffShiftNotes(1)">Up ▲</a>
                                     </td>
                                 </tr>                                    
                                 <tr>
-                                    <td><label for="expimg-select-theme">Theme:</label></td>
+                                    <td><label for="expimg-select-theme">Theme</label></td>
                                     <td>
                                         <span excludetype="staff-set" style="padding-right: 0.5ch;">
                                             <select name="expimg-theme" id="expimg-select-theme" onchange="updateImageExportPopup()">
@@ -520,7 +520,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     </td>
                                 </tr>
                                 <tr includetype="ruler-set">
-                                    <td><label for="expimg-first-pc">Start at:</label></td>
+                                    <td><label for="expimg-first-pc">Start at</label></td>
                                     <td>
                                         <span class="range-label">0</span>
                                         <input type="range" id="expimg-first-pc" name="expimg-first-pc" oninput="updateImageExportPopup()" 
@@ -537,7 +537,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     </datalist>
                                 </tr>
                                 <tr includetype="clockface-set clockface-intervals">
-                                    <td><label for="expimg-scale">Scaling:</label></td>
+                                    <td><label for="expimg-scale">Scaling</label></td>
                                     <td>
                                         <span class="range-label">Small</span>
                                         <input type="range" id="expimg-scale" name="expimg-scale" oninput="updateImageExportPopup()" 
@@ -551,7 +551,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     </datalist>
                                 </tr>
                                 <tr excludetype="staff-set">
-                                    <td><label for="expimg-stroke">Strokes:</label></td>
+                                    <td><label for="expimg-stroke">Strokes</label></td>
                                     <td>
                                         <span class="range-label">Thin</span>
                                         <input type="range" id="expimg-stroke" name="expimg-stroke" oninput="updateImageExportPopup()" 
@@ -567,7 +567,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     </datalist>
                                 </tr>
                                 <tr>
-                                    <td>Format:</td>
+                                    <td>Format</td>
                                     <td>
                                         <span>
                                             <input id="radio-export-file-svg" type="radio" name="export-file-type" value="svg" onchange="updateImageExportPopup()" checked>
@@ -578,14 +578,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                             <label for="radio-export-file-png">PNG image</label>
                                         </span>
                                         <span id="span-input-export-file-png-size" hidden>
-                                            <label for="input-export-file-png-size">Width:</label>
+                                            <label for="input-export-file-png-size">Height:</label>
                                             <input id="input-export-file-png-size" type="number" value="1000" step="100" min="100" max="10000" onchange="updateImageExportPopup()"/>
                                             <label for="input-export-file-png-size"> pixels</label>
                                         </span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Export:</td>
+                                    <td>Export</td>
                                     <td>
                                         <a id="export-image-download-svg-link" href="javascript:downloadImage('svg')">Save SVG file</a>
                                         <a id="export-image-download-png-link" href="javascript:downloadImage('png')" hidden>Save PNG file</a>
