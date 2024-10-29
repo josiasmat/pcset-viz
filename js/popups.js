@@ -345,14 +345,13 @@ function showExportImagePopup() {
 
 
 function updateImageExportPopup() {
+    const popup_export = document.getElementById("popup-export-image");
     const file_type = document.querySelector('input[name="export-file-type"]:checked').value;
     document.getElementById("export-image-download-svg-link").hidden = (file_type != "svg");
     document.getElementById("export-image-download-png-link").hidden = (file_type != "png");
     document.getElementById("span-input-export-file-png-size").hidden = (file_type != "png");
-    if ( file_type == "svg")
-        document.getElementById("export-image-copy-link").hidden = !( ClipboardItem.supports("image/svg+xml") );
-    else
-        document.getElementById("export-image-copy-link").hidden = !( ClipboardItem.supports("image/png") );
+    document.getElementById("export-image-copy-link").hidden = 
+        !( ClipboardItem.supports( ( file_type == "svg") ? "image/svg+xml" : "image/png" ) );
 
     const graphics_type = document.getElementById("expimg-select-type").value;
 
@@ -361,16 +360,10 @@ function updateImageExportPopup() {
     for ( const elm of document.querySelectorAll("#popup-export-options *[excludetype]") )
         elm.hidden = (elm.getAttribute("excludetype").includes(graphics_type));
 
-    const theme = (graphics_type == "staff-set")
-        ? "basic-"
-                + document.getElementById("expimg-select-theme-bg").value
-                + document.getElementById("expimg-select-theme-color").value
-        : document.getElementById("expimg-select-theme").value 
-                + '-' + document.getElementById("expimg-select-theme-bg").value
-                + document.getElementById("expimg-select-theme-color").value;
-    
+    const theme = getImageExportTheme();
+
     function exportStaffPreviewClick(elm, type, index) {
-        if ( type == "note" ) {
+        if ( type == "note" && ![2,7,9].includes(index) ) {
             elm.style.cursor = "pointer";
             elm.style.pointerEvents = "bounding-box";
             elm.setAttribute("onclick", `exportStaffNoteClick(${index})`);
@@ -389,13 +382,23 @@ function updateImageExportPopup() {
     preview.svg.setAttribute("max-width", "100%");
     preview.svg.setAttribute("max-height", "100%");
     const div_preview = document.getElementById("popup-export-preview");
-    if ( GRAPHICS_THEMES[theme].bg_type == "dark" ) {
-        div_preview.style.backgroundColor = "var(--bg-dark)"; 
-    } else {
-        div_preview.style.backgroundColor = "var(--bg-light)";
-    }
-    div_preview.innerHTML = preview.svg.outerHTML;
+    div_preview.style.backgroundColor = ( GRAPHICS_THEMES[theme].bg_type == "dark" )
+        ? "var(--bg-dark)" : "var(--bg-light)"
+    div_preview.setHTMLUnsafe(preview.svg.outerHTML);
     saveImageExportPopupSettings();
+}
+
+
+function getImageExportTheme() {
+    const theme_elm = document.getElementById("expimg-select-theme");
+    const bg_elm    = document.getElementById("expimg-select-theme-bg");
+    const color_elm = document.getElementById("expimg-select-theme-color");
+    const theme = [
+        (theme_elm.checkVisibility() ? theme_elm.value : "basic"),
+        (bg_elm.checkVisibility()    ? bg_elm.value    : "light"),
+        (color_elm.checkVisibility() ? color_elm.value : "")
+    ].filter( (s) => s ).join('-');
+    return theme;
 }
 
 
@@ -416,12 +419,13 @@ function loadImageExportPopupSettings() {
     document.getElementById("chk-export-polygon").checked = config_export_image.readBool("polygon", config.polygon);
     document.getElementById("chk-export-sym-axes").checked = config_export_image.readBool("symmetry_axes", config.symmetry_axes);
     document.getElementById("chk-export-fifths").checked = config_export_image.readBool("fifths", config.fifths);
-    document.getElementById("chk-export-ic1").checked = config_export_image.readBool("ic1", config.ic1);
-    document.getElementById("chk-export-ic2").checked = config_export_image.readBool("ic2", config.ic2);
-    document.getElementById("chk-export-ic3").checked = config_export_image.readBool("ic3", config.ic3);
-    document.getElementById("chk-export-ic4").checked = config_export_image.readBool("ic4", config.ic4);
-    document.getElementById("chk-export-ic5").checked = config_export_image.readBool("ic5", config.ic5);
-    document.getElementById("chk-export-ic6").checked = config_export_image.readBool("ic6", config.ic6);
+    document.getElementById("chk-export-double-row").checked = config_export_image.readBool("double-row", false);
+    document.getElementById("chk-export-ic1").checked = config_export_image.readBool("ic1", false);
+    document.getElementById("chk-export-ic2").checked = config_export_image.readBool("ic2", false);
+    document.getElementById("chk-export-ic3").checked = config_export_image.readBool("ic3", false);
+    document.getElementById("chk-export-ic4").checked = config_export_image.readBool("ic4", false);
+    document.getElementById("chk-export-ic5").checked = config_export_image.readBool("ic5", false);
+    document.getElementById("chk-export-ic6").checked = config_export_image.readBool("ic6", false);
     document.getElementById("expimg-select-theme").value = config_export_image.readString("theme", "basic");
     document.getElementById("expimg-select-theme-color").value = config_export_image.readString("theme-color", "");
     document.getElementById("expimg-select-theme-bg").value = config_export_image.readString("theme-bg", "light");
@@ -440,6 +444,7 @@ function saveImageExportPopupSettings() {
     config_export_image.writeBool("polygon", document.getElementById("chk-export-polygon").checked);
     config_export_image.writeBool("symmetry_axes", document.getElementById("chk-export-sym-axes").checked);
     config_export_image.writeBool("fifths", document.getElementById("chk-export-fifths").checked);
+    config_export_image.writeBool("double-row", document.getElementById("chk-export-double-row").checked);
     config_export_image.writeBool("ic1", document.getElementById("chk-export-ic1").checked);
     config_export_image.writeBool("ic2", document.getElementById("chk-export-ic2").checked);
     config_export_image.writeBool("ic3", document.getElementById("chk-export-ic3").checked);
@@ -529,13 +534,7 @@ function makeStaffSvgFromParams(theme, callback = null) {
 
 function downloadImage(type) {
     const graphics_type = document.getElementById("expimg-select-type").value;
-    const theme = (graphics_type == "staff-set")
-        ? "basic-"
-                + document.getElementById("expimg-select-theme-bg").value
-                + document.getElementById("expimg-select-theme-color").value
-        : document.getElementById("expimg-select-theme").value 
-                + '-' + document.getElementById("expimg-select-theme-bg").value
-                + document.getElementById("expimg-select-theme-color").value;
+    const theme = getImageExportTheme();
     let svg;
     switch ( graphics_type ) {
         case "clockface-set"      : svg = makeClockfaceSvgFromParams(theme); break;
@@ -553,13 +552,7 @@ function downloadImage(type) {
 function copyImageToClipboard() {
     const type = document.querySelector('input[name="export-file-type"]:checked').value;
     const graphics_type = document.getElementById("expimg-select-type").value;
-    const theme = (graphics_type == "staff-set")
-        ? "basic-"
-                + document.getElementById("expimg-select-theme-bg").value
-                + document.getElementById("expimg-select-theme-color").value
-        : document.getElementById("expimg-select-theme").value 
-                + '-' + document.getElementById("expimg-select-theme-bg").value
-                + document.getElementById("expimg-select-theme-color").value;
+    const theme = getImageExportTheme();
     let svg;
     switch ( graphics_type ) {
         case "clockface-set"      : svg = makeClockfaceSvgFromParams(theme); break;
