@@ -771,7 +771,7 @@ const GRAPHICS_THEMES = {
         polygon_stroke: "#77fa", polygon_fill: "#77f2", axis: "#fffa", off: { text: "#fffa" }
     },
     "hard-light": {
-        bg_type: "light", fg: "#000", bg: "none", circle_stroke: "#000", circle_fill: "#000", 
+        bg_type: "light", fg: "#000", bg: "none", circle_stroke: "#000", circle_fill: "#444", 
         polygon_stroke: "#000", on: { text: "#fff" }, off: { circle_stroke: "#000" }
     },
     "hard-light-red": {
@@ -787,7 +787,7 @@ const GRAPHICS_THEMES = {
         polygon_stroke: "#00f",on: { text: "#fff" }, off: { circle_stroke: "#000" }
     },
     "hard-dark": {
-        bg_type: "dark", fg: "#fff", bg: "none", circle_stroke: "#fff", circle_fill: "#fff",
+        bg_type: "dark", fg: "#fff", bg: "none", circle_stroke: "#fff", circle_fill: "#ccc",
         polygon_stroke: "#fff", on: { text: "#000" }, off: { circle_stroke: "#fff" }
     },
     "hard-dark-red": {
