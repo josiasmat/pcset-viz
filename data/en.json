@@ -290,7 +290,10 @@
             "names": ["Minor-seventh chord"]
         },
         "[0258]": {
-            "names": ["Half-diminished seventh chord"]
+            "names": [
+                "Half-diminished seventh chord",
+                "Tristan chord"
+            ]
         },
         "[0368]": {
             "names": [
