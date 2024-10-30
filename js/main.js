@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 "use strict";
 
-const VERSION = "2024-10-29";
+const VERSION = "2024-10-10";
 
 const config_storage = new LocalStorageHandler("pcsetviz");
 const config_visible_data = new LocalStorageHandler("pcsetviz-visible-data");
@@ -32,6 +32,7 @@ const STAFF_CLEFS = ["G2", "C3", "C4", "F4"];
 
 const config = {
     last_set: "",
+    prime_unique: true,
     note_names: false,
     polygon: true,
     intervals: true,
@@ -154,6 +155,7 @@ function showPcset(options = {}) {
     const normal = state.pcset.normal;
     const reduced = normal.reduced;
     const prime = reduced.prime;
+    const prime_inversion = prime.invert().reduced;
     //const inversion = normal.invert();
     //const inversion_reduced = inversion.reduced;
     const complement = normal.complement;
@@ -169,6 +171,8 @@ function showPcset(options = {}) {
     const inversional_symmetries = state.pcset.inversionally_symmetric_sets();
     const transpositional_symmetries = state.pcset.transpositionally_symmetric_sets(false);
     const multiples = state.pcset.multiples_unique();
+
+    const mirror = reduced.isMirror();
 
     state.axes = state.pcset.inversional_symmetry_axes();
 
@@ -191,9 +195,16 @@ function showPcset(options = {}) {
     //     + addEquivIf(!state.pcset.isEqualTo(reduced), `T<sub>${12-normal.head}</sub>`)
     // );
 
-    document.getElementById("prime-form").setHTMLUnsafe(
-        checkmarkIf(state.pcset.isEqualTo(prime)) + pcsetHyperlink(prime, {copy: true})
-    );
+    if ( prime.hasDistinctInverse() ) {
+        document.getElementById("prime-form").setHTMLUnsafe(
+            checkmarkIf(state.pcset.isEqualTo(prime)) + pcsetHyperlink(prime, {copy: true})
+            + " · Inverse: " 
+            + checkmarkIf(state.pcset.isEqualTo(prime_inversion)) + pcsetHyperlink(prime_inversion, {copy: true}) );
+    } else {
+        document.getElementById("prime-form").setHTMLUnsafe( 
+            checkmarkIf(state.pcset.isEqualTo(prime)) + pcsetHyperlink(prime, {copy: true})
+        );
+    }
 
     document.getElementById("ic-vector").setHTMLUnsafe(strWithCopyLink(
         (config.vector_format == "short") ? icvector.str_hex(true) : icvector.str_numbers(true)
@@ -206,16 +217,16 @@ function showPcset(options = {}) {
     document.getElementById("complement").setHTMLUnsafe(
         pcsetHyperlink(complement) 
         + addEquivIf(!complement.isEqualTo(complement_prime), pcsetHyperlink(complement_prime))
-        + ` (${complement.forte_name})`
+        + ` (${complement.forte_name(!config.prime_unique)})`
     );
 
     document.getElementById("zcorrespondent").setHTMLUnsafe(
-        (zcorrespondent) ? `${pcsetHyperlink(zcorrespondent)} (${zcorrespondent.forte_name})` : "-"
+        (zcorrespondent) ? `${pcsetHyperlink(zcorrespondent)} (${zcorrespondent.forte_name(!config.prime_unique)})` : "-"
     );
 
     operationUpdate();
 
-    document.getElementById("forte-name").setHTMLUnsafe(strWithCopyLink(prime.forte_name));
+    document.getElementById("forte-name").setHTMLUnsafe(strWithCopyLink(normal.forte_name(!config.prime_unique)));
 
     document.getElementById("carter-name").setHTMLUnsafe(strWithCopyLink(prime.carter_number.toString()));
 
@@ -270,7 +281,7 @@ function showPcset(options = {}) {
     //    "Null set","Singleton","Dyad","Trichord","Tetrachord","Pentachord","Hexachord","Heptachord",
     //    "Octachord","Nonachord","Decachord","Undecachord","Dodechachord"][state.pcset.size]);
     if ( icvector.count_value(1) == 6 ) features.push("All-interval");
-    if ( inversional_symmetries.length > 0 ) features.push("Mirror");
+    if ( mirror ) features.push("Mirror");
     if ( zcorrespondent ) features.push("Z-set");
     if ( comb_count > 0 ) features.push(( comb_count >= 3 ? "All&#8209;combinatorial&nbsp;(" : "Combinatorial&nbsp;(" ) + combs_str + ")");
     document.getElementById("features").setHTMLUnsafe(textOrDash(features.join(", ")));
@@ -572,6 +583,7 @@ function toggleVisibleData(id, checked = null) {
 function updateInterfaceFromConfig() {
     document.querySelector(`input[name="div-layout"][value="${config.layout}"]`).checked = true;
     document.querySelector(`input[name="set-format"][value="${config.set_format}"]`).checked = true;
+    document.querySelector(`input[name="prime-form"][value="${config.prime_unique.toString()}"]`).checked = true;
     document.querySelector(`input[name="vector-format"][value="${config.vector_format}"]`).checked = true;
     document.querySelector(`input[name="inversion-format"][value="${config.inversion_format}"]`).checked = true;
     document.getElementById("chk-note-names").checked = config.note_names;
@@ -588,6 +600,7 @@ function updateConfigFromInterface() {
     if ( new_set_format != config.set_format )
         input_main.value = state.pcset.toString(new_set_format, false);
     config.set_format = new_set_format;
+    config.prime_unique = document.getElementById("radio-prime-form-unique").checked;
     config.vector_format = document.querySelector(`input[name="vector-format"]:checked`).value;
     config.inversion_format = document.querySelector(`input[name="inversion-format"]:checked`).value;
     config.note_names = document.getElementById("chk-note-names").checked;
@@ -607,6 +620,7 @@ function updateConfigFromInterface() {
 function readConfig() {
     config.layout = config_storage.readString("layout", "svg-first");
     config.set_format = config_storage.readString("set-format", SET_FORMATS[0]);
+    config.prime_unique = config_storage.readBool("prime-unique", true);
     config.vector_format = config_storage.readString("vector-format", VECTOR_FORMATS[0]);
     config.inversion_format = config_storage.readString("inversion-format", INVERSION_FORMATS[0]);
     config.last_set = config_storage.readString("last-set", "");
@@ -628,6 +642,7 @@ function readConfig() {
 function saveConfig() {
     config_storage.writeString("layout", config.layout);
     config_storage.writeString("set-format", config.set_format);
+    config_storage.writeBool("prime-unique", config.prime_unique);
     config_storage.writeString("vector-format", config.vector_format);
     config_storage.writeString("inversion-format", config.inversion_format);
     config_storage.writeBool("note_names", config.note_names);

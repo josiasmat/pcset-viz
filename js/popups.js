@@ -121,7 +121,7 @@ function showPrimeSelector() {
 
 
 function showForteSelector() {
-    document.getElementById("popup-set-selector-second-column-header").textContent = "Forte names";
+    document.getElementById("popup-set-selector-second-column-header").textContent = "Forte/Morris names";
     document.getElementById("table-set-row-filter").hidden = true;
 
     // set of cardinality 0, 1, 11 & 12
@@ -139,8 +139,13 @@ function showForteSelector() {
         let links = []
         for ( let entry of Object.entries(PCSET_CATALOG[i]) ) {
             const set = entry[0].slice(1,-1);
-            const text = entry[1].fn;
-            links.push(makeSelectorSetLink(set, text));
+            const name = entry[1].fn;
+            if ( !config.prime_unique && entry[1].inv ) {
+                const inv = entry[1].inv.slice(1,-1);
+                links.push(makeSelectorSetLink(set, name+'A'));
+                links.push(makeSelectorSetLink(inv, name+'B'));
+            } else
+                links.push(makeSelectorSetLink(set, name));
         }
         const id = `table-set-row${( i>1 && i<11 ) ? i : 0}`;
         const elm = document.getElementById(id);
@@ -208,7 +213,7 @@ function showDescriptionSelector() {
             const len = set.size; //entry[0].length-2;
             const str_short = set.toString("short-ab", false);// entry[0].substring(1,len+1);
             const str_full = set.toString(config.set_format, true);
-            const hint = `${str_full} (${set.forte_name})\n${entry[1]["names"].join("\n")}`;
+            const hint = `${str_full} (${set.forte_name(config.prime_unique)})\n${entry[1]["names"].join("\n")}`;
             for ( let name of entry[1]["names"] ) {
                 if ( filterName(name) ) {
                     const link = makeSelectorSetLink(str_short,name, {hint:hint,nosetfont:true});

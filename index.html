@@ -74,7 +74,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                             <td id="prime-form"></td>
                         </tr>
                         <tr id="row-forte">
-                            <td i18n="row-forte">Forte name: <a href="javascript:showForteSelector()">&#128269;</a></td>
+                            <td i18n="row-forte">Forte/Morris name: <a href="javascript:showForteSelector()">&#128269;</a></td>
                             <td id="forte-name"></td>
                         </tr>
                         <tr id="row-carter" hidden>
@@ -281,6 +281,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                         <label for="radio-setformat-notes-flats">[C,D&#9837;,D,…,A,B&#9837;,B]</label>
                                     </span>
                                     <span class="keyboard-shortcut" style="float: inline-end;">(Alt+F)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Forte/Morris name</td>
+                                <td>
+                                    <span>
+                                        <input id="radio-prime-form-unique" type="radio" name="prime-form" value="true" onchange="onChange()" checked>
+                                        <label for="radio-prime-form-unique">Prime and its inverse are the same (Forte)</label>
+                                    </span>
+                                    <span>
+                                        <input id="radio-prime-form-distinct" type="radio" name="prime-form" value="false" onchange="onChange()">
+                                        <label for="radio-prime-form-distinct">Differentiate prime and its inverse</label>
+                                    </span>
                                 </td>
                             </tr>
                             <tr>
@@ -589,7 +602,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     <td>
                                         <a id="export-image-download-svg-link" href="javascript:downloadImage('svg')">Save SVG file</a>
                                         <a id="export-image-download-png-link" href="javascript:downloadImage('png')" hidden>Save PNG file</a>
-                                        <span id="export-image-copy-link"> • <a href="javascript:copyImageToClipboard()">Copy image to clipboard</a></span>
+                                        <span id="export-image-copy-link"> · <a href="javascript:copyImageToClipboard()">Copy image to clipboard</a></span>
                                     </td>
                                 </tr>
                             </tbody>

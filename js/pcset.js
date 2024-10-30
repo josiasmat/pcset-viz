@@ -267,6 +267,14 @@ class PcSet {
         return this.size == 0;
     }
 
+    hasDistinctInverse() {
+        return ( this.#get_catalog_entry().inv );
+    }
+
+    isMirror() {
+        return ( !this.is_empty() && !this.hasDistinctInverse() );
+    }
+
     // COMPARISON AND SEGMENTATION
 
     /**
@@ -277,7 +285,7 @@ class PcSet {
      */
     isEqualTo(other) {
         if ( this.size != other.size ) return false;
-        for ( let i = 0; i < this.size; i++ )
+        for ( let i = this.size-1; i >= 0; i-- )
             if ( this.at(i) != other.at(i) )
                 return false;
         return true;
@@ -611,12 +619,15 @@ class PcSet {
     }
 
     #get_catalog_entry() {
-        return PCSET_CATALOG[this.size][this.prime.#strCompact(true, "0123456789AB")];
+        return PCSET_CATALOG[this.size][this.prime.#strCompact(true, PCSET_TOKEN_MAP_SHORT_AB)];
     }
 
-    get forte_name() {
+    forte_name(ab = false) {
         const entry = this.#get_catalog_entry();
-        return entry.fn;
+        if ( ab && entry.inv )
+            return entry.fn + ( this.prime.isEqualTo(this.reduced) ? 'A' : 'B' );
+        else 
+            return entry.fn;
     }
 
     get carter_number() {
@@ -1450,3 +1461,14 @@ const PCSET_CATALOG = [
         "[0123456789AB]": { fn: "12-1", cn: 1 }
     }
 ]
+
+
+// Add inverses to catalog
+for ( let i = 3; i < 11; i++ ) {
+    for ( const entry of Object.entries(PCSET_CATALOG[i]) ) {
+        const prime = new PcSet(entry[0]);
+        const inverse = prime.invert().reduced;
+        if ( !prime.isEqualTo(inverse) )
+            entry[1].inv = inverse.toString("short-ab", true);
+    }
+}
