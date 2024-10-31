@@ -155,7 +155,6 @@ function pcsetHyperlink(pcset, options = {}) {
 
 function copyLink(s) {
     return "<small>(" + makeAnchorStr(`javascript:copyToClipboard('${s}')`, {text:"copy"}) + ")</small>";
-    //return `<small>(<a href="javascript:copyToClipboard('${s}')">copy</a>)</small>`;
 }
 
 
@@ -749,15 +748,11 @@ function handleKeyboardShortcut(ev) {
             createSvg(document.getElementById("visualization-svg"));
             onVisualizationConfigChange(); 
             break;
-        // case "escape":
-        //     hideAllPopups();
-        //     break;
     }
 }
 
 function enableKeyboardShortcuts() {
     window.addEventListener("keydown", handleKeyboardShortcut);
-    //document.addEventListener("keydown", handleKeyboardShortcut);
 }
 
 
