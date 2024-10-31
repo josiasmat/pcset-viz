@@ -47,6 +47,8 @@ const pc_drag_state = {
     to: null
 }
 
+var polygon_update_timer = null;
+
 
 function createSvg(element) {
 
@@ -261,9 +263,15 @@ function drawVisualization(options = {}) {
 
     viz.polygon.style.display = (config.polygon) ? "inline" : "none";
 
-    if ( !options.keep_polygon ) drawPolygon();
-    drawSymmetryLines();
-    //drawIntervals();
+    
+    if ( polygon_update_timer ) clearTimeout(polygon_update_timer);
+    polygon_update_timer = setTimeout(() => {
+            if ( !options.keep_polygon ) drawPolygon();
+            drawSymmetryLines();
+            polygon_update_timer = null;
+        }, options.polygon_delay ? options.polygon_delay : 0
+    );
+    
 }
 
 
@@ -349,7 +357,7 @@ function drawPolygon() {
             }
         }
     } else {
-        console.log(`Error detected in polygon: normal is [${normal_array.toString()}], polygon is [${state.polygon.toString()}]`);
+        //console.log(`Error detected in polygon: normal is [${normal_array.toString()}], polygon is [${state.polygon.toString()}]`);
         state.polygon = Array.from(normal_array);
     }
 

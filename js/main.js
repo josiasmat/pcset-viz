@@ -110,6 +110,8 @@ var state = {
     }
 }
 
+var history_update_timer = null;
+
 var string_data = new Object();
 
 
@@ -163,12 +165,16 @@ function strWithCopyLink(s, cs = null) {
 }
 
 
-function pushSetToHistory() {
-    const s = state.pcset.toString("short-ab", false);
-    window.history.pushState([s,state.last_op,++state.history_index], document.title, 
-                             `${window.location.pathname}?set=${s}`);
-    config.last_set = s;
-    config_storage.writeString("last-set", s);
+function pushSetToHistory(timeout = 0) {
+    if ( history_update_timer ) clearTimeout(history_update_timer);
+    history_update_timer = setTimeout(() => { 
+            const s = state.pcset.toString("short-ab", false);
+            window.history.pushState([s,state.last_op,++state.history_index], document.title, 
+                                    `${window.location.pathname}?set=${s}`);
+            config.last_set = s;
+            config_storage.writeString("last-set", s);
+            history_update_timer = null;
+        }, timeout);
 }
 
 
@@ -178,8 +184,9 @@ function pushSetToHistory() {
  */
 function showPcset(options = {}) {
     
-    if ( !options.no_history ) pushSetToHistory();
-
+    if ( !options.no_history )
+        pushSetToHistory(options.history_delay ? options.history_delay : 0);
+        
     const normal = state.pcset.normal;
     const reduced = normal.reduced;
     const prime = reduced.prime;

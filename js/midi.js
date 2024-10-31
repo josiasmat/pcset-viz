@@ -26,7 +26,6 @@ const midi = {
     mode: MIDI_MODES[1],
     keys: Array(128).fill(false),
     pcs: Array(12).fill(0),
-    
 }
 
 const config_midi_storage = new LocalStorageHandler("pcsetviz-midi");
@@ -190,13 +189,13 @@ function updatePlayedNotes(key = null, pc = null, note_on = false, first_on = fa
         case "accumulate":
             if ( key != null ) {
                 const sum = midi.keys.reduce( (sum,k) => sum += k ? 1 : 0, 0 );
-                if ( sum == 1 && first_on ) {
+                if ( sum == 1 && first_on )
                     state.pcset = new PcSet([pc]);
-                } else if ( midi.pcs[pc] > 0 )
+                else if ( midi.pcs[pc] > 0 )
                     state.pcset.add(pc);
             }
     }
-    showPcset();
+    showPcset({history_delay: 250, polygon_delay: 100});
 }
 
 
