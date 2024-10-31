@@ -140,7 +140,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                             <td id="inversions"></td>
                         </tr>
                         <tr id="row-cti" hidden>
-                            <td i18n="row-cti">Common tones under <span>I<sub>n</sub></span>:</td>
+                            <td i18n="row-cti">Common tones under <span id="cti-inversion-label">I<sub>n</sub></span>:</td>
                             <td id="cti"></td>
                         </tr>
                         <tr id="row-multiples" hidden>
@@ -385,7 +385,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                 <td>
                                     <span>
                                         <input id="radio-theme-auto" type="radio" name="theme" value="auto" onchange="onChange()" checked>
-                                        <label for="radio-theme-auto">Use system theme</label>
+                                        <label for="radio-theme-auto">Follow browser setting</label>
                                     </span>
                                     <span>
                                         <input id="radio-theme-light" type="radio" name="theme" value="light" onchange="onChange()">

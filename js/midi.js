@@ -24,7 +24,7 @@ const midi = {
     dev: null,
     channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
     mode: MIDI_MODES[1],
-    keys: Array(128).fill(0),
+    keys: Array(128).fill(false),
     pcs: Array(12).fill(0),
     
 }
@@ -147,7 +147,7 @@ function handleMIDIEvent(ev) {
 
 
 function setNoteOn(key) {
-    midi.keys[key] += 1;
+    midi.keys[key] = true;
     const pc = mod12(key);
     midi.pcs[pc] += 1;
     updatePlayedNotes(key, pc, true, (midi.pcs[pc] == 1));
@@ -155,7 +155,7 @@ function setNoteOn(key) {
 
 
 function setNoteOff(key) {
-    midi.keys[key] = Math.max(midi.keys[key]-1, 0);
+    midi.keys[key] = false;
     const pc = mod12(key);
     midi.pcs[pc] = Math.max(midi.pcs[pc]-1, 0);
     updatePlayedNotes(key, pc, false);
@@ -163,7 +163,7 @@ function setNoteOff(key) {
 
 
 function setAllNotesOff() {
-    midi.keys = Array(128).fill(0);
+    midi.keys = Array(128).fill(false);
     midi.pcs = Array(12).fill(0);
     updatePlayedNotes();
 }
@@ -171,37 +171,25 @@ function setAllNotesOff() {
 
 function updatePlayedNotes(key = null, pc = null, note_on = false, first_on = false) {
     switch ( midi.mode ) {
-        case "toggle":
-            if ( key != null && first_on )
-                state.pcset.toggle(pc);
-            break;
         case "direct":
-            state.pcset = new PcSet(midi.pcs.reduce(
-                (r,x,i) => { if (x>0) r.push(i); return r; }, []
+            state.pcset = new PcSet(midi.keys.reduce(
+                (r,k,i) => { if (k) r.push(mod12(i)); return r; }, []
             ));
             break;
+        case "toggle":
+            if ( first_on )
+                state.pcset.toggle(mod12(key));
+            break;
         case "chord":
-            if ( key != null ) {
-                if ( first_on ) {
-                    state.pcset = new PcSet(midi.pcs.reduce(
-                        (r,x,i) => { if (x>0) r.push(i); return r; }, []
-                    ));
-                }
-                if ( note_on ) {
-                    for ( let key = 0; key < 128; key++ ) {
-                        const lowest = mod12(key);
-                        if ( midi.keys[key] != 0 && state.pcset.has(lowest)) {
-                            while ( state.pcset.head != lowest )
-                                state.pcset = state.pcset.shift(1);
-                            break;
-                        }
-                    }
-                }
+            if ( note_on ) {
+                state.pcset = new PcSet(midi.keys.reduce(
+                    (r,k,i) => { if (k) r.push(mod12(i)); return r; }, []
+                ));
             }
             break;
         case "accumulate":
-            if ( pc != null ) {
-                const sum = midi.pcs.reduce( (sum,x) => sum += x );
+            if ( key != null ) {
+                const sum = midi.keys.reduce( (sum,k) => sum += k ? 1 : 0, 0 );
                 if ( sum == 1 && first_on ) {
                     state.pcset = new PcSet([pc]);
                 } else if ( midi.pcs[pc] > 0 )

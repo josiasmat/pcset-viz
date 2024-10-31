@@ -513,8 +513,32 @@ class PcSet {
      *      from the end to the beginning).
      * @return {PcSet} Returns a new PcSet object with the shifted set.
      */
-    shift(n) {
+    shifted(n) {
         return this.segment(this.size, n);
+    }
+
+    shiftedTo(pc) {
+        const i = this.index_of(pc)
+        if ( i != -1 )
+            return this.shifted(i);
+    }
+
+    shift(n) {
+        if ( this.size > 1 ) {
+            if ( n >=  0 ) {
+                for ( let i = 0; i < n; i++ )
+                    this.#data.push(this.#data.shift());
+            } else {
+                for ( let i = 0; i > n; i-- )
+                    this.#data.unshift(this.#data.pop());
+            }
+        }
+    }
+
+    shiftTo(pc) {
+        const i = this.index_of(pc);
+        if ( i != -1 )
+            this.shift(i);
     }
 
     /**
@@ -574,7 +598,7 @@ class PcSet {
         let ambitus = compute_interval(best.head, best.tail);
         let binv = best.zero.binary_value;
         for ( let n = 1; n < len; n++ ) {
-            const candidate = initial.shift(n);
+            const candidate = initial.shifted(n);
             const cand_ambt = compute_interval(candidate.head, candidate.tail);
             const cand_binv = candidate.zero.binary_value;
             if ( (cand_ambt < ambitus) || ( cand_ambt == ambitus && cand_binv < binv) ) {
@@ -849,7 +873,6 @@ class PcSet {
     ctts_unique(include_zero = true) {
         let sets = this.ctts(include_zero);
         PcSet.#filter_unique_tagged(sets);
-        // if ( !include_zero ) sets.shift();
         return sets;
     }
 
@@ -893,7 +916,7 @@ class PcSet {
     rotations(include_zero = true) {
         let sets = [];
         for ( let n = (include_zero ? 0 : 1); n < this.size; n++ )
-            sets.push([[n], this.shift(n)]);
+            sets.push([[n], this.shifted(n)]);
         return sets;
     }
 

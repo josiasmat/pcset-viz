@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 "use strict";
 
-const VERSION = "2024-10-30";
+const VERSION = "2024-10-31";
 
 const config_storage = new LocalStorageHandler("pcsetviz");
 const config_visible_data = new LocalStorageHandler("pcsetviz-visible-data");
@@ -67,6 +67,35 @@ class DataRow {
 }
 
 var data_rows = [];
+
+var data_cells = {
+    ruler_view: document.getElementById("ruler-view"),
+    staff_view: document.getElementById("staff-view"),
+    normal_form: document.getElementById("normal-form"),
+    prime_form: document.getElementById("prime-form"),
+    forte_name: document.getElementById("forte-name"),
+    carter_name: document.getElementById("carter-name"),
+    descriptive_name: document.getElementById("descriptive-name"),
+    ic_vector: document.getElementById("ic-vector"),
+    ct_vector: document.getElementById("ct-vector"),
+    complement: document.getElementById("complement"),
+    zcorrespondent: document.getElementById("zcorrespondent"),
+    features: document.getElementById("features"),
+    rotations: document.getElementById("rotations"),
+    symmetries: document.getElementById("symmetries"),
+    transpositions: document.getElementById("transpositions"),
+    ctt: document.getElementById("ctt"),
+    inversions: document.getElementById("inversions"),
+    cti: document.getElementById("cti"),
+    cti_inv_label: document.getElementById("cti-inversion-label"),
+    multiplications: document.getElementById("multiples"),
+    subsets: document.getElementById("subsets"),
+    operation: {
+        selector: document.getElementById("operation-selector"),
+        index: document.getElementById("operation-index"),
+        result: document.getElementById("operation-result")
+    }
+}
 
 var state = {
     pcset: new PcSet(),
@@ -155,9 +184,7 @@ function showPcset(options = {}) {
     const normal = state.pcset.normal;
     const reduced = normal.reduced;
     const prime = reduced.prime;
-    const prime_inversion = prime.invert().reduced;
-    //const inversion = normal.invert();
-    //const inversion_reduced = inversion.reduced;
+    const prime_inverse = prime.invert().reduced;
     const complement = normal.complement;
     const complement_prime = complement.prime;
     const zcorrespondent = prime.zcorrespondent;
@@ -172,91 +199,87 @@ function showPcset(options = {}) {
     const transpositional_symmetries = state.pcset.transpositionally_symmetric_sets(false);
     const multiples = state.pcset.multiples_unique();
 
-    const mirror = reduced.isMirror();
+    const is_mirror = reduced.isMirror();
 
     state.axes = state.pcset.inversional_symmetry_axes();
 
     function checkmarkIf(cond) {
-        if (cond) return "<small>✔</small> ";
-        return "";
+        return (cond) ? "<small>✔</small> " : "";
     }
 
     function addEquivIf(cond, s) {
-        if (cond) return "&nbsp;=&nbsp;" + s;
-        return "";
+        return (cond) ? "&nbsp;=&nbsp;" + s : "";
     }
 
-    document.getElementById("normal-form").setHTMLUnsafe(
-        checkmarkIf(state.pcset.isEqualTo(normal)) + pcsetHyperlink(normal, {copy: true})
-    );
-
-    // document.getElementById("reduced-form").setHTMLUnsafe(
-    //     checkmarkIf(state.pcset.isEqualTo(reduced)) + pcsetHyperlink(reduced, {copy: true, op: ["T", 12-normal.head]})
-    //     + addEquivIf(!state.pcset.isEqualTo(reduced), `T<sub>${12-normal.head}</sub>`)
-    // );
+    data_cells.normal_form.setHTMLUnsafe(
+        checkmarkIf(state.pcset.isEqualTo(normal)) + pcsetHyperlink(normal, {copy: true}));
 
     if ( prime.hasDistinctInverse() ) {
-        document.getElementById("prime-form").setHTMLUnsafe(
+        data_cells.prime_form.setHTMLUnsafe(
             checkmarkIf(state.pcset.isEqualTo(prime)) + pcsetHyperlink(prime, {copy: true})
             + " · Inverse: " 
-            + checkmarkIf(state.pcset.isEqualTo(prime_inversion)) + pcsetHyperlink(prime_inversion, {copy: true}) );
+            + checkmarkIf(state.pcset.isEqualTo(prime_inverse)) + pcsetHyperlink(prime_inverse, {copy: true}) );
     } else {
-        document.getElementById("prime-form").setHTMLUnsafe( 
+        data_cells.prime_form.setHTMLUnsafe( 
             checkmarkIf(state.pcset.isEqualTo(prime)) + pcsetHyperlink(prime, {copy: true})
         );
     }
 
-    document.getElementById("ic-vector").setHTMLUnsafe(strWithCopyLink(
+    data_cells.ic_vector.setHTMLUnsafe(strWithCopyLink(
         (config.vector_format == "short") ? icvector.str_hex(true) : icvector.str_numbers(true)
     ));
 
-    document.getElementById("ct-vector").setHTMLUnsafe(strWithCopyLink(
+    data_cells.ct_vector.setHTMLUnsafe(strWithCopyLink(
         (config.vector_format == "short") ? ctvector.str_hex(true) : ctvector.str_numbers(true)
     ));
 
-    document.getElementById("complement").setHTMLUnsafe(
+    data_cells.complement.setHTMLUnsafe(
         pcsetHyperlink(complement) 
         + addEquivIf(!complement.isEqualTo(complement_prime), pcsetHyperlink(complement_prime))
         + ` (${complement.forte_name(!config.prime_unique)})`
     );
 
-    document.getElementById("zcorrespondent").setHTMLUnsafe(
+    data_cells.zcorrespondent.setHTMLUnsafe(
         (zcorrespondent) ? `${pcsetHyperlink(zcorrespondent)} (${zcorrespondent.forte_name(!config.prime_unique)})` : "-"
     );
 
     operationUpdate();
 
-    document.getElementById("forte-name").setHTMLUnsafe(strWithCopyLink(normal.forte_name(!config.prime_unique)));
+    data_cells.forte_name.setHTMLUnsafe(
+        strWithCopyLink(normal.forte_name(!config.prime_unique)));
 
-    document.getElementById("carter-name").setHTMLUnsafe(strWithCopyLink(prime.carter_number.toString()));
+    data_cells.carter_name.setHTMLUnsafe(
+        strWithCopyLink(prime.carter_number.toString()));
 
-    document.getElementById("rotations").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(rotations)));
+    data_cells.rotations.setHTMLUnsafe(textOrDash(
+        setCollectionToStrWithLinks(rotations)));
     
-    document.getElementById("transpositions").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(transpositions, "Tn", " = ")));
+    data_cells.transpositions.setHTMLUnsafe(textOrDash(
+        setCollectionToStrWithLinks(transpositions, "Tn", " = ")));
 
-    document.getElementById("inversions").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(inversions, config.inversion_format, " = ")));
+    data_cells.inversions.setHTMLUnsafe(textOrDash(
+        setCollectionToStrWithLinks(inversions, config.inversion_format, " = ")));
     
-    document.getElementById("ctt").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(ctts, "Tn", ": ", false)));
+    data_cells.ctt.setHTMLUnsafe(textOrDash(
+        setCollectionToStrWithLinks(ctts, "Tn", ": ", false)));
 
-    document.querySelector("#row-cti td span").setHTMLUnsafe(
+    data_cells.cti_inv_label.setHTMLUnsafe(
         ( config.inversion_format == "In" ) ? "I<sub>n</sub>" : "T<sub>n</sub>I" );
 
-    document.getElementById("cti").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(ctis, config.inversion_format, ": ", false)));
+    data_cells.cti.setHTMLUnsafe(textOrDash(
+        setCollectionToStrWithLinks(ctis, config.inversion_format, ": ", false)));
     
-    document.getElementById("symmetries").setHTMLUnsafe(textOrDash(
+    data_cells.symmetries.setHTMLUnsafe(textOrDash(
         [setCollectionToStrWithLinks(inversional_symmetries, config.inversion_format, " = "), 
          setCollectionToStrWithLinks(transpositional_symmetries, "Tn", " = ")]
             .filter((s) => s != "").join(", ")
     ));
     
-    document.getElementById("multiples").setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(multiples, "Mn", " = ")));
+    data_cells.multiplications.setHTMLUnsafe(textOrDash(
+        setCollectionToStrWithLinks(multiples, "Mn", " = ")));
 
-    //document.getElementById("subsets").setHTMLUnsafe(
-    //    `Show <a href="javascript:showSubsets()">all subsets</a> | <a href="javascript:showSubsetsPrimes()">prime subsets</a>`
-    //);
-
-    document.getElementById("descriptive-name").setHTMLUnsafe(textOrDash(pcsetGetDescriptiveNames(reduced).join(", ")));
-
+    data_cells.descriptive_name.setHTMLUnsafe(textOrDash(
+        pcsetGetDescriptiveNames(reduced).join(", ")));
 
     // Hexacordal combinatorials
 
@@ -281,10 +304,11 @@ function showPcset(options = {}) {
     //    "Null set","Singleton","Dyad","Trichord","Tetrachord","Pentachord","Hexachord","Heptachord",
     //    "Octachord","Nonachord","Decachord","Undecachord","Dodechachord"][state.pcset.size]);
     if ( icvector.count_value(1) == 6 ) features.push("All-interval");
-    if ( mirror ) features.push("Mirror");
+    if ( is_mirror ) features.push("Mirror");
     if ( zcorrespondent ) features.push("Z-set");
     if ( comb_count > 0 ) features.push(( comb_count >= 3 ? "All&#8209;combinatorial&nbsp;(" : "Combinatorial&nbsp;(" ) + combs_str + ")");
-    document.getElementById("features").setHTMLUnsafe(textOrDash(features.join(", ")));
+
+    data_cells.features.setHTMLUnsafe(textOrDash(features.join(", ")));
 
     // ruler views
 
@@ -300,7 +324,7 @@ function showPcset(options = {}) {
         { scale: 1, start: state.ruler.start, note_names: config.note_names, fn: adaptRulerView }, 
         (getCurrentTheme() == "dark") ? "basic-dark" : "basic-light"
     );
-    document.getElementById("ruler-view").setHTMLUnsafe(ruler_view.svg.outerHTML);
+    data_cells.ruler_view.setHTMLUnsafe(ruler_view.svg.outerHTML);
 
     // staff view
 
@@ -343,7 +367,7 @@ function showPcset(options = {}) {
         },
         (getCurrentTheme() == "dark") ? "basic-dark" : "basic-light"
     );
-    document.getElementById("staff-view").setHTMLUnsafe(staff_view.svg.outerHTML);
+    data_cells.staff_view.setHTMLUnsafe(staff_view.svg.outerHTML);
 
     drawVisualization(options);
 
@@ -351,48 +375,49 @@ function showPcset(options = {}) {
 
 
 function operationUpdate(reset = false) {
-    const op = document.getElementById("operation-selector").value;
-    const index_element = document.getElementById("operation-index");
-    const previous = parseInt(index_element.getAttribute("previous-value"));
-    let index = parseInt(index_element.value);
+    const op = data_cells.operation.selector.value;
+    const previous = parseInt(data_cells.operation.index.getAttribute("previous-value"));
+    let index = parseInt(data_cells.operation.index.value);
     switch ( op ) {
         case "Rn":
-            index_element.setAttribute("max", state.pcset.size);
-            index_element.setAttribute("min", -state.pcset.size);
+            data_cells.operation.index.setAttribute("max", state.pcset.size);
+            data_cells.operation.index.setAttribute("min", -state.pcset.size);
             if ( reset ) index = 1;
             if ( index == 0 ) index = -Math.sign(previous);
             if ( Math.abs(index) >= state.pcset.size ) index = 0;
             break;
         case "Tn":
-            index_element.setAttribute("max", 12);
-            index_element.setAttribute("min", -12);
+            data_cells.operation.index.setAttribute("max", 12);
+            data_cells.operation.index.setAttribute("min", -12);
             if ( reset ) index = 1;
             if ( index == 0 ) index = -Math.sign(previous);
             if ( Math.abs(index) >= 12 ) index = Math.sign(index);
             break;
         default:
-            index_element.setAttribute("max", 12);
-            index_element.setAttribute("min", -1);
+            data_cells.operation.index.setAttribute("max", 12);
+            data_cells.operation.index.setAttribute("min", -1);
             if ( reset || index >= 12 ) index = 0;
             if ( index < 0 ) index += 12;
     }
-    index_element.value = index.toString();
-    index_element.setAttribute("previous-value", index.toString());
+    data_cells.operation.index.value = index.toString();
+    data_cells.operation.index.setAttribute("previous-value", index.toString());
 
     let result;
     switch ( op ) {
-        case "Rn": result = state.pcset.shift(index); break;
+        case "Rn": result = state.pcset.shifted(index); break;
         case "Tn": result = state.pcset.transpose(index); break;
         case "In": result = state.pcset.invert(index); break;
         case "Mn": result = state.pcset.multiply(index); break;
         default: result = state.pcset;
     }
-    document.getElementById("operation-result").setHTMLUnsafe(pcsetHyperlink(result, {op: [op,index], enable: true}));
+
+    data_cells.operation.result.setHTMLUnsafe(
+        pcsetHyperlink(result, {op: [op,index], enable: true}));
 }
 
 
 function pcsetRotate(amount) {
-    state.pcset = state.pcset.shift(amount);
+    state.pcset.shift(amount);
     input_main.value = state.pcset.toString(config.set_format, false);
     showPcset({ no_history: false, keep_polygon: true });
 }
@@ -416,26 +441,6 @@ function staffClefClick() {
 function staffNoteClick(pc) {
     state.staff_accidental_swap[pc] = !state.staff_accidental_swap[pc];
     showPcset({ no_history: true, keep_polygon: true });
-}
-
-
-function showSubsets() {
-    const subsets_element = document.getElementById("subsets");
-    subsets_element.setHTMLUnsafe("Computing subsets...");
-    const clone = state.pcset.clone();
-    const subsets = clone.subsets();
-    if ( clone.isEqualTo(state.pcset) )
-        subsets_element.setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(subsets)));
-}
-
-
-function showSubsetsPrimes() {
-    const subsets_element = document.getElementById("subsets");
-    subsets_element.setHTMLUnsafe("Computing subsets...");
-    const clone = state.pcset.clone();
-    const subsets = clone.prime_subsets();
-    if ( clone.isEqualTo(state.pcset) )
-        subsets_element.setHTMLUnsafe(textOrDash(setCollectionToStrWithLinks(subsets)));
 }
 
 

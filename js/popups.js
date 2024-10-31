@@ -408,7 +408,7 @@ function getImageExportTheme() {
 
 
 function exportStaffShiftNotes(amount) {
-    export_data.pcset = export_data.pcset.shift(amount);
+    export_data.pcset.shift(amount);
     updateImageExportPopup();
 }
 
