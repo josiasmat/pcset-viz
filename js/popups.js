@@ -57,7 +57,9 @@ function updateConfigPopup() {
         for ( const port of ports ) {
             options.push(addOptionToHtmlSelect(
                 midi_select_elm, port.id, port.name,
-                ( midi.dev && midi.dev.name == port.name )
+                ( midi.dev 
+                    && midi.dev.name == port.name 
+                    && midi.dev.state == "connected" )
             ));
         }
         if ( options.length > 1 )
