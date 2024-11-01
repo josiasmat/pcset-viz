@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 "use strict";
 
-const VERSION = "2024-10-31";
+const VERSION = "2024-11-01";
 
 const config_storage = new LocalStorageHandler("pcsetviz");
 const config_visible_data = new LocalStorageHandler("pcsetviz-visible-data");
@@ -169,8 +169,11 @@ function pushSetToHistory(timeout = 0) {
     if ( history_update_timer ) clearTimeout(history_update_timer);
     history_update_timer = setTimeout(() => { 
             const s = state.pcset.toString("short-ab", false);
-            window.history.pushState([s,state.last_op,++state.history_index], document.title, 
-                window.location.pathname + (s ? `?set=${s}` : ''));
+            if ( s != window.history.state[0] ) {
+                window.history.pushState([s,state.last_op,++state.history_index], document.title, 
+                    window.location.pathname + (s ? `?set=${s}` : ''));
+                console.log(`Saved set [${s}] to history at index ${state.history_index}.`);
+            }
             config.last_set = s;
             config_storage.writeString("last-set", s);
             history_update_timer = null;
@@ -179,8 +182,15 @@ function pushSetToHistory(timeout = 0) {
 
 
 /**
- * Update visualization and table with given PcSet object.
- * @param {PcSet} pcset A _PcSet_ object.
+ * Update visualization and table.
+ * @param {Objects} options An object accepting the following properties:
+ *      * _no_history_ : set to true to prevent the set from being pushed
+ *          into the history stack.
+ *      * _history_delay_ : set it to a value in milliseconds to delay 
+ *          pushing the new set to the history stack.
+ *      * _keep_polygon_ : set to true to prevent changing the polygon.
+ *      * _polygon_delay_ : set it to a value in milliseconds to delay
+ *          the display of the new polygon.
  */
 function showPcset(options = {}) {
     

@@ -169,6 +169,7 @@ function setAllNotesOff() {
 
 
 function updatePlayedNotes(key = null, pc = null, note_on = false, first_on = false) {
+    const previous_pcset = state.pcset.clone();
     switch ( midi.mode ) {
         case "direct":
             state.pcset = new PcSet(midi.keys.reduce(
@@ -195,7 +196,8 @@ function updatePlayedNotes(key = null, pc = null, note_on = false, first_on = fa
                     state.pcset.add(pc);
             }
     }
-    showPcset({history_delay: 250, polygon_delay: 100});
+    if ( !state.pcset.isEqualTo(previous_pcset) )
+        showPcset({history_delay: 250, polygon_delay: 100});
 }
 
 
