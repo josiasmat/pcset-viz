@@ -169,11 +169,9 @@ function pushSetToHistory(timeout = 0) {
     if ( history_update_timer ) clearTimeout(history_update_timer);
     history_update_timer = setTimeout(() => { 
             const s = state.pcset.toString("short-ab", false);
-            if ( s != window.history.state[0] ) {
+            if ( s != window.history.state[0] )
                 window.history.pushState([s,state.last_op,++state.history_index], document.title, 
                     window.location.pathname + (s ? `?set=${s}` : ''));
-                console.log(`Saved set [${s}] to history at index ${state.history_index}.`);
-            }
             config.last_set = s;
             config_storage.writeString("last-set", s);
             history_update_timer = null;
