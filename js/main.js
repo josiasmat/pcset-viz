@@ -170,7 +170,7 @@ function pushSetToHistory(timeout = 0) {
     history_update_timer = setTimeout(() => { 
             const s = state.pcset.toString("short-ab", false);
             window.history.pushState([s,state.last_op,++state.history_index], document.title, 
-                                    `${window.location.pathname}?set=${s}`);
+                window.location.pathname + (s ? `?set=${s}` : ''));
             config.last_set = s;
             config_storage.writeString("last-set", s);
             history_update_timer = null;
@@ -778,9 +778,11 @@ enableKeyboardShortcuts();
     const url_param_set = getUrlQueryValue("set");
     if ( url_param_set ) {
         goto(url_param_set, null, false);
+        window.history.replaceState([url_param_set,'',state.history_index], document.title, 
+            `${window.location.pathname}?set=${url_param_set}`);
     } else {
         goto(config.last_set, null, false);
-        document.location.href += `?set=${config.last_set}`
+        window.history.replaceState([config.last_set,'',state.history_index], document.title, 
+            window.location.pathname + (config.last_set ? `?set=${config.last_set}` : ''));
     }
-
 }
