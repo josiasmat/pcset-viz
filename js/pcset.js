@@ -455,17 +455,7 @@ class PcSet {
         return new PcSet( this.#data.map((x) => mod12(index-x)) ).normal;
     }
 
-     /**
-     * Returns a new PcSet object which is an inversion of the original one.
-     * Short alias to invert().
-     * @param  {Number} index Optional; the inversion's index. Defaults to 0.
-     * @return {PcSet} Returns a new PcSet object with the inverted set.
-     */
-    I(index = 0) {
-        return this.invert(index);
-    }
-
-     /**
+    /**
      * Returns a new PcSet object which is a transposition of the original one.
      * @param  {Number} n The number of semitones by which to transpose. Positive and 
      *      negative numbers allowed.
@@ -473,25 +463,6 @@ class PcSet {
      */
     transpose(n) {
         return new PcSet( this.#data.map((x) => mod12(x+n)) );
-    }
-
-    /**
-     * Returns a new PcSet object which is a transposition of the original one.
-     * Short alias to transpose().
-     * @param  {Number} n The number of semitones by which to transpose. Positive and 
-     *      negative numbers allowed.
-     * @return {PcSet} Returns a new PcSet object with the transposed set.
-     */
-    T(n) {
-        return this.transpose(n);
-    }
-
-    TnI(n) {
-        return this.invert().transpose(n);
-    }
-
-    Ixy(x, y) {
-        return this.invert().transpose(x+y);
     }
 
     /**
@@ -539,6 +510,27 @@ class PcSet {
         const i = this.index_of(pc);
         if ( i != -1 )
             this.shift(i);
+    }
+
+    /**
+     * Finds the operation which transforms _other_ into this PcSet.
+     * @param {PcSet} other 
+     * @returns {[String, Number] | null} a 2-element array, where the first is 
+     *      a string containing the operation type ('T' or 'I'), and the 
+     *      second is the operation index.
+     */
+    findTransformFrom(other) {
+        // find transposition
+        const transpositions = other.transpositions(false);
+        for ( const trn of transpositions )
+            if ( this.is_superset_of(trn[1]) )
+                return ['T', trn[0]];
+        // find inversion
+        const inversions = other.inversions();
+        for ( const inv of inversions )
+            if ( this.is_superset_of(inv[1]) )
+                return ['I', inv[0]];
+        return null;
     }
 
     /**
