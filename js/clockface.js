@@ -285,12 +285,12 @@ function drawPolygon() {
 
     function nearest_index(pc, array) {
         let index = 0;
-        let diff = compute_interval_class(pc, array[0]);
+        let ic = compute_interval_class(pc, array[0]);
         for ( let i = 1; i < array.length; i++ ) {
-            const new_diff = compute_interval_class(pc, array[i]);
-            if ( new_diff < diff ) {
+            const new_ic = compute_interval_class(pc, array[i]);
+            if ( new_ic < ic ) {
                 index = i;
-                diff = new_diff;
+                ic = new_ic;
             }
         }
         return index;
@@ -302,40 +302,44 @@ function drawPolygon() {
     if ( state.pcset.size != state.polygon.length ) {
         // No animation
         state.polygon = normal_array;
-    } else if ( state.last_op == null ) {
-        // No operation
-        const size = state.pcset.size;
-        let array = Array.from(normal_array);
-        let new_polygon = Array(size).fill(null);
-        // Keep same pcs
-        for ( let i = 0; i < size; i++ ) {
-            const pc = state.polygon[i];
-            const found = array.indexOf(pc);
-            if ( found != -1 ) {
-                new_polygon[i] = pc;
-                array.splice(found, 1);
+    } else switch ( state.last_op ? state.last_op[0] : null ) {
+        // Compute best transition between points
+        case "T":
+        case "Tn":
+            const tr = (state.last_op[1] <= 6) 
+                ? state.last_op[1] 
+                : state.last_op[1]-12;
+            state.polygon = state.polygon.map((x) => mod12(x+tr));
+            break;
+        case "I":
+        case "In":
+        case "TnI":
+            const ix = state.last_op[1];
+            state.polygon = state.polygon.map((x) => mod12(ix-x));
+            break;
+        default:
+            const size = normal_array.length;
+            let new_pcset = Array.from(normal_array);
+            let new_polygon = Array(size).fill(null);
+            // Keep same pcs
+            for ( let i = 0; i < size; i++ ) {
+                const pc = state.polygon[i];
+                const found = new_pcset.indexOf(pc);
+                if ( found != -1 ) {
+                    new_polygon[i] = pc;
+                    new_pcset.splice(found, 1);
+                }
             }
-        }
-        // Move different pcs
-        for ( let i = 0; i < size; i++ ) {
-            if ( new_polygon[i] == null ) {
-                const pc = normal_array[i];
-                const next = nearest_index(pc, array);
-                new_polygon[i] = array[next];
-                array.splice(next, 1);
+            // Move different pcs
+            for ( let i = 0; i < size; i++ ) {
+                if ( new_polygon[i] == null ) {
+                    const pc = state.polygon[i];
+                    const next = nearest_index(pc, new_pcset);
+                    new_polygon[i] = new_pcset[next];
+                    new_pcset.splice(next, 1);
+                }
             }
-        }
-        state.polygon = new_polygon;
-    } else if ( state.last_op[0] == "Tn" ) {
-        // Transposition operation
-        const tr = (state.last_op[1] <= 6) 
-            ? state.last_op[1] 
-            : state.last_op[1]-12;
-        state.polygon = state.polygon.map((x) => mod12(x+tr));
-    } else if ( ["In","TnI"].includes(state.last_op[0]) ) {
-        // Inversion operation
-        const ix = state.last_op[1];
-        state.polygon = state.polygon.map((x) => mod12(ix-x));
+            state.polygon = new_polygon;
     }
 
     // Correct polygon if necessary
