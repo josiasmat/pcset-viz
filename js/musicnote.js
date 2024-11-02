@@ -245,14 +245,14 @@ class MusicalScale {
     clone() { return new MusicalScale(this.#notes); }
 
     adjustToClef(clef_str) {
-        const staff_center = ( clef_str == "G2" ) ? 5.5 : 6;
+        const staff_center = ( clef_str == "G2" ) ? 4.5 : 6;
         function computeMean(notes) {
             return (notes[0].staffPosition(clef_str) + notes[notes.length-1].staffPosition(clef_str)) / 2;
         }
         let mean = Math.abs(staff_center - computeMean(this.#notes));
         let min = mean;
         this.#notes.forEach( (note) => note.unlock() );
-        while ( mean <= min ) {
+        while ( mean <= min || this.#notes[0].staffPosition(clef_str) < -1) {
             min = mean;
             this.#notes.forEach( (note) => note.transposeOctaves(1) );
             mean = Math.abs(staff_center - computeMean(this.#notes));
