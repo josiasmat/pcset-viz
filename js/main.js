@@ -202,7 +202,9 @@ function showPcset(options = {}) {
     const normal = state.pcset.normal;
     const reduced = normal.reduced;
     const prime = reduced.prime;
+    const prime_op = prime.findTransformFrom(state.pcset);
     const prime_inverse = prime.invert().reduced;
+    const prime_inverse_op = prime_inverse.findTransformFrom(state.pcset);
     const complement = normal.complement;
     const complement_prime = complement.prime;
     const zcorrespondent = prime.zcorrespondent;
@@ -234,12 +236,15 @@ function showPcset(options = {}) {
 
     if ( prime.hasDistinctInverse() ) {
         data_cells.prime_form.setHTMLUnsafe(
-            checkmarkIf(state.pcset.isEqualTo(prime)) + pcsetHyperlink(prime, {copy: true})
+            checkmarkIf(state.pcset.isEqualTo(prime)) 
+            + pcsetHyperlink(prime, {op: prime_op, copy: true})
             + " · Inverse: " 
-            + checkmarkIf(state.pcset.isEqualTo(prime_inverse)) + pcsetHyperlink(prime_inverse, {copy: true}) );
+            + checkmarkIf(state.pcset.isEqualTo(prime_inverse)) 
+            + pcsetHyperlink(prime_inverse, {op: prime_inverse_op, copy: true}) );
     } else {
         data_cells.prime_form.setHTMLUnsafe( 
-            checkmarkIf(state.pcset.isEqualTo(prime)) + pcsetHyperlink(prime, {copy: true})
+            checkmarkIf(state.pcset.isEqualTo(prime)) 
+            + pcsetHyperlink(prime, {op: prime_op, copy: true})
         );
     }
 
