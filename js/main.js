@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 "use strict";
 
-const VERSION = "2024-11-01";
+const VERSION = "2024-11-02";
 
 const config_storage = new LocalStorageHandler("pcsetviz");
 const config_visible_data = new LocalStorageHandler("pcsetviz-visible-data");
@@ -189,11 +189,15 @@ function pushSetToHistory(timeout = 0) {
  *      * _keep_polygon_ : set to true to prevent changing the polygon.
  *      * _polygon_delay_ : set it to a value in milliseconds to delay
  *          the display of the new polygon.
+ *      * _keep_input_ : set to true to prevent changing the input control.
  */
 function showPcset(options = {}) {
     
     if ( !options.no_history )
         pushSetToHistory(options.history_delay ? options.history_delay : 0);
+
+    if ( !options.keep_input )
+        input_main.value = state.pcset.toString(config.set_format, false);
         
     const normal = state.pcset.normal;
     const reduced = normal.reduced;
@@ -498,12 +502,13 @@ function setCollectionToStrWithLinks(sets, op = null, sep = " = ", include_op_in
 }
 
 
-function goto(s, op = null, push_to_history = true) {
+function goto(s, op = null, options = {}) {
     state.pcset = new PcSet(s);
     state.last_op = op;
-    input_main.value = state.pcset.toString(config.set_format, false);
+    //input_main.value = state.pcset.toString(config.set_format, false);
     typeof(hideAllPopups) === typeof(Function) && hideAllPopups();
-    showPcset({ no_history: !push_to_history });
+    showPcset(options);
+    //showPcset({ no_history: !push_to_history });
 }
 
 
@@ -516,7 +521,7 @@ function onChange() {
 function onInput() {
     state.pcset = new PcSet(input_main.value);
     state.last_op = null;
-    showPcset();
+    showPcset({keep_input: true});
 }
 
 
@@ -547,7 +552,7 @@ function historyEventHandler(evt) {
         op = null;
         state.undone_op = null;
     }
-    goto(seq, op, false);
+    goto(seq, op, {no_history: true});
     state.history_index = evt.state[2];
 }
 
@@ -785,11 +790,11 @@ enableKeyboardShortcuts();
 {
     const url_param_set = getUrlQueryValue("set");
     if ( url_param_set ) {
-        goto(url_param_set, null, false);
+        goto(url_param_set, null, {no_history: true});
         window.history.replaceState([url_param_set,'',state.history_index], document.title, 
             `${window.location.pathname}?set=${url_param_set}`);
     } else {
-        goto(config.last_set, null, false);
+        goto(config.last_set, null, {no_history: true});
         window.history.replaceState([config.last_set,'',state.history_index], document.title, 
             window.location.pathname + (config.last_set ? `?set=${config.last_set}` : ''));
     }
