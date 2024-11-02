@@ -196,8 +196,10 @@ function updatePlayedNotes(key = null, pc = null, note_on = false, first_on = fa
                     state.pcset.add(pc);
             }
     }
-    if ( !state.pcset.isEqualTo(previous_pcset) )
-        showPcset({history_delay: 250, polygon_delay: 100});
+    if ( !state.pcset.isEqualTo(previous_pcset) ) {
+        state.last_op = null;
+        showPcset({history_delay: 300, polygon_delay: 150});
+    }
 }
 
 
