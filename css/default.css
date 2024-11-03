@@ -290,6 +290,11 @@ dialog.popup-container[open] {
             color: white;
             border: none;
         }
+        .svg-icon {
+            padding: 0 3px;
+            fill: var(--popup-title-fg-color);
+            vertical-align: 0;
+        }
     }
 }
 
@@ -436,6 +441,21 @@ a, span.same-set {
     &:hover {
         background-color: var(--hyperlink-hover-bg-color);
         border: 1px solid var(--hyperlink-hover-border-color);
+    }
+}
+
+.icon-search {
+    padding: 0 3px;
+}
+
+.svg-icon {
+    box-sizing: border-box; 
+    object-fit: contain;
+    width: auto; 
+    height: 0.7lh; 
+    vertical-align: -7%;
+    .svg-hyperlink {
+        fill: var(--hyperlink-fg-color);
     }
 }
 

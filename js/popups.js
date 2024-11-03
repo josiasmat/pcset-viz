@@ -622,3 +622,14 @@ function handleDialogClick(e) {
 for ( const dg of document.querySelectorAll("dialog.popup-container") ) {
     dg.addEventListener("click", handleDialogClick, { passive: true });
 }
+
+// Make close buttons
+for ( const elm of document.querySelectorAll(".close-button") ) {
+    const svg = createSvgElement(SVG_ICONS.close.w, SVG_ICONS.close.h,
+        { "class": "svg-icon" }
+    );
+    svg.appendChild(
+        createSvgPathFromData(SVG_ICONS.close.d, 0, 0)
+    );
+    elm.setHTMLUnsafe(svg.outerHTML);
+}

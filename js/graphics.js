@@ -160,12 +160,12 @@ class StaticClockfaceView extends PcSetBaseView {
         }
         
         // create root svg element
-        this.svg = document.createElementNS(SVGNS, "svg");
+        this.svg = document.createElementNS(GRAPHICS_SVGNS, "svg");
         this.svg.setAttribute("version", "1.1");
         this.svg.setAttribute("width", size.toString());
         this.svg.setAttribute("height", size.toString());
         this.svg.setAttribute("viewbox", [0,0,size,size].join(" "));
-        this.svg.setAttribute("xmlns", SVGNS);
+        this.svg.setAttribute("xmlns", GRAPHICS_SVGNS);
 
         // draw polygon
         if ( options.polygon && pcset.size > 1 ) {
@@ -185,7 +185,7 @@ class StaticClockfaceView extends PcSetBaseView {
 
         // draw intervals
         if ( options.intervals && Array.isArray(options.intervals) ) {
-            const g_intervals = document.createElementNS(SVGNS, "g");
+            const g_intervals = document.createElementNS(GRAPHICS_SVGNS, "g");
             for ( const pc1 of pcset ) {
                 for ( const interval of options.intervals ) {
                     const pc2 = mod12(pc1 + interval);
@@ -204,7 +204,7 @@ class StaticClockfaceView extends PcSetBaseView {
                             pq.x = (pm.x + pq.x) / 2;
                             pq.y = (pm.y + pq.y) / 2;
                         }
-                        const line = document.createElementNS(SVGNS, "path");
+                        const line = document.createElementNS(GRAPHICS_SVGNS, "path");
                         line.setAttribute("fill", "none");
                         line.setAttribute("stroke", color(theme.polygon_stroke));
                         line.setAttribute("stroke-opacity", opacity(theme.polygon_stroke));
@@ -220,7 +220,7 @@ class StaticClockfaceView extends PcSetBaseView {
         // draw symmetry axes
         if ( options.symmetry_axes && pcset.size > 0 ) {
             const symmetries = pcset.inversional_symmetry_axes();
-            const g_axes = document.createElementNS(SVGNS, "g");
+            const g_axes = document.createElementNS(GRAPHICS_SVGNS, "g");
             for ( const symmetry of symmetries ) {
                 // calculate dashes
                 const dashes = 30;
@@ -248,12 +248,12 @@ class StaticClockfaceView extends PcSetBaseView {
 
         // draw circles and text
         for ( let pc = 0; pc < 12; pc++ ) {
-            const g_pc = document.createElementNS(SVGNS, "g");
+            const g_pc = document.createElementNS(GRAPHICS_SVGNS, "g");
             const p = getPoint(pc, pc_center_distance);
 
             function makeCircle(stroke, fill) {
                 //if ( opacity(stroke) + opacity(fill) == 0 ) return;
-                const circle = document.createElementNS(SVGNS, "circle");
+                const circle = document.createElementNS(GRAPHICS_SVGNS, "circle");
                 circle.setAttribute("cx", p.x);
                 circle.setAttribute("cy", p.y);
                 circle.setAttribute("r", pc_radius);
@@ -274,7 +274,7 @@ class StaticClockfaceView extends PcSetBaseView {
                 makeCircle(theme.off.circle_stroke, theme.off.circle_fill);
 
             // text
-            const text = document.createElementNS(SVGNS, "path");
+            const text = document.createElementNS(GRAPHICS_SVGNS, "path");
             const text_data = ( options.note_names ) 
                 ? SVG_PATHS_NOTES[pc.toString()] : SVG_PATHS_NUMBERS[pc.toString()];
             const text_scale = (scale-0.05)**1.5;
@@ -351,12 +351,12 @@ class StaticRulerPcSetView extends PcSetBaseView {
         const total_height = row_height + row_diff;
 
         // create root svg element
-        this.svg = document.createElementNS(SVGNS, "svg");
+        this.svg = document.createElementNS(GRAPHICS_SVGNS, "svg");
         this.svg.setAttribute("version", "1.1");
         this.svg.setAttribute("width", total_width.toString());
         this.svg.setAttribute("height", total_height.toString());
         this.svg.setAttribute("viewbox", [0,0,total_width,row_height].join(" "));
-        this.svg.setAttribute("xmlns", SVGNS);
+        this.svg.setAttribute("xmlns", GRAPHICS_SVGNS);
 
         if ( options.fn ) options.fn(this.svg, "svg", 0);
 
@@ -366,7 +366,7 @@ class StaticRulerPcSetView extends PcSetBaseView {
                 .map((x) => mod(x-DOUBLE_ROW_FACTORS[first_pc],7));
         for ( let i = 0; i < 12; i++ ) {
             const pc = mod12(first_pc+i);
-            const g_pc = document.createElementNS(SVGNS, "g");
+            const g_pc = document.createElementNS(GRAPHICS_SVGNS, "g");
             const py = (options.double_row) 
                 ? ( isWhiteKey(pc) ? v_center + row_diff : v_center )
                 : v_center;
@@ -376,7 +376,7 @@ class StaticRulerPcSetView extends PcSetBaseView {
 
             function makeCircle(stroke, fill) {
                 //if ( opacity(stroke) + opacity(fill) == 0 ) return;
-                const circle = document.createElementNS(SVGNS, "circle");
+                const circle = document.createElementNS(GRAPHICS_SVGNS, "circle");
                 circle.setAttribute("cx", px);
                 circle.setAttribute("cy", py);
                 circle.setAttribute("r", pc_radius - stroke_width);
@@ -397,7 +397,7 @@ class StaticRulerPcSetView extends PcSetBaseView {
                 makeCircle(theme.off.circle_stroke, theme.off.circle_fill);
 
             // text
-            const text = document.createElementNS(SVGNS, "path");
+            const text = document.createElementNS(GRAPHICS_SVGNS, "path");
             const text_data = ( options.note_names ) 
                 ? SVG_PATHS_NOTES[pc.toString()] : SVG_PATHS_NUMBERS[pc.toString()];
             const text_scale = scale*1.3;
@@ -489,15 +489,15 @@ class StaticStaffPcSetView extends PcSetBaseView {
                 + (black_key_count * (scale * SVG_PATHS_ACCIDENTALS["s"].w + accidental_margin - (note_margin/3)));
 
         // create root svg element
-        this.svg = document.createElementNS(SVGNS, "svg");
+        this.svg = document.createElementNS(GRAPHICS_SVGNS, "svg");
         this.svg.setAttribute("version", "1.1");
         this.svg.setAttribute("height", height.toString());
-        this.svg.setAttribute("xmlns", SVGNS);
+        this.svg.setAttribute("xmlns", GRAPHICS_SVGNS);
 
         if ( options.fn ) options.fn(this.svg, "svg", 0);
 
         // draw staff
-        const staff_g = document.createElementNS(SVGNS, "g");
+        const staff_g = document.createElementNS(GRAPHICS_SVGNS, "g");
         for ( let i = 0; i < 5; i++ ) {
             const y = staff_y_offset + (staff_spacing * i);
             const line = makeSvgLine(0, y, 0, y, {"stroke-width": staff_line_width, "stroke": color(theme.axis)});
@@ -508,7 +508,7 @@ class StaticStaffPcSetView extends PcSetBaseView {
         if ( options.fn ) options.fn(staff_g, "staff", 0);
 
         // draw clef
-        const clef = document.createElementNS(SVGNS, "path");
+        const clef = document.createElementNS(GRAPHICS_SVGNS, "path");
         clef.setAttribute("fill", theme.fg);
         clef.setAttribute("d", clef_data.d);
         clef.setAttribute("transform", `translate(${clef_margin_left} ${clef_y}),scale(${scale})`);
@@ -526,13 +526,13 @@ class StaticStaffPcSetView extends PcSetBaseView {
                         note.swapAccidental();
 
             // draw notes
-            const notes_g = document.createElementNS(SVGNS, "g");
+            const notes_g = document.createElementNS(GRAPHICS_SVGNS, "g");
 
             let x = clef_margin_left + clef_width + clef_margin_right;
             let previous_note = notes.note(0);
             for ( const note of notes ) {
-                const this_note_g = document.createElementNS(SVGNS, "g");
-                const note_element = document.createElementNS(SVGNS, "path");
+                const this_note_g = document.createElementNS(GRAPHICS_SVGNS, "g");
+                const note_element = document.createElementNS(GRAPHICS_SVGNS, "path");
                 note_element.setAttribute("fill", theme.fg);
                 note_element.setAttribute("d", notehead.d);
                 const pos = note.staffPosition(clef_str) / 2;
@@ -541,7 +541,7 @@ class StaticStaffPcSetView extends PcSetBaseView {
                     // draw accidental
                     x -= (note_margin/3);
                     const acc_data = SVG_PATHS_ACCIDENTALS[note.accidental == 1 ? "s" : note.accidental == -1 ? "f" : "n"];
-                    const acc_symbol = document.createElementNS(SVGNS, "path");
+                    const acc_symbol = document.createElementNS(GRAPHICS_SVGNS, "path");
                     acc_symbol.setAttribute("fill", theme.fg);
                     acc_symbol.setAttribute("d", acc_data.d);
                     const acc_y = staff_y_offset + staff_height - (pos * staff_spacing) - (acc_data.h * scale / 2) + (acc_data.y * scale);
@@ -582,7 +582,7 @@ class StaticStaffPcSetView extends PcSetBaseView {
         // draw barline
         if ( options.barline && options.barline != "none" ) {
             width += staff_spacing / 2;
-            const barline_g = document.createElementNS(SVGNS, "g");
+            const barline_g = document.createElementNS(GRAPHICS_SVGNS, "g");
             const thin_barline_width = staff_spacing * 0.18;
             const barline_gap = staff_spacing * 0.37;
             //width += note_margin / 2;
@@ -642,7 +642,7 @@ class StaticStaffPcSetView extends PcSetBaseView {
 
 
 function makeSvgLine(x1, y1, x2, y2, attributes) {
-    const line = document.createElementNS(SVGNS, "line");
+    const line = document.createElementNS(GRAPHICS_SVGNS, "line");
     line.setAttribute("x1", x1);
     line.setAttribute("y1", y1);
     line.setAttribute("x2", x2);
@@ -655,7 +655,7 @@ function makeSvgLine(x1, y1, x2, y2, attributes) {
 
 function makeSvgPolygon(points, attributes) {
     const count = points.length;
-    const polygon = document.createElementNS(SVGNS, "path");
+    const polygon = document.createElementNS(GRAPHICS_SVGNS, "path");
     let d = `M ${points[0].x} ${points[0].y}`;
     if ( count > 1 ) {
         for ( let i = 1; i < count; i++ )
@@ -666,6 +666,31 @@ function makeSvgPolygon(points, attributes) {
             polygon.setAttribute(attr[0], attr[1]);
     }
     return polygon;
+}
+
+
+function createSvgElement(width, height, attributes = {}) {
+    const svg = document.createElementNS(GRAPHICS_SVGNS, "svg");
+    svg.setAttribute("version", "1.1");
+    // svg.setAttribute("width", width);
+    // svg.setAttribute("height", height);
+    svg.setAttribute("viewbox", [0,0,width,height].join(" "));
+    //svg.setAttribute("xmlns", GRAPHICS_SVGNS);
+    for ( const attr of Object.entries(attributes) ) {
+        svg.setAttribute(attr[0], attr[1]);
+    }
+    return svg;
+}
+
+
+function createSvgPathFromData(d, x = 0, y = 0, attributes = {}) {
+    const path = document.createElementNS(GRAPHICS_SVGNS, "path");
+    path.setAttribute("x", x);
+    path.setAttribute("y", y);
+    path.setAttribute("d", d);
+    for ( const attr of Object.entries(attributes) )
+        path.setAttribute(attr[0], attr[1]);
+    return path;
 }
 
 
@@ -851,4 +876,9 @@ const SVG_PATHS_ACCIDENTALS = {
     "n" : { w: 30.526621, h: 115.71625, y: 0.0, d: "m 29.633706,25.36433 c -0.334843,-0.36271 -0.892915,-0.53022 -1.590639,-0.53022 l -0.362702,0.16751 c 0,0 -0.167332,0 -0.167332,0 L 4.9947522,31.25203 V 0 H 0 v 88.39859 c 0,1.95334 1.6184084,2.31604 3.2089222,2.31604 l 22.5182808,-6.2504 v 31.25202 h 4.799418 c 0,-29.6337 0,-57.84419 0,-88.39858 0,-0.69773 -0.334843,-1.59064 -0.892915,-1.95334 M 4.9947522,75.36762 V 46.06883 L 25.727203,40.18118 V 69.64737 L 4.9947522,75.36762" },
     "s" : { w: 43.585503, h: 119.12057, y: 0.0, d: "m 41.604303,40.90675 c 1.088285,-0.16751 1.9812,-1.42312 1.9812,-2.51141 V 27.87573 c 0,-1.78583 -1.255796,-2.51123 -2.874115,-2.51123 l -5.887703,1.25561 V 0 H 29.828897 V 27.68036 L 13.923902,30.91718 V 5.72037 H 8.92915 V 31.9776 L 1.9532516,33.40073 C 0.892915,33.59592 0,34.82368 0,35.91197 v 10.35227 c 0,1.95326 1.4230833,2.51133 3.0415006,2.51133 L 8.92915,47.5199 V 76.98611 L 1.9532516,78.40918 C 0.892915,78.5767 0,79.83231 0,80.9206 v 10.3521 c 0,1.95334 1.4230833,2.48355 3.0415006,2.48355 L 8.92915,92.52849 v 26.59208 h 4.994752 V 91.44021 l 15.904995,-3.20896 v 25.19699 h 4.994788 V 87.171 l 6.780618,-1.25579 c 1.088285,-0.19519 1.9812,-1.42295 1.9812,-2.51124 v -10.5197 c 0,-1.78583 -1.255796,-2.51132 -2.874115,-2.51132 l -5.887703,1.25567 V 42.16241 l 6.780618,-1.25566 M 13.923902,46.43167 29.828897,43.22274 V 72.68896 L 13.923902,76.0932 V 46.43167" },
     "f" : { w: 36.246815, h: 112.31211, y: -24.0, d: "m 21.42996,53.21219 c -8.92915,0 -14.1192184,5.52483 -15.0121334,6.61311 L 7.14332,2.48337 C 7.14332,1.06042 6.0829834,0 4.6319966,0 H 2.5113234 C 1.0603366,0 0,1.06042 0,2.48337 l 0.892915,107.34517 c 0,1.42313 1.0603366,2.48356 2.5113234,2.48356 0.3348432,0 1.0603366,-0.16752 1.4230922,-0.33485 15.3470124,-7.70139 31.4194824,-22.32296 31.4194824,-40.73933 0,-9.26409 -4.269205,-18.02573 -14.816853,-18.02573 M 5.8876672,103.57814 6.4178266,68.75449 c 0.3627556,-1.61841 3.0415006,-6.78066 10.1848204,-6.78066 6.445811,0 6.975845,6.05516 6.975845,9.82216 0,15.87715 -5.887614,22.49029 -17.6908248,31.78215" }
+}
+
+const SVG_ICONS = {
+    close: { w: 13.229, h: 13.229, d: "M 1.4140625,0 0,1.4140625 5.1992187,6.6132812 0,11.814453 1.4140625,13.228516 6.6132812,8.0273438 11.814453,13.228516 13.228516,11.814453 8.0273438,6.6132812 13.228516,1.4140625 11.814453,0 6.6132812,5.1992187 Z" },
+    magnifier: { w: 13.229, h: 13.229, d: "m 4.9263143,5.1676432e-4 c -1.2629519,0 -2.5261804,0.47979364568 -3.4860921,1.43970543568 -1.91982354,1.9198234 -1.91982354,5.0518439 0,6.9716674 1.4976053,1.4976051 3.7159206,1.7892114 5.5381632,0.9503296 l 3.6183836,3.6183838 c 0.316988,0.316988 0.725094,0.271989 0.979269,0.186552 0.254175,-0.08544 0.464369,-0.232343 0.65629,-0.424264 l 0.510563,-0.510563 c 0.191921,-0.191921 0.338824,-0.402118 0.424264,-0.65629 0.08544,-0.254175 0.130436,-0.662281 -0.186552,-0.979269 L 9.3622192,6.9783854 C 10.201101,5.1561428 9.9094947,2.9378275 8.4118896,1.4402222 7.4519779,0.48031041 6.1892662,5.1676432e-4 4.9263143,5.1676432e-4 Z m 0,1.31413163568 c 0.9218485,0 1.8436131,0.3537817 2.5507487,1.0609172 1.4142709,1.4142712 1.414271,3.6872263 0,5.1014974 -1.4142711,1.414271 -3.6872262,1.4142709 -5.1014974,0 -1.41427109,-1.4142711 -1.41427109,-3.6872262 0,-5.1014974 C 3.0827012,1.6684301 4.0044658,1.3146484 4.9263143,1.3146484 Z m 3.6886637,6.7892497 3.193087,3.1930869 -0.51108,0.51108 L 8.1038981,8.614978 C 8.1996134,8.5329806 8.2675896,8.4693732 8.3581462,8.3788167 8.4487027,8.2882601 8.5329382,8.199571 8.614978,8.1038981 Z" },
 }

@@ -781,6 +781,8 @@ function enableKeyboardShortcuts() {
 }
 
 
+// Run at load
+
 collectDataRows();
 populatePopupConfigVisibleData();
 readConfig();
@@ -803,4 +805,17 @@ enableKeyboardShortcuts();
         window.history.replaceState([config.last_set,'',state.history_index], document.title, 
             window.location.pathname + (config.last_set ? `?set=${config.last_set}` : ''));
     }
+}
+
+
+for ( const elm of document.querySelectorAll(".icon-search") ) {
+    const svg = createSvgElement(SVG_ICONS.magnifier.w, SVG_ICONS.magnifier.h,
+        { "class": "svg-icon" }
+    );
+    svg.appendChild(
+        createSvgPathFromData(SVG_ICONS.magnifier.d, 0, 0, {
+            "class": "svg-hyperlink"
+        })
+    );
+    elm.setHTMLUnsafe(svg.outerHTML);
 }
