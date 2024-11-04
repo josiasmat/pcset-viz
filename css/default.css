@@ -98,18 +98,17 @@ body {
     font-style: normal;
 }
 
-@media (orientation: landscape) {
+@media (aspect-ratio >= 1.2) {
     body {
         overflow: hidden; 
         height: 100%;
         font-size: 12pt;
     }
 }
-@media (orientation: portrait) {
+@media (aspect-ratio < 1.2) {
     body {
         overflow: visible; 
         height: auto;
-        font-size: 16pt;
     }
 }
 
@@ -120,7 +119,7 @@ main {
     color: var(--fg-color);
 }
 
-@media (orientation: landscape) {
+@media (aspect-ratio >= 1.2) {
     main {
         height: 100%;
         flex-direction: row;
@@ -129,7 +128,7 @@ main {
         }
     }
 }
-@media (orientation: portrait) {
+@media (aspect-ratio < 1.2) {
     main {
         height: auto;
         flex-direction: column;
@@ -149,16 +148,22 @@ main {
     background-color: var(--bg-color);
 }
 
-@media (orientation: landscape) {
+@media (aspect-ratio >= 1.2) {
     #visualization-area {
         width: 50%;
         height: 100%;
     }
 }
-@media (orientation: portrait) {
+@media (1.0 < aspect-ratio < 1.2) {
     #visualization-area {
         width: 100%;
-        aspect-ratio: 1/1;
+        height: 99.3vh;
+    }
+}
+@media (aspect-ratio <= 1.0) {
+    #visualization-area {
+        width: 100%;
+        aspect-ratio: 1;
     }
 }
 
@@ -198,7 +203,7 @@ main {
     }
 }
 
-@media (orientation: landscape) {
+@media (aspect-ratio >= 1.2) {
     #data-area {
         width: 50%;
         height: 100%;
@@ -209,10 +214,14 @@ main {
         }
     }
 }
-@media (orientation: portrait) {
+@media (aspect-ratio < 1.2) {
     #data-area {
         width: 100%;
         height: auto;
+    }
+}
+@media (aspect-ratio < 0.7) {
+    #data-area {
         th, td {
             &:first-child {
                 width: 30%;
@@ -228,16 +237,14 @@ main {
     font-weight: 200;
 }
 
-/* .popup-outer-container {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background-color: var(--popup-bg-dim-color);
-    justify-content: center;
-    align-items: center;
-    user-select: none;
-} */
+@media (aspect-ratio < 0.7) {
+    .popup-container {
+        font-size: 3.3vw;
+        input, select, label {
+            font-size: 3.0vw;
+        }
+    }
+}
 
 dialog.popup-container[open] {
     overflow: hidden;
@@ -272,7 +279,7 @@ dialog.popup-container[open] {
         text-align: center;
         padding-top: 0.35lh;
         margin-left: 1.8lh;
-        font-size: large;
+        font-size: larger;
         font-weight: bold;
         color: var(--popup-title-fg-color);
     }
@@ -280,7 +287,7 @@ dialog.popup-container[open] {
         float: inline-end;
         background-color: var(--popup-title-bg-color);
         color: var(--popup-title-fg-color);
-        font-size: large;
+        font-size: larger;
         border: none;
         padding: 0.3lh !important;
         height: 100%;
@@ -359,43 +366,56 @@ dialog.popup-container[open] {
             }
         }
         .keyboard-shortcut {
-            font-size: small;
+            font-size: smaller;
             color: var(--fg-dim-color);
         }
     }
 }
 
+@media (aspect-ratio >= 1.2) {
+    #popup-export-image .popup-main {
+        flex-direction: row;
+    }
+    #popup-export-options {
+        margin-left: 8px;
+        padding-left: 7px;
+        border-left: 3px solid var(--table-alternate-color);
+    }
+}
+
+@media (aspect-ratio < 1.2) {
+    #popup-export-image .popup-main {
+        flex-direction: column-reverse;
+    }
+    #popup-export-preview {
+        max-height: 50vh;
+    }
+    #popup-export-options {
+        margin-bottom: 8px;
+        padding-bottom: 7px;
+        border-bottom: 3px solid var(--table-alternate-color);
+    }
+}
+
 #popup-export-image {
     width: 70%;
-    min-width: min(90ch, 95%);
+    min-width: min(110ch, 95%);
     max-width: 95%;
     max-height: 95%;
     .popup-main {
         display: flex;
-        flex-direction: row;
     }
     #popup-export-preview {
-        /* min-height: 100%; */
-        /* height: 100%; */
-        /* min-width: 100px; */
         flex: 1 0;
-        aspect-ratio: 1/1;
-        /* border-color: var(--popup-border-color); */
-        /* background-color: white; */
+        aspect-ratio: 1;
         margin: 2px;
         padding: 8px;
         box-sizing: border-box;
     }
     #popup-export-options {
         flex: 2 1;
-        /* width: minmax(54ch, 90ch); */
-        /* height: fit-content; */
         max-height: fit-content;
         min-width: 54ch;
-        margin-left: 8px;
-        padding-left: 7px;
-        border-left: 3px solid var(--table-alternate-color);
-        /* min-width: 70ch; */
         table {
             th, td {
                 &:first-child {
@@ -477,7 +497,7 @@ input[type="checkbox"], input[type="radio"] {
 }
 
 span.range-label {
-    font-size: small;
+    font-size: smaller;
     color: var(--fg-dim-color);
     vertical-align: middle;
     padding: 0 0 0.3lh 1ch;
