@@ -200,6 +200,9 @@ main {
     #staff-view {
         padding-top: 1px;
         padding-bottom: 1px;
+        svg {
+            width: 100%;
+        }
     }
 }
 
@@ -227,7 +230,13 @@ main {
                 width: 30%;
             }
         }
-        font-size: 3.7vw;
+        /* font-size: 3.7vw; */
+        &, label, input, select {
+            font-size: 3.7vw;
+        }
+        #staff-view svg {
+            height: 10vh;
+        }
     }
 }
 
