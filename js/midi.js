@@ -55,14 +55,16 @@ function requestMidiPermission(callback_prompt, callback_granted, callback_denie
  *      MIDIInput objects.
  */
 function requestMidiInputs(callback_ok, callback_fail) {
-    navigator.requestMIDIAccess().then((access) => {
-        const ports = [];
-        if ( access.inputs.size > 0 ) {
-            for ( const port of access.inputs.values() )
-                ports.push(port);
-        }
-        callback_ok(ports);
-    }, callback_fail);
+    if ( navigator.requestMIDIAccess ) {
+        navigator.requestMIDIAccess().then((access) => {
+            const ports = [];
+            if ( access.inputs.size > 0 ) {
+                for ( const port of access.inputs.values() )
+                    ports.push(port);
+            }
+            callback_ok(ports);
+        }, callback_fail);
+    }
 }
 
 
@@ -84,46 +86,50 @@ function selectMidiDevice() {
 
 
 function connectMidiDeviceByName(port_name, msg_element = null) {
-    if ( msg_element ) msg_element.innerText = "Connecting...";
-    requestMidiInputs((ports) => {
-        for ( const port of ports ) {
-            if ( port.name == port_name ) {
-                midi.dev = port;
-                port.addEventListener("midimessage", handleMIDIEvent);
-                console.log(`Connected to MIDI device "${port.name}".`);
-                if ( msg_element ) msg_element.innerText = "Connected";
-                saveMidiConfig();
-                return;
+    if ( navigator.requestMIDIAccess ) {
+        if ( msg_element ) msg_element.innerText = "Connecting...";
+        requestMidiInputs((ports) => {
+            for ( const port of ports ) {
+                if ( port.name == port_name ) {
+                    midi.dev = port;
+                    port.addEventListener("midimessage", handleMIDIEvent);
+                    console.log(`Connected to MIDI device "${port.name}".`);
+                    if ( msg_element ) msg_element.innerText = "Connected";
+                    saveMidiConfig();
+                    return;
+                }
             }
-        }
-        console.log(`Unable to connect to MIDI device with name "${port_name}".`);
-        if ( msg_element ) msg_element.innerText = "Failed connection";
-    }, () => { 
-        console.log("MIDI access denied.");
-        if ( msg_element ) msg_element.innerText = "MIDI access denied";
-    });
+            console.log(`Unable to connect to MIDI device with name "${port_name}".`);
+            if ( msg_element ) msg_element.innerText = "Failed connection";
+        }, () => { 
+            console.log("MIDI access denied.");
+            if ( msg_element ) msg_element.innerText = "MIDI access denied";
+        });
+    }
 }
 
 
 function connectMidiDeviceById(port_id, msg_element = null) {
-    if ( msg_element ) msg_element.innerText = "Connecting...";
-    requestMidiInputs((ports) => {
-        for ( const port of ports ) {
-            if ( port.id == port_id ) {
-                midi.dev = port;
-                port.addEventListener("midimessage", handleMIDIEvent);
-                console.log(`Connected to MIDI device "${port.name}".`);
-                if ( msg_element ) msg_element.innerText = "Connected";
-                saveMidiConfig();
-                return;
+    if ( navigator.requestMIDIAccess ) {
+        if ( msg_element ) msg_element.innerText = "Connecting...";
+        requestMidiInputs((ports) => {
+            for ( const port of ports ) {
+                if ( port.id == port_id ) {
+                    midi.dev = port;
+                    port.addEventListener("midimessage", handleMIDIEvent);
+                    console.log(`Connected to MIDI device "${port.name}".`);
+                    if ( msg_element ) msg_element.innerText = "Connected";
+                    saveMidiConfig();
+                    return;
+                }
             }
-        }
-        console.log(`Unable to connect to MIDI device with id "${port_id}".`);
-        if ( msg_element ) msg_element.innerText = "Failed connection"; 
-    }, () => { 
-        console.log("MIDI access denied.");
-        if ( msg_element ) msg_element.innerText = "MIDI access denied"; 
-    });
+            console.log(`Unable to connect to MIDI device with id "${port_id}".`);
+            if ( msg_element ) msg_element.innerText = "Failed connection"; 
+        }, () => { 
+            console.log("MIDI access denied.");
+            if ( msg_element ) msg_element.innerText = "MIDI access denied"; 
+        });
+    }
 }
 
 
