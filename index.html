@@ -65,6 +65,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                             </td>
                             <td id="staff-view" style="display: inline-flex"></td>
                         </tr>
+                        <tr id="row-operations">
+                            <td i18n="row-operations">Operation:</td>
+                            <td id="operations">
+                                <select name="operation-selector" id="operation-selector" onchange="operationUpdate(true)">
+                                    <option value="Tn">Transpose</option>
+                                    <option value="In">Invert</option>
+                                    <option value="Mn">Multiply</option>
+                                    <option value="Rn">Shift</option>
+                                </select>
+                                <input type="number" id="operation-index" name="operation-index" 
+                                    min="-12" max="12" value="1" previous="1" oninput="operationUpdate()"/>
+                                =&nbsp;<span id="operation-result"></span>
+                            </td>
+                        </tr>
                         <tr id="row-normal">
                             <td i18n="row-normal">Normal order:</td>
                             <td id="normal-form"></td>
@@ -104,20 +118,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                         <tr id="row-features">
                             <td i18n="row-features">Set features: <a href="javascript:showFeaturesSelector()" hidden>&#128269;</a></td>
                             <td id="features"></td>
-                        </tr>
-                        <tr id="row-operations">
-                            <td i18n="row-operations">Operation:</td>
-                            <td id="operations">
-                                <select name="operation-selector" id="operation-selector" onchange="operationUpdate(true)">
-                                    <option value="Tn">Transpose</option>
-                                    <option value="In">Invert</option>
-                                    <option value="Mn">Multiply</option>
-                                    <option value="Rn">Shift</option>
-                                </select>
-                                <input type="number" id="operation-index" name="operation-index" 
-                                    min="-12" max="12" value="1" previous="1" oninput="operationUpdate()"/>
-                                =&nbsp;<span id="operation-result"></span>
-                            </td>
                         </tr>
                         <tr id="row-rotations" hidden>
                             <td i18n="row-rotations">Orderings:</td>
