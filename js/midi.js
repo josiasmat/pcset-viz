@@ -26,6 +26,8 @@ const midi = {
     mode: MIDI_MODES[1],
     keys: Array(128).fill(false),
     pcs: Array(12).fill(0),
+    sustain: Array(128).fill(false),
+    pedal: false,
 }
 
 const config_midi_storage = new LocalStorageHandler("pcsetviz-midi");
@@ -144,7 +146,13 @@ function handleMIDIEvent(ev) {
                 setNoteOff(ev.data[1]);
                 break;
             case 0xB0 + ch:
-                if ( ev.data[1] == 123 )
+                if ( ev.data[1] == 64 ) {
+                    if ( midi.pedal && ev.data[2] < 64 )
+                        midi.sustain = Array.from(midi.keys);
+                    midi.pedal = (ev.data[2] >= 64);
+                    updatePlayedNotes();
+                }
+                else if ( ev.data[1] == 123 )
                     setAllNotesOff();
         }
     }
@@ -153,6 +161,7 @@ function handleMIDIEvent(ev) {
 
 function setNoteOn(key) {
     midi.keys[key] = true;
+    midi.sustain[key] = true;
     const pc = mod12(key);
     midi.pcs[pc] += 1;
     updatePlayedNotes(key, pc, true, (midi.pcs[pc] == 1));
@@ -161,6 +170,7 @@ function setNoteOn(key) {
 
 function setNoteOff(key) {
     midi.keys[key] = false;
+    if ( !midi.pedal ) midi.sustain[key] = false;
     const pc = mod12(key);
     midi.pcs[pc] = Math.max(midi.pcs[pc]-1, 0);
     updatePlayedNotes(key, pc, false);
@@ -169,6 +179,7 @@ function setNoteOff(key) {
 
 function setAllNotesOff() {
     midi.keys = Array(128).fill(false);
+    midi.sustain = Array(128).fill(false);
     midi.pcs = Array(12).fill(0);
     updatePlayedNotes();
 }
@@ -178,7 +189,7 @@ function updatePlayedNotes(key = null, pc = null, note_on = false, first_on = fa
     const previous_pcset = state.pcset.clone();
     switch ( midi.mode ) {
         case "direct":
-            state.pcset = new PcSet(midi.keys.reduce(
+            state.pcset = new PcSet(midi.sustain.reduce(
                 (r,k,i) => { if (k) r.push(mod12(i)); return r; }, []
             ));
             break;
