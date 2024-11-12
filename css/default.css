@@ -497,11 +497,34 @@ a, span.same-set {
     opacity: 25%;
 }
 
+#midi-connection-status {
+    display: inline;
+    padding: 3px 8px;
+    border-radius: 4px;
+    &[status="0"] {
+        background-color: #7773;
+    }
+    &[status="1"] {
+        background-color: #00f3;
+    }
+    &[status="2"] {
+        background-color: #0f03;
+    }
+    &[status="3"] {
+        background-color: #f003;
+    }
+}
+
 input[type="checkbox"], input[type="radio"] {
     width: 1lh;
     height: 1lh;
-    &, + label {
-        cursor: pointer;
+    &[disabled]+label {
+        color: var(--fg-dim-color);
+    }
+    &:not([disabled]) {
+        &, + label {
+            cursor: pointer;
+        }
     }
 }
 
