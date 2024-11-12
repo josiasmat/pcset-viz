@@ -26,8 +26,35 @@ const midi = {
     mode: MIDI_MODES[1],
     keys: Array(128).fill(false),
     pcs: Array(12).fill(0),
-    sustain: Array(128).fill(false),
-    pedal: false,
+    notes: Array(128).fill(false),
+    pedal: {
+        enabled: false,
+        pressed: false,
+    },
+    keyPressed(key) {
+        return ( this.pedal.enabled && this.pedal.pressed )
+            ? this.keys[key] : this.notes[key];
+    },
+    setNoteOn(key) {
+        const pc = key % 12;
+        this.keys[key] = true;
+        this.pcs[pc] += 1;
+        this.notes[key] = true;
+        return pc;
+    },
+    setNoteOff(key) {
+        const pc = key % 12;
+        this.keys[key] = false;
+        this.pcs[pc] = Math.max(this.pcs[pc]-1, 0);
+        if ( !this.pedal.enabled || !this.pedal.pressed )
+            this.notes[key] = false;
+        return pc;
+    },
+    setPedal(int_value) {
+        this.pedal.pressed = (int_value >= 64);
+        if ( !this.pedal.enabled || !this.pedal.pressed )
+            this.notes = Array.from(this.keys);
+    },
 }
 
 const config_midi_storage = new LocalStorageHandler("pcsetviz-midi");
@@ -72,64 +99,63 @@ function requestMidiInputs(callback_ok, callback_fail) {
 
 function selectMidiDevice() {
     const midi_select_elm = document.getElementById("select-midi-device");
-    const midi_status_elm = document.getElementById("midi-connection-status");
     const port_id = midi_select_elm.value;
     if ( midi.dev ) {
         midi.dev.removeEventListener("midimessage", handleMIDIEvent);
         midi.dev = null;
     }
     if ( port_id == "" ) {
-        midi_status_elm.setHTMLUnsafe("Disconnected");
+        updateConfigMidiStatus("Disconnected", 0);
         saveMidiConfig();
     } else {
-        connectMidiDeviceById(port_id, midi_status_elm);
+        connectMidiDeviceById(port_id, updateConfigMidiStatus);
     }
 }
 
 
-function connectMidiDeviceByName(port_name, msg_element = null) {
+function connectMidiDeviceByName(port_name, msg_func = null) {
     if ( navigator.requestMIDIAccess ) {
-        if ( msg_element ) msg_element.innerText = "Connecting...";
+        if ( msg_func ) msg_func("Connecting...", 2);
         requestMidiInputs((ports) => {
             for ( const port of ports ) {
                 if ( port.name == port_name ) {
                     midi.dev = port;
                     port.addEventListener("midimessage", handleMIDIEvent);
                     console.log(`Connected to MIDI device "${port.name}".`);
-                    if ( msg_element ) msg_element.innerText = "Connected";
+                    if ( msg_func ) msg_func("Connected", 1);
                     saveMidiConfig();
                     return;
                 }
             }
             console.log(`Unable to connect to MIDI device with name "${port_name}".`);
-            if ( msg_element ) msg_element.innerText = "Failed connection";
+            if ( msg_func ) msg_func("Failed connection", 3);
         }, () => { 
             console.log("MIDI access denied.");
-            if ( msg_element ) msg_element.innerText = "MIDI access denied";
+            if ( msg_func ) msg_func("MIDI access denied", 3);
         });
     }
 }
 
 
-function connectMidiDeviceById(port_id, msg_element = null) {
+function connectMidiDeviceById(port_id, msg_func = null) {
     if ( navigator.requestMIDIAccess ) {
-        if ( msg_element ) msg_element.innerText = "Connecting...";
+        if ( msg_func ) msg_func("Connecting...", 2);
         requestMidiInputs((ports) => {
             for ( const port of ports ) {
                 if ( port.id == port_id ) {
                     midi.dev = port;
                     port.addEventListener("midimessage", handleMIDIEvent);
                     console.log(`Connected to MIDI device "${port.name}".`);
-                    if ( msg_element ) msg_element.innerText = "Connected";
+                    if ( msg_func ) msg_func("Connected", 1);
                     saveMidiConfig();
                     return;
                 }
             }
             console.log(`Unable to connect to MIDI device with id "${port_id}".`);
-            if ( msg_element ) msg_element.innerText = "Failed connection"; 
+            if ( msg_func ) msg_func("Failed connection", 3);
         }, () => { 
             console.log("MIDI access denied.");
-            if ( msg_element ) msg_element.innerText = "MIDI access denied"; 
+            if ( msg_func ) msg_func("MIDI access denied", 3);
         });
     }
 }
@@ -147,12 +173,9 @@ function handleMIDIEvent(ev) {
                 break;
             case 0xB0 + ch:
                 if ( ev.data[1] == 64 ) {
-                    if ( midi.pedal && ev.data[2] < 64 )
-                        midi.sustain = Array.from(midi.keys);
-                    midi.pedal = (ev.data[2] >= 64);
+                    midi.setPedal(ev.data[2]);
                     updatePlayedNotes();
-                }
-                else if ( ev.data[1] == 123 )
+                } else if ( ev.data[1] == 123 )
                     setAllNotesOff();
         }
     }
@@ -160,36 +183,31 @@ function handleMIDIEvent(ev) {
 
 
 function setNoteOn(key) {
-    midi.keys[key] = true;
-    midi.sustain[key] = true;
-    const pc = mod12(key);
-    midi.pcs[pc] += 1;
-    updatePlayedNotes(key, pc, true, (midi.pcs[pc] == 1));
+    const pc = midi.setNoteOn(key);
+    updatePlayedNotes(key, pc, true);
 }
 
 
 function setNoteOff(key) {
-    midi.keys[key] = false;
-    if ( !midi.pedal ) midi.sustain[key] = false;
-    const pc = mod12(key);
-    midi.pcs[pc] = Math.max(midi.pcs[pc]-1, 0);
+    const pc = midi.setNoteOff(key);
     updatePlayedNotes(key, pc, false);
 }
 
 
 function setAllNotesOff() {
     midi.keys = Array(128).fill(false);
-    midi.sustain = Array(128).fill(false);
+    midi.notes = Array(128).fill(false);
     midi.pcs = Array(12).fill(0);
     updatePlayedNotes();
 }
 
 
-function updatePlayedNotes(key = null, pc = null, note_on = false, first_on = false) {
+function updatePlayedNotes(key = null, pc = null, note_on = false) {
+    const first_on = (note_on ? midi.pcs[pc] == 1 : false);
     const previous_pcset = state.pcset.clone();
     switch ( midi.mode ) {
         case "direct":
-            state.pcset = new PcSet(midi.sustain.reduce(
+            state.pcset = new PcSet(midi.notes.reduce(
                 (r,k,i) => { if (k) r.push(mod12(i)); return r; }, []
             ));
             break;
@@ -199,14 +217,14 @@ function updatePlayedNotes(key = null, pc = null, note_on = false, first_on = fa
             break;
         case "chord":
             if ( note_on ) {
-                state.pcset = new PcSet(midi.keys.reduce(
+                state.pcset = new PcSet(midi.notes.reduce(
                     (r,k,i) => { if (k) r.push(mod12(i)); return r; }, []
                 ));
             }
             break;
         case "accumulate":
             if ( key != null ) {
-                const sum = midi.keys.reduce( (sum,k) => sum += k ? 1 : 0, 0 );
+                const sum = midi.notes.reduce( (sum,k) => sum += k ? 1 : 0, 0 );
                 if ( sum == 1 && first_on )
                     state.pcset = new PcSet([pc]);
                 else if ( midi.pcs[pc] > 0 )
@@ -220,13 +238,9 @@ function updatePlayedNotes(key = null, pc = null, note_on = false, first_on = fa
 }
 
 
-function selectMidiMode() {
-    midi.mode = document.getElementById("select-midi-mode").value;
-    saveMidiConfig();
-}
-
 function loadMidiConfig() {
     midi.mode = config_midi_storage.readString("mode", MIDI_MODES[1]);
+    midi.pedal.enabled = config_midi_storage.readString("pedal", false);
     const dev_name = config_midi_storage.readString("last-device-name", "");
     if ( dev_name )
         connectMidiDeviceByName(dev_name);
@@ -234,6 +248,7 @@ function loadMidiConfig() {
 
 function saveMidiConfig() {
     config_midi_storage.writeString("mode", midi.mode);
+    config_midi_storage.writeString("pedal", midi.pedal.enabled);
     config_midi_storage.writeString("last-device-name", midi.dev ? midi.dev.name : "");
 }
 

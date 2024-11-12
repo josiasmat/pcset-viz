@@ -37,6 +37,17 @@ function showConfigPopup() {
 }
 
 
+/**
+ * @param {String} text 
+ * @param {Number} value 0 = gray, 1 = blue, 2 = green, 3 = red
+ */
+function updateConfigMidiStatus(text, value) {
+    const midi_status_elm = document.getElementById("midi-connection-status");
+    midi_status_elm.setAttribute("status", value.toString());
+    midi_status_elm.innerHTML = text;
+}
+
+
 function updateConfigPopup() {
     const checkboxes = document.querySelectorAll("#visible-data-checkboxes-area input");
     for ( let checkbox of checkboxes ) {
@@ -45,8 +56,10 @@ function updateConfigPopup() {
         checkbox.checked = !(target_elm.hasAttribute("hidden"));
     }
     document.getElementById("select-midi-mode").value = midi.mode;
+    const midi_pedal_elm = document.getElementById("chk-midi-pedal");
+    midi_pedal_elm.value = midi.pedal.enabled;
+    midi_pedal_elm.disabled = (midi.mode == "toggle");
     const midi_select_elm = document.getElementById("select-midi-device");
-    const midi_status_elm = document.getElementById("midi-connection-status");
     clearSelectOptions(midi_select_elm);
     const options = [addOptionToHtmlSelect(
         midi_select_elm, "", "No device available"
@@ -64,11 +77,23 @@ function updateConfigPopup() {
         }
         if ( options.length > 1 )
             midi_select_elm.insertBefore(options[0], options[1]);
-        midi_status_elm.innerHTML = ( midi.dev ) ? "Connected" : "Disconnected";
+        if ( midi.dev )
+            updateConfigMidiStatus("Connected", 1);
+        else
+            updateConfigMidiStatus("Disconnected", 0);
         //selectMidiDevice();
     }, () => {
-        midi_status_elm.innerHTML = "MIDI access denied";
+        updateConfigMidiStatus("MIDI access denied", 3);
     });
+}
+
+
+function selectMidiMode() {
+    midi.mode = document.getElementById("select-midi-mode").value;
+    const midi_pedal_elm = document.getElementById("chk-midi-pedal");
+    midi.pedal.enabled = midi_pedal_elm.checked;
+    midi_pedal_elm.disabled = (midi.mode == "toggle");
+    saveMidiConfig();
 }
 
 

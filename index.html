@@ -349,6 +349,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                 <td>MIDI input</td>
                                 <td>
                                     <span>
+                                        <label for="select-midi-device">Device:</label>
+                                        <select name="select-midi-device" id="select-midi-device" onchange="selectMidiDevice()">
+                                            <option value="">No device selected</option>
+                                        </select>
+                                        →
+                                        <span id="midi-connection-status" status="0">Disconnected</span>
+                                    </span>
+                                    <span>
                                         <label for="">Mode:</label>
                                         <select name="select-midi-mode" id="select-midi-mode" onchange="selectMidiMode()">
                                             <option value="accumulate">Accumulate</option>
@@ -358,13 +366,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                         </select>
                                     </span>
                                     <span>
-                                        <label for="select-midi-device">Device:</label>
-                                        <select name="select-midi-device" id="select-midi-device" onchange="selectMidiDevice()">
-                                            <option value="">No device selected</option>
-                                        </select>
+                                        <input id="chk-midi-pedal" type="checkbox" onchange="selectMidiMode()">
+                                        <label for="chk-midi-pedal">Enable sustain pedal</label>
                                     </span>
-                                →
-                                    <span id="midi-connection-status">Disconnected</span>
                                 </td>
                             </tr>
                             <tr>
