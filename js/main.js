@@ -142,7 +142,9 @@ function textOrDash(s) {
  * @returns {String}
  */
 function pcsetHyperlink(pcset, options = {}) {
-    const tx = (options.text) ? options.text : htmlEscape(pcset.toString(config.set_format, true));
+    const tx = (options.text) ? options.text : htmlEscape(
+        (options.normalize) ? pcset.normal.toString(config.set_format, true) : pcset.toString(config.set_format, true)
+    );
     let anchor;
     if ( pcset.isEqualTo(state.pcset) && !options.enable )
         anchor = `<span class="setfont same-set">${tx}</span>`;
@@ -435,7 +437,7 @@ function operationUpdate(reset = false) {
     }
 
     data_cells.operation.result.setHTMLUnsafe(
-        pcsetHyperlink(result, {op: [op,index], enable: true}));
+        pcsetHyperlink(result, {op: [op,index], enable: true, normalize: false}));
 }
 
 
@@ -497,12 +499,14 @@ function setCollectionToStrWithLinks(sets, op = null, sep = " = ", include_op_in
             if ( item[0].length > 1 ) item[1] = item[1].normal;
             strings.push(
                 `${op.replace('n', "<sub>" + ranges.join(",") + "</sub>")}${sep.replaceAll(' ',"&nbsp;")}${
-                    include_op_in_link ? pcsetHyperlink(item[1], { op: [op,item[0][0]] }) : pcsetHyperlink(item[1])}`
+                    include_op_in_link ? 
+                        pcsetHyperlink(item[1], { op: [op,item[0][0]], normalize: true }) :
+                        pcsetHyperlink(item[1], { normalize: true })}`
             )
         }
         return strings.join(", ");
     } else {
-        return sets.map( (item) => pcsetHyperlink(item) ).join(", ");
+        return sets.map( (item) => pcsetHyperlink(item, {normalize: true}) ).join(", ");
     }
 }
 
