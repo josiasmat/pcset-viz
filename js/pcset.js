@@ -37,7 +37,10 @@ var PCSET_CHAR_MAP = Array.from(PCSET_TOKEN_MAP_SHORT_AB);
 
 class PcSet {
 
+    /** @type {Number[]} */
     #data = [];
+
+    /** @type {Number} */
     #binv;
 
     static #cache = {};
@@ -72,9 +75,15 @@ class PcSet {
         PcSet.#cache = {};
     }
 
+    /**
+     * Constructs a new PcSet object.
+     * @param {Number[]|String} [arg] An optional source for the set, which
+     *      can be an array of pitches or pitch-classes, or a string containing
+     *      a list of pitch-classes.
+     */
     constructor(arg = []) {
         if ( typeof(arg) == "string" ) {
-            if ( substr_found_in_str(arg, [" ",",",";"]) )
+            if ( substrFoundInStr(arg, [" ",",",";"]) )
                 this.#parseStringLong(arg);
             else
                 this.#parseStringCompact(arg);
@@ -198,34 +207,55 @@ class PcSet {
         return this.#left_bracket + s + this.#right_bracket;
     }
 
+    /**
+     * Returns a deep-copy of this PcSet object.
+     * @returns {PcSet}
+     */
     clone() {
         return new PcSet(this.#data);
     }
 
     // PROPERTIES
 
+    /** The number of pitch-classes in the set. @returns {Number} */
     get size() {
         return this.#data.length;
     }
 
+    /** The number of pitch-classes in the set.
+     * @returns {Number}
+     * @alias size 
+     */ 
     get cardinality() {
         return this.size;
     }
 
+    /** The first pitch-class in the set. @returns {Number} */
     get head() {
-        return ( this.is_empty() ) ? null : this.#data[0];
+        return ( this.isEmpty() ) ? null : this.#data[0];
     }
 
+    /** The last pitch-class in the set. @returns {Number} */
     get tail() {
         const len = this.size;
         return ( len == 0 ) ? null : this.#data[len-1];
     }
 
+    /** 
+     * Returns the pitch-class set at given index. Accepts negative indexes.
+     * @param {Number} index
+     * */
     at(index) {
         return this.#data[mod(index, this.size)];
     }
 
-    index_of(pc) {
+    /**
+     * Returns the index of the given pitch-class inside the set, or -1 if
+     *      the pitch-class is not a member of the set.
+     * @param {Number} pc A pitch-class.
+     * @returns {Number}
+     */
+    indexOf(pc) {
         return this.#data.indexOf(pc);
     }
 
@@ -235,8 +265,7 @@ class PcSet {
      */
     icvector() {
         const cached = PcSet.#cacheRead(this.binary_value, "icv");
-        return cached ? cached 
-            : PcSet.#cacheWrite(this.binary_value, "icv", IntervalClassVector.from_pcset(this));
+        return cached ?? PcSet.#cacheWrite(this.binary_value, "icv", IntervalClassVector.from_pcset(this));
     }
 
     /**
@@ -245,41 +274,57 @@ class PcSet {
      */
     ctvector() {
         const cached = PcSet.#cacheRead(this.binary_value, "ctv");
-        return cached ? cached 
-            : PcSet.#cacheWrite(this.binary_value, "ctv", CommonToneVector.from_pcset(this));
-        //return CommonToneVector.from_pcset(this);
+        return cached ?? PcSet.#cacheWrite(this.binary_value, "ctv", CommonToneVector.from_pcset(this));
     }
 
+    /** The binary value of the set, which corresponds to the sum of the
+     *      powers of two of every member of the set. This gives unique values
+     *      for all possible unordered pitch-class sets.
+     */
     get binary_value() {
-        if ( !this.#binv ) this.#update_binary_value();
+        if ( !this.#binv ) this.#updateBinaryValue();
         return this.#binv;
     }
 
-    #update_binary_value() {
+    #updateBinaryValue() {
         this.#binv = this.#data.reduce((sum, pc) => sum + (2**pc), 0);
     }
 
-    to_array() {
+    /** 
+     * Returns a new array containing the pitch-classes of this set.
+     * @returns {Number[]}
+     */
+    toArray() {
         return Array.from(this.#data);
     }
 
-    is_empty() {
+    /** @returns {Boolean} _true_ if the set is empty. */
+    isEmpty() {
         return this.size == 0;
     }
 
+    /** 
+     * @returns {Boolean} _true_ if the set has a distinct inverse,
+     *      i.e. if the set is *not* a mirror.
+     */
     hasDistinctInverse() {
-        return ( this.#get_catalog_entry().inv );
+        return ( this.#getCatalogEntry().inv );
     }
 
+    /**
+     * @returns {Boolean} _true_ if the set is a mirror, i.e. if
+     *      the set has no distinct inverse.
+     */
     isMirror() {
-        return ( !this.is_empty() && !this.hasDistinctInverse() );
+        return ( !this.isEmpty() && !this.hasDistinctInverse() );
     }
 
     // COMPARISON AND SEGMENTATION
 
     /**
-     * Compares the set to another set, returning _true_ if they are equal.
-     * To compare set classes, use *set.prime.isEqualTo(other.prime)*.
+     * Compares the set to another set, returning _true_ if they have the
+     * same members in the same order.
+     * To compare set classes, use *set.isSameSetClass(other)*.
      * @param {PcSet} other 
      * @returns {Boolean}
      */
@@ -291,7 +336,17 @@ class PcSet {
         return true;
     }
 
-    is_superset_of(other) {
+    /**
+     * Compares the set to another set, returning _true_ if they have
+     * the same members, irrespective of ordering.
+     * @param {PcSet} other 
+     * @returns {Boolean}
+     */
+    isSameSetClass(other) {
+        return ( this.size == other.size && this.isSupersetOf(other) );
+    }
+
+    isSupersetOf(other) {
         for ( const pc of other ) {
             if ( ! this.has(pc) )
                 return false;
@@ -299,13 +354,13 @@ class PcSet {
         return true;
     }
 
-    is_subset_of(other) {
-        return other.is_superset_of(this);
+    isSubsetOf(other) {
+        return other.isSupersetOf(this);
     }
 
-    segment_index(other) {
+    getSegmentIndex(other) {
         if ( other.size > this.size ) return -1;
-        const head_index = this.index_of(this.head);
+        const head_index = this.indexOf(this.head);
         if ( head_index == -1 ) return -1;
         const len_this = this.size;
         const len_other = other.size;
@@ -316,12 +371,12 @@ class PcSet {
         return head_index;
     }
 
-    has_segment(other) {
-        return this.segment_index(other) != -1;
+    hasSegment(other) {
+        return this.getSegmentIndex(other) != -1;
     }
 
-    is_segment_of(other) {
-        return other.has_segment(this);
+    isSegmentOf(other) {
+        return other.hasSegment(this);
     }
 
     // STRING REPRESENTATION
@@ -350,16 +405,19 @@ class PcSet {
         }
     }
 
+    /** @returns {String} */
     #strCompact(include_brackets = false, char_map = PCSET_CHAR_MAP) {
         const s = this.#data.map((x) => char_map[x]).join("");
         return (include_brackets) ? this.#encloseStr(s) : s;
     }
 
+    /** @returns {String} */
     #strNumbers(include_brackets = false) {
         const s = this.#data.map((x) => x.toString()).join(",");
         return (include_brackets) ? this.#encloseStr(s) : s;
     }
 
+    /** @returns {String} */
     #strFromMap(map, include_brackets) {
         const s = this.#data.map((x) => map[x]).join(",");
         return (include_brackets) ? this.#encloseStr(s) : s;
@@ -370,6 +428,7 @@ class PcSet {
     /**
      * Check if set has the specified pitch class.
      * @param {Number} pitch Pitch or pitch-class number. 
+     * @returns {Boolean}
      */
     has(pitch) {
         return this.#data.includes(mod12(pitch));
@@ -378,14 +437,14 @@ class PcSet {
     /**
      * Adds the specified pitch-class to the set.
      * @param  {Number} pc Pitch-class number.
-     * @return {Boolean} Returns true if pitch-class was added; false if it was already 
+     * @return {Boolean} _true_ if pitch-class was added; false if it was already 
      *      a member of the set.
      */
     add(pc) {
         if ( this.has(pc) ) return false;
         this.#data.push(pc);
         this.#sortFromFirst();
-        this.#update_binary_value();
+        this.#updateBinaryValue();
         return true;
     }
 
@@ -399,13 +458,13 @@ class PcSet {
         const i = this.#data.indexOf(pc);
         if ( i == -1 ) return false;
         this.#data.splice(i, 1);
-        this.#update_binary_value();
+        this.#updateBinaryValue();
         return true;
     }
 
     /**
-     * Adds or removes the pitch-class to or from the set, depending if the pitch-class 
-     * is a member of the set or not.
+     * Adds the specified pitch-class to the set if it is not a member of the
+     * set; otherwise removes the pitch-class from the set.
      * @param  {Number} pc Pitch-class number.
      */
     toggle(pc) {
@@ -421,13 +480,8 @@ class PcSet {
      *      possible, either because _from_ is not a member of the set, or _to_ is
      *      already a member of the set.
      */
-    move_to(from, to) {
-        if ( this.has(from) && !this.has(to) ) {
-            this.remove(from);
-            this.add(to);
-            return true;
-        }
-        return false;
+    moveTo(from, to) {
+        return !this.has(to) && this.remove(from) && this.add(to);
     }
 
     /**
@@ -440,8 +494,8 @@ class PcSet {
      *      possible, either because _pc_ is not a member of the set, or if _interval_
      *      takes to a pitch-class that is already a member of the set.
      */
-    move_by(pc, interval) {
-        return this.move_to(pc, mod12(pc+interval));
+    moveBy(pc, interval) {
+        return this.moveTo(pc, mod12(pc+interval));
     }
 
     // TRANSFORMATIONS
@@ -489,7 +543,7 @@ class PcSet {
     }
 
     shiftedTo(pc) {
-        const i = this.index_of(pc)
+        const i = this.indexOf(pc)
         if ( i != -1 )
             return this.shifted(i);
     }
@@ -507,7 +561,7 @@ class PcSet {
     }
 
     shiftTo(pc) {
-        const i = this.index_of(pc);
+        const i = this.indexOf(pc);
         if ( i != -1 )
             this.shift(i);
     }
@@ -521,14 +575,14 @@ class PcSet {
      */
     findTransformFrom(other) {
         // find transposition
-        const transpositions = other.transpositions(false);
+        const transpositions = other.getTranspositions(false);
         for ( const trn of transpositions )
-            if ( this.is_superset_of(trn[1]) )
+            if ( this.isSupersetOf(trn[1]) )
                 return ['T', trn[0]];
         // find inversion
-        const inversions = other.inversions();
+        const inversions = other.getInversions();
         for ( const inv of inversions )
-            if ( this.is_superset_of(inv[1]) )
+            if ( this.isSupersetOf(inv[1]) )
                 return ['I', inv[0]];
         return null;
     }
@@ -553,7 +607,7 @@ class PcSet {
     }
 
     /**
-     * Returns a new PcSet object which is the complement of the original one.
+     * A new PcSet object which is the complement of the original one.
      * @return {PcSet}
      */
     get complement() {
@@ -565,7 +619,7 @@ class PcSet {
     }
 
     /**
-     * Returns a new PcSet object in which the elements are transposed so that the first
+     * A new PcSet object in which the elements are transposed so that the first
      * one is zero.
      * @return {PcSet}
      */
@@ -574,7 +628,7 @@ class PcSet {
     }
 
     /**
-     * Returns a new PcSet object which is the normal form of the original one.
+     * A new PcSet object which is the normal form of the original one.
      * @return {PcSet}
      */
     get normal() {
@@ -587,11 +641,11 @@ class PcSet {
         const initial = this.clone();
         initial.#sortAscending();
         let best = initial.clone();
-        let ambitus = compute_interval(best.head, best.tail);
+        let ambitus = computeInterval(best.head, best.tail);
         let binv = best.zero.binary_value;
         for ( let n = 1; n < len; n++ ) {
             const candidate = initial.shifted(n);
-            const cand_ambt = compute_interval(candidate.head, candidate.tail);
+            const cand_ambt = computeInterval(candidate.head, candidate.tail);
             const cand_binv = candidate.zero.binary_value;
             if ( (cand_ambt < ambitus) || ( cand_ambt == ambitus && cand_binv < binv) ) {
                 best = candidate;
@@ -605,7 +659,7 @@ class PcSet {
     }
 
     /**
-     * Returns a new PcSet object which is the normal form transposed so that the first
+     * A new PcSet object which is the normal form transposed so that the first
      * element is zero.
      * @return {PcSet}
      */
@@ -619,7 +673,7 @@ class PcSet {
     }
 
     /**
-     * Returns a new PcSet object which is the prime form of the original one.
+     * A new PcSet object which is the prime form of the original one.
      * @return {PcSet}
      */
     get prime() {
@@ -634,25 +688,43 @@ class PcSet {
         return primed;
     }
 
-    #get_catalog_entry() {
+    /** @returns {Object} */
+    #getCatalogEntry() {
         return PCSET_CATALOG[this.size][this.prime.#strCompact(true, PCSET_TOKEN_MAP_SHORT_AB)];
     }
 
-    forte_name(ab = false) {
-        const entry = this.#get_catalog_entry();
+    /** @returns {String} */
+    #getForteName(ab = false) {
+        const entry = this.#getCatalogEntry();
         if ( ab && entry.inv )
             return entry.fn + ( this.prime.isEqualTo(this.reduced) ? 'A' : 'B' );
         else 
             return entry.fn;
     }
 
+    /** Forte/Morris name of the set. @returns {String} */
+    get forte_name() {
+        return this.#getForteName(false);
+    }
+
+    /** 
+     * Forte/Morris name of the set, appending 'A' to sets that have distinct
+     * inverses and 'B' to ones that are inverses of prime sets.
+     * @returns {String} 
+     */
+    get forte_name_ab() {
+        return this.#getForteName(true);
+    }
+
+    /** Carter number of the set. @returns {Number} */
     get carter_number() {
-        const entry = this.#get_catalog_entry();
+        const entry = this.#getCatalogEntry();
         return entry.cn;
     }
 
+    /** Z-correspondent of the set, or _null_. @returns {PcSet | null} */
     get zcorrespondent() {
-        const entry = this.#get_catalog_entry();
+        const entry = this.#getCatalogEntry();
         const zc = (entry) ? entry.zc : null;
         return (zc) ? new PcSet(zc) : null;
     }
@@ -668,7 +740,7 @@ class PcSet {
      * @return {Array} Returns an array of numbers representing the levels of 
      *      transpositional symmetry of the set.
      */
-    transpositional_symmetries(include_zero = true) {
+    getTranspositionalEquivalents(include_zero = true) {
         const icvec = this.icvector();
         const pcslen = this.size;
         let sym = [];
@@ -686,8 +758,8 @@ class PcSet {
         return sym;
     }
 
-    transpositional_symmetry_axes(include_zero = true) {
-        const symmetries = this.transpositional_symmetries(include_zero);
+    getTranspositionalEquivalenceIndexes(include_zero = true) {
+        const symmetries = this.getTranspositionalEquivalents(include_zero);
         let axes = [];
         for ( let sym of symmetries ) {
             for ( let b = sym; b < 12; b+= sym ) {
@@ -712,12 +784,12 @@ class PcSet {
      *      any set onto itself. Set it to false to exclude level zero from the count.
      * @return {Number} Returns the number of levels of transpositional symmetry of the set.
      */
-    transpositional_symmetry_degree(include_zero = true) {
+    getTranspositionalSymmetryDegree(include_zero = true) {
         return this.icvector().count_value(this.size, true);
         //return this.t_symmetries(include_zero).length;
     }
 
-    inversional_symmetries() {
+    getInversionalSymmetries() {
         const ctvec = this.ctvector();
         const pcslen = this.size;
         let sym = [];
@@ -729,11 +801,11 @@ class PcSet {
         return sym;
     }
 
-    inversional_symmetry_axes() {
-        return this.inversional_symmetries().map((x) => {return new Axis(x/2)});
+    getInversionalSymmetryAxes() {
+        return this.getInversionalSymmetries().map((x) => {return new Axis(x/2)});
     }
 
-    inversional_symmetry_degree() {
+    getInversionalSymmetryDegree() {
         return this.ctvector().count_value(this.size);
     }
 
@@ -787,17 +859,22 @@ class PcSet {
         return new PcSet(new_array).normal;
     }
 
-    sym_difference(other) {
+    symDifference(other) {
         return this.union(other).difference(this.intersection(other));
     }
 
     // COLLECTIONS OF SET TRANSFORMATIONS
 
     /**
+     * TaggedSetCollection
+     * @typedef {[Number[], PcSet][]} TaggedSetCollection
+     */
+
+    /**
      * Utility function to remove duplicated sets.
      * @param {PcSet[]} sets An array of PcSets.
      */
-    static #filter_unique(sets, normalize = true) {
+    static #filterUnique(sets, normalize = true) {
         if ( normalize ) {
             for ( let i = 0; i < sets.length-1; i++ ) {
                 const set_i_normal = sets[i].normal;
@@ -823,11 +900,12 @@ class PcSet {
 
     /**
      * Utility function to remove duplicated sets.
-     * @param {[Number,PcSet][]} tagged_sets An array of tagged PcSets, where each
+     * @param {[Number[], PcSet][]} tagged_sets An array of tagged PcSets, where each
      *      item is a 2-item array where the first item is a tag and the second
      *      item is the PcSet object.
+     * @returns {[Number[], PcSet][]}
      */
-    static #filter_unique_tagged(tagged_sets) {
+    static #filterUniqueTagged(tagged_sets) {
         for ( let i = 0; i < tagged_sets.length-1; i++ ) {
             const set_i_normal = tagged_sets[i][1].normal;
             for ( let j = tagged_sets.length-1; j > i; j-- ) {
@@ -843,89 +921,140 @@ class PcSet {
             set[0].sort((a,b) => a-b);
     }
 
-    transpositions(include_zero = true) {
+    /**
+     * @param {Boolean} include_zero 
+     * @returns {[Number[], PcSet][]}
+     */
+    getTranspositions(include_zero = true) {
         let sets = [];
         for ( let n = (include_zero ? 0 : 1); n < 12; n++ )
             sets.push([[n], this.transpose(n)]);
         return sets;
     }
 
-    transpositions_unique(include_zero = true) {
-        let sets = this.transpositions(include_zero);
-        PcSet.#filter_unique_tagged(sets);
+    /**
+     * @param {Boolean} include_zero 
+     * @returns {[Number[], PcSet][]}
+     */
+    getTranspositionsUnique(include_zero = true) {
+        let sets = this.getTranspositions(include_zero);
+        PcSet.#filterUniqueTagged(sets);
         return sets;
     }
 
-    ctts(include_zero = true) {
-        let sets = this.transpositions(include_zero)
+    /**
+     * @param {Boolean} include_zero 
+     * @returns {[Number[], PcSet][]}
+     */
+    getCtts(include_zero = true) {
+        let sets = this.getTranspositions(include_zero)
             .map( (item) => [item[0],item[1].intersection(this)] );
         return sets;
     }
 
-    ctts_unique(include_zero = true) {
-        let sets = this.ctts(include_zero);
-        PcSet.#filter_unique_tagged(sets);
+    /**
+     * @param {Boolean} include_zero 
+     * @returns {[Number[], PcSet][]}
+     */
+    getCttsUnique(include_zero = true) {
+        let sets = this.getCtts(include_zero);
+        PcSet.#filterUniqueTagged(sets);
         return sets;
     }
 
-    transpositionally_symmetric_sets(include_zero = true) {
-        let sets = this.transpositional_symmetries(include_zero).map((n) => [[n], this.transpose(n)]);
-        PcSet.#filter_unique_tagged(sets);
+    /**
+     * @param {Boolean} include_zero 
+     * @returns {[Number[], PcSet][]}
+     */
+    getTranspositionallyEquivalentSets(include_zero = true) {
+        let sets = this.getTranspositionalEquivalents(include_zero).map((n) => [[n], this.transpose(n)]);
+        PcSet.#filterUniqueTagged(sets);
         return sets;
     }
     
-    inversions() {
+    /**
+     * @returns {[Number[], PcSet][]}
+     */
+    getInversions() {
         let sets = [];
         for ( let n = 0; n < 12; n++ )
             sets.push([[n], this.invert(n)]);
         return sets;
     }
 
-    inversions_unique() {
-        let sets = this.inversions();
-        PcSet.#filter_unique_tagged(sets);
+    /**
+     * @returns {[Number[], PcSet][]}
+     */
+    getInversionsUnique() {
+        let sets = this.getInversions();
+        PcSet.#filterUniqueTagged(sets);
         return sets;
     }
     
-    ctis() {
-        let sets = this.inversions()
+    /**
+     * @returns {[Number[], PcSet][]}
+     */
+    getCtis() {
+        let sets = this.getInversions()
             .map( (item) => [item[0],item[1].intersection(this)] );
         return sets;
     }
 
-    ctis_unique() {
-        let sets = this.ctis();
-        PcSet.#filter_unique_tagged(sets);
+    /**
+     * @returns {[Number[], PcSet][]}
+     */
+    getCtisUnique() {
+        let sets = this.getCtis();
+        PcSet.#filterUniqueTagged(sets);
         return sets;
     }
 
-    inversionally_symmetric_sets() {
-        let sets = this.inversional_symmetries().map((n) => [[n], this.invert(n)]);
-        PcSet.#filter_unique_tagged(sets);
+    /**
+     * @returns {[Number[], PcSet][]}
+     */
+    getInversionallySymmetricSets() {
+        let sets = this.getInversionalSymmetries().map((n) => [[n], this.invert(n)]);
+        PcSet.#filterUniqueTagged(sets);
         return sets;
     }
 
-    rotations(include_zero = true) {
+    /**
+     * @returns {[Number[], PcSet][]}
+     */
+    getRotations(include_zero = true) {
         let sets = [];
         for ( let n = (include_zero ? 0 : 1); n < this.size; n++ )
             sets.push([[n], this.shifted(n)]);
         return sets;
     }
 
-    multiples(include_zero = true) {
+    /**
+     * @param {Boolean} include_zero 
+     * @returns {[Number[], PcSet][]}
+     */
+    getMultiples(include_zero = true) {
         let sets = [];
         for ( let n = (include_zero ? 0 : 1); n < 12; n++ )
             sets.push([[n], this.multiply(n)]);
         return sets;
     }
 
-    multiples_unique() {
-        let sets = this.multiples(true);
-        PcSet.#filter_unique_tagged(sets);
+    /**
+     * @param {Boolean} include_zero 
+     * @returns {[Number[], PcSet][]}
+     */
+    getMultiplesUnique(include_zero = true) {
+        let sets = this.getMultiples(include_zero);
+        PcSet.#filterUniqueTagged(sets);
         return sets;
     }
 
-    subsets(min_size = 0, max_size = this.size) {
+    /**
+     * @param {Number} min_size 
+     * @param {Number} max_size 
+     * @returns {PcSet[]}
+     */
+    getSubsets(min_size = 0, max_size = this.size) {
         let sets = [];
         const arrays = PcSet.#combinations(this.#data);
         for ( const array of arrays )
@@ -935,27 +1064,35 @@ class PcSet {
         return sets;
     }
 
-    prime_subsets(min_size = 0, max_size = this.size) {
+    /**
+     * @param {Number} min_size 
+     * @param {Number} max_size 
+     * @returns {PcSet[]}
+     */
+    getPrimeSubsets(min_size = 0, max_size = this.size) {
         let sets = [];
         const arrays = PcSet.#combinations(this.#data);
         for ( const array of arrays )
             if ( array.length >= min_size && array.length <= max_size )
                 sets.push(new PcSet(array).prime);
-        PcSet.#filter_unique(sets, false);
+        PcSet.#filterUnique(sets, false);
         sets.sort((a,b) => a.size - b.size);
         return sets;
     }
 
-    hexachordalCombinatorials() {
+    /** 
+     * @returns {{i: Number[], p: Number[], ri: Number[], r: Number[]}}
+     */
+    getHexachordalCombinations() {
         if ( this.size != 6 ) return { i: [], p: [], ri: [], r: [] };
         const comb = {};
         const complement = this.complement.normal;
-        const inversions = this.inversions_unique();
-        const transpositions = this.transpositions_unique(false);
-        comb.i  = inversions.filter( (item) => item[1].is_superset_of(complement) ).map( (item) => item[0] );
-        comb.p  = transpositions.filter( (item) => item[1].is_superset_of(complement) ).map( (item) => item[0] );
-        comb.ri = inversions.filter( (item) => item[1].is_superset_of(this) ).map( (item) => item[0] );
-        comb.r  = transpositions.filter( (item) => item[1].is_superset_of(this) ).map( (item) => item[0] );
+        const inversions = this.getInversionsUnique();
+        const transpositions = this.getTranspositionsUnique(false);
+        comb.i  = inversions.filter( (item) => item[1].isSameSetClass(complement) ).map( (item) => item[0] );
+        comb.p  = transpositions.filter( (item) => item[1].isSameSetClass(complement) ).map( (item) => item[0] );
+        comb.ri = inversions.filter( (item) => item[1].isSameSetClass(this) ).map( (item) => item[0] );
+        comb.r  = transpositions.filter( (item) => item[1].isSameSetClass(this) ).map( (item) => item[0] );
         return comb;
     }
 
@@ -1021,43 +1158,51 @@ class IntervalClassVector {
         const size = pcset.size;
         for ( let i = 0; i < size-1; i++ ) {
             for ( let j = i+1; j < size; j++ ) {
-                icvec[compute_interval_class(pcset.at(i), pcset.at(j))-1] += 1;
+                icvec[computeIntervalClass(pcset.at(i), pcset.at(j))-1] += 1;
             }
         }
         return new IntervalClassVector(icvec);
     }
 
+    /** @returns {String} */
     str_hex(include_brackets = false) {
         const s = this.#data.map((x) => x.toString(16)).join("").toUpperCase();
         return (include_brackets) ? this.#enclose_str(s) : s;
     }
 
+    /** @returns {String} */
     str_numbers(include_brackets = false) {
         const s = this.#data.map((x) => x.toString()).join(",").toUpperCase();
         return (include_brackets) ? this.#enclose_str(s) : s;
     }
 
+    /** @returns {String} */
     get #left_bracket() {
         return ICVEC_DEFAULT_BRACKETS.charAt(0);
     }
 
+    /** @returns {String} */
     get #right_bracket() {
         return ICVEC_DEFAULT_BRACKETS.charAt(1);
     }
 
+    /** @returns {String} */
     #enclose_str(s) {
         return this.#left_bracket + s + this.#right_bracket;
     }
 
+    /** @returns {IntervalClassVector} */
     copy() {
         return new IntervalClassVector(this.#data);
     }
 
+    /** @returns {Number} */
     at(interval) {
-        const ic = interval_class_of(interval);
+        const ic = intervalClassOf(interval);
         return ( ic == 0 ) ? 0 : this.#data[ic-1];
     }
 
+    /** @returns {Number} */
     count_value(value, double6 = false) {
         if ( !double6 ) 
             return this.#data.filter((x)=>x==value).length;
@@ -1065,6 +1210,7 @@ class IntervalClassVector {
             + ( 2*this.#data[5] == value ) ? 1 : 0;
     }
 
+    /** @returns {Number} */
     sum() {
         return this.#data.reduce((sum, x) => sum + x, 0);
     }
@@ -1087,6 +1233,10 @@ class CommonToneVector {
                 this.#data[i] = Math.trunc(array[i]);
     }
 
+    /** 
+     * @param {PcSet} pcset
+     * @returns {CommonToneVector} 
+     */
     static from_pcset(pcset) {
         let ctvec = Array(12).fill(0);
         for ( const a of pcset )
@@ -1095,6 +1245,7 @@ class CommonToneVector {
         return new CommonToneVector(ctvec);
     }
 
+    /** @returns {String} */
     str_hex(include_brackets = false) {
         let s = "";
         for ( let x of this.#data )
@@ -1109,35 +1260,43 @@ class CommonToneVector {
         return (include_brackets) ? this.#enclose_str(s) : s;
     }
 
+    /** @returns {String} */
     str_numbers(include_brackets = false) {
         const s = this.#data.map((x) => x.toString()).join(',');
         return (include_brackets) ? this.#enclose_str(s) : s;
     }
 
+    /** @returns {String} */
     get #left_bracket() {
         return CTVEC_DEFAULT_BRACKETS.charAt(0);
     }
 
+    /** @returns {String} */
     get #right_bracket() {
         return CTVEC_DEFAULT_BRACKETS.charAt(1);
     }
 
+    /** @returns {String} */
     #enclose_str(s) {
         return this.#left_bracket + s + this.#right_bracket;
     }
 
+    /** @returns {CommonToneVector} */
     copy() {
         return new CommonToneVector(this.#data);
     }
 
+    /** @returns {Number} */
     at(pitch) {
         return this.#data[mod12(pitch)];
     }
 
+    /** @returns {Number} */
     count_value(value) {
         return this.#data.filter( (x) => x == value ).length;
     }
 
+    /** @returns {Number} */
     sum() {
         return this.#data.reduce((sum, x) => sum + x, 0);
     }
@@ -1147,21 +1306,29 @@ class CommonToneVector {
 
 class Axis {
 
-    a; b;
+    /** @type {Number} */ a;
+    /** @type {Number} */ b;
 
+    /**
+     * @param {Number} a 
+     * @param {Number} b 
+     */
     constructor (a, b = null) {
         this.a = mod12(a);
         this.b = mod12( (b == null) ? a+6 : b );
     }
 
+    /** @returns {[Number, Number]} */
     get pair() {
         return [this.a, this.b];
     }
 
+    /** @returns {String} */
     toString() {
         return `Axis(${this.a},${this.b})`;
     }
 
+    /** @returns {Boolean} */
     equal_to(other) {
         return (this.a == other.a && this.b == other.b)
             || (this.a == other.b && this.b == other.a);
@@ -1170,59 +1337,114 @@ class Axis {
 }
 
 
-function mod(val, m) {
-    return (val >= 0) ? val%m : (val%m)+m;
+/** 
+ * Computes _val % div_ for positive values, and
+ * _val % div + div_ for negative values.
+ * @param {Number} val - value
+ * @param {Number} div - divisor
+ * @returns {Number} 
+ */
+function mod(val, div) {
+    return (val >= 0) ? val%div : (val%div)+div;
 }
 
+/**
+ * Shorthand for _mod(val, 12)_.
+ * @param {Number} val
+ * @returns {Number}
+ */
 function mod12(val) {
     return mod(val, 12);
 }
 
+/**
+ * Shorthand for _mod(val, 6)_.
+ * @param {Number} val
+ * @returns {Number}
+ */
 function mod6(val) {
     return mod(val, 6);
 }
 
-function compute_interval(low, high) {
+/**
+ * Computes the interval, in semitones, between two pitches.
+ * @param {Number} low - lower pitch
+ * @param {Number} high - higher pitch
+ * @returns {Number}
+ */
+function computeInterval(low, high) {
     return mod12(high - low);
 }
 
-function interval_class_of(interval) {
+/**
+ * Computes the interval class of an interval.
+ * @param {Number} interval - Interval, in semitones.
+ * @returns {Number} Interval class: 0, 1, 2, 3, 4, 5 or 6.
+ */
+function intervalClassOf(interval) {
     return (interval <= 6) ? interval : 12-interval;
 }
 
-function compute_interval_class(pc1, pc2) {
-    return interval_class_of(compute_interval(pc1, pc2));
+/**
+ * Computes the interval class given two pitches.
+ * Same as: _intervalClassOf(computeInterval(pc1, pc2))_.
+ * @param {Number} pc1 
+ * @param {Number} pc2 
+ * @returns {Number}
+ */
+function computeIntervalClass(pc1, pc2) {
+    return intervalClassOf(computeInterval(pc1, pc2));
 }
 
-function substr_found_in_str(str, sub_array) {
+/** 
+ * Returns _true_ if one of the strings in *sub_array* is found inside *str*.
+ * @param {String} str
+ * @param {String[]} sub_array
+ * @returns {Boolean}
+ */
+function substrFoundInStr(str, sub_array) {
     for ( const sub of sub_array )
         if ( str.includes(sub) )
             return true;
     return false;
 }
 
-
+/**
+ * Returns _true_ if a given pitch-class corresponds to a black-key.
+ * @param {Number} pc 
+ * @returns {Boolean}
+ */
 function isBlackKey(pc) {
     return [1,3,6,8,10].includes(pc);
 }
 
+/**
+ * Returns _true_ if a given pitch-class corresponds to a white-key.
+ * @param {Number} pc 
+ * @returns {Boolean}
+ */
 function isWhiteKey(pc) {
     return [0,2,4,5,7,9,11].includes(pc);
 }
 
+/**
+ * @typedef {Object} CatalogPcSetData
+ * @property {String} fn  - Forte/Morris name.
+ * @property {Number} cn  - Carte number.
+ * @property {String} zc  - Z-correspondent set.
+ * @property {String} inv - Inverse set (computed on script load).
+ */
 
 /**
- * Catalog of pitch-class sets.
+ * Catalog of pitch-class sets. Usage:
  * 
- * PCSET_CATALOG[index][set].property
+ *      PCSET_CATALOG[cardinality][set].property
  * 
- * @param {Number} index Cardinality
- * @param {Number} set Set in hexadecimal format, enclosed with brackets [ ].
+ * The set must be enclosed in brackets. Example:
  * 
- * Properties:
- * @param fn Forte number.
- * @param cn Carter number.
- * @param zc Z-correspondent set.
+ *      PCSET_CATALOG[3]["[012]"].fn
+ * 
+ * @type {Object.<String, CatalogPcSetData>[]}
  */
 const PCSET_CATALOG = [
     { // index 0
@@ -1476,7 +1698,6 @@ const PCSET_CATALOG = [
         "[0123456789AB]": { fn: "12-1", cn: 1 }
     }
 ]
-
 
 // Add inverses to catalog
 for ( let i = 3; i < 11; i++ ) {

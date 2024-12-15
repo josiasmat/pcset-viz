@@ -101,7 +101,7 @@ function between(value, floor, ceiling) {
  * @returns {Number}
  */
 function clamp(value, min, max) {
-    return ( value < min ) ? min : ( value > max ) ? max : value;
+    return (value < min) ? min : ( (value > max) ? max : value );
 }
 
 
@@ -135,7 +135,7 @@ function htmlEscape(str) {
  * @returns {String} A HTML string of the anchor element.
  */
 function makeAnchorStr(url, options = {} ) {
-    const tx = ( options.text )    ? options.text : url;
+    const tx = options.text ?? url;
     const id = ( options.id )      ? ` id="${options.id}"` : "";
     const tg = ( options.target )  ? ` target="${options.target}"` : "";
     const cl = ( options.classes ) ? ` class="${options.classes.join(' ')}"` : "";
@@ -164,7 +164,7 @@ function nextOf(value, array) {
  */
 function getUrlQueryValue(param, default_value = "") {
     const result = new URLSearchParams(window.parent.location.search).get(param);
-    return result ? result : default_value;
+    return result ?? default_value;
 }
 
 
@@ -188,30 +188,28 @@ function combinations(array = []) {
 
 /**
  * Equivalent to Python's zip.
- * @param {...Array}
  * @returns {Array}
  */
 function zip() {
     // from https://stackoverflow.com/questions/4856717/javascript-equivalent-of-pythons-zip-function
     var args = [].slice.call(arguments);
-    var shortest = args.length==0 ? [] : args.reduce(function(a,b){
-        return a.length<b.length ? a : b
-    });
-    return shortest.map(function(_,i){
-        return args.map(function(array){return array[i]})
-    });
+    var shortest = (args.length == 0) 
+        ? [] : args.reduce( (a,b) => (a.length < b.length ) ? a : b );
+    return shortest.map( (_,i) => args.map( (array) => array[i] ) );
 }
 
 
 /**
  * Return successive overlapping pairs taken from an array.
  * Equivalent to Python's pairwise.
- * @param {Array} array 
- * @returns {[any,any][]}
+ * @template T
+ * @param {T[]} array 
+ * @param {Boolean} last_first If _true_, pair the last item with the first one at the end.
+ * @returns {[T,T][]}
  */
 function pairwise(array, last_first = false) {
-    const pairs = zip(array.slice(0,array.length-1), array.slice(1));
-    if ( last_first ) pairs.push([array[array.length-1],array[0]]);
+    const pairs = zip(array.slice(0,-1), array.slice(1));
+    if ( last_first ) pairs.push([array.at(-1), array[0]]);
     return pairs;
 }
 
@@ -387,5 +385,44 @@ function clearSelectOptions(select_element) {
     let L = select_element.options.length - 1;
     for( let i = L; i >= 0; i-- )
        select_element.remove(i);
- }
+}
  
+
+/**
+ * Returns a string representation of an array of numbers,
+ * differentiating ranges and discrete values.
+ * @param {Number[]} numbers - an array of numbers.
+ * @param {String} discrete_sep - optional; default is a comma.
+ * @param {String} range_sep - optional; default is a dash.
+ * @returns {String}
+ */
+function integerRangesToStr(numbers, discrete_sep = ',', range_sep = '-') {
+    if ( numbers.length == 0 ) return '';
+    const ranges = [];
+    let [a, b] = [numbers[0], numbers[0]];
+    for ( let i = 1; i < numbers.length; i++ ) {
+        if ( numbers[i] != b + 1 ) {
+            ranges.push((a==b) ? b.toString() : [a,b].join(range_sep));
+            a = numbers[i];
+        }
+        b = numbers[i];
+    }
+    ranges.push((a==b) ? b.toString() : [a,b].join(range_sep));
+    return ranges.join(discrete_sep);
+}
+
+
+function romanize(n) {
+    const ROMAN_DIGITS = [
+        [1000,'M'], [900,'CM'], [500,'D'], [400,'CD'], [100,'C'], [90,'XC'],
+        [50,'L'], [40,'XL'], [10,'X'], [9,'IX'], [5,'V'], [4,'IV'], [1,'I']
+    ];
+    let s = '';
+    for ( let [v,d] of ROMAN_DIGITS ) {
+        while ( n >= v ) {
+            n -= v;
+            s += d;
+        }
+    }
+    return s;
+}

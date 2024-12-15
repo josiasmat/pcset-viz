@@ -40,7 +40,6 @@ const midi = {
         this.keys[key] = true;
         this.pcs[pc] += 1;
         this.notes[key] = true;
-        return pc;
     },
     setNoteOff(key) {
         const pc = key % 12;
@@ -48,12 +47,17 @@ const midi = {
         this.pcs[pc] = Math.max(this.pcs[pc]-1, 0);
         if ( !this.pedal.enabled || !this.pedal.pressed )
             this.notes[key] = false;
-        return pc;
     },
     setPedal(int_value) {
         this.pedal.pressed = (int_value >= 64);
         if ( !this.pedal.enabled || !this.pedal.pressed )
             this.notes = Array.from(this.keys);
+    },
+    resetNotes() {
+        this.keys = Array(128).fill(false);
+        this.pcs = Array(12).fill(0);
+        this.notes = Array(128).fill(false);
+        this.pedal.pressed = false;
     },
 }
 
@@ -182,28 +186,39 @@ function handleMIDIEvent(ev) {
 }
 
 
+/** @param {Number} key */
 function setNoteOn(key) {
-    const pc = midi.setNoteOn(key);
-    updatePlayedNotes(key, pc, true);
+    midi.setNoteOn(key);
+    updatePlayedNotes(key, true);
 }
 
 
+/** @param {Number} key */
 function setNoteOff(key) {
-    const pc = midi.setNoteOff(key);
-    updatePlayedNotes(key, pc, false);
+    midi.setNoteOff(key);
+    updatePlayedNotes(key, false);
 }
 
 
 function setAllNotesOff() {
-    midi.keys = Array(128).fill(false);
-    midi.notes = Array(128).fill(false);
-    midi.pcs = Array(12).fill(0);
+    midi.resetNotes();
     updatePlayedNotes();
 }
 
 
-function updatePlayedNotes(key = null, pc = null, note_on = false) {
-    const first_on = (note_on ? midi.pcs[pc] == 1 : false);
+function midiPanic() {
+    setAllNotesOff();
+}
+
+
+/**
+ * @param {Number?} key 
+ * @param {Number?} pc 
+ * @param {Boolean} note_on 
+ */
+function updatePlayedNotes(key = null, note_on = false) {
+    const pc = (key != null) ? (key % 12) : null;
+    const first_on = note_on ? (midi.pcs[pc] == 1) : false;
     const previous_pcset = state.pcset.clone();
     switch ( midi.mode ) {
         case "direct":
@@ -224,7 +239,7 @@ function updatePlayedNotes(key = null, pc = null, note_on = false) {
             break;
         case "accumulate":
             if ( key != null ) {
-                const sum = midi.notes.reduce( (sum,k) => sum += k ? 1 : 0, 0 );
+                const sum = midi.notes.reduce( (sum,k) => sum += (k ? 1 : 0), 0 );
                 if ( sum == 1 && first_on )
                     state.pcset = new PcSet([pc]);
                 else if ( midi.pcs[pc] > 0 )

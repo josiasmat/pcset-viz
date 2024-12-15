@@ -240,7 +240,7 @@ function showDescriptionSelector() {
             const len = set.size; //entry[0].length-2;
             const str_short = set.toString("short-ab", false);// entry[0].substring(1,len+1);
             const str_full = set.toString(config.set_format, true);
-            const hint = `${str_full} (${set.forte_name(config.prime_unique)})\n${entry[1]["names"].join("\n")}`;
+            const hint = `${str_full} (${config.prime_unique ? set.forte_name : set.forte_name_ab})\n${entry[1]["names"].join("\n")}`;
             for ( let name of entry[1]["names"] ) {
                 if ( filterName(name) ) {
                     const link = makeSelectorSetLink(str_short,name, {hint:hint,nosetfont:true});
@@ -288,7 +288,7 @@ function showSubsetSelector() {
         `Subsets of <span class="setfont">${superset.toString(config.set_format, true)}</span>`);
     document.getElementById("table-set-row-filter").hidden = true;
 
-    const subsets = superset.subsets();
+    const subsets = superset.getSubsets();
     subsets.sort((a,b) => a.binary_value - b.binary_value);
 
     let links = Array(13);
@@ -323,7 +323,7 @@ function showPrimeSubsetSelector() {
         `Prime subsets of <span class="setfont">${superset.toString(config.set_format, true)}</span>`);
     document.getElementById("table-set-row-filter").hidden = true;
 
-    const subsets = superset.prime_subsets();
+    const subsets = superset.getPrimeSubsets();
     //subsets.sort((a,b) => a.binary_value - b.binary_value);
 
     let links = Array(13);
@@ -558,7 +558,7 @@ function makeStaffSvgFromParams(theme, callback = null) {
                 (a, x, i) => {if (x) a.push(i); return a;}, []
             ),
             stroke_width: parseFloat(document.getElementById("expimg-stroke").value),
-            fn: ( callback ) ? callback : null
+            fn: callback ?? null
         },
         theme
     );

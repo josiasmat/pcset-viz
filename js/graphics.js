@@ -25,13 +25,20 @@ const PNG_MIME = "image/png";
 
 class PcSetBaseView {
 
+    /** @type {HTMLElement} */
     svg;
 
+    /** @return {Blob} */
     get svg_blob() {
         const head = '<?xml version="1.0" encoding="UTF-8"?>\n';
         return new Blob([head + this.svg.outerHTML], {type: SVG_MIME});
     }
 
+    /**
+     * @param {Number} width
+     * @param {Number} height
+     * @callback callback
+     */
     #makePng(width, height, callback) {
         const image = new Image(this.svg.width, this.svg.height);
         const svg_url = URL.createObjectURL(this.svg_blob);
@@ -139,9 +146,9 @@ class StaticClockfaceView extends PcSetBaseView {
 
         this.pcset_str = pcset.toString("short-ab", false);
 
-        const size = (options.size) ? options.size : 500;
-        const scale = (options.scale) ? options.scale : 1.0;
-        const stroke_width = (options.stroke_width) ? options.stroke_width : 3.0;
+        const size = options.size ?? 500;
+        const scale = options.scale ?? 1.0;
+        const stroke_width = options.stroke_width ?? 3.0;
 
         theme = PcSetBaseView.getTheme(theme);
 
@@ -169,7 +176,7 @@ class StaticClockfaceView extends PcSetBaseView {
 
         // draw polygon
         if ( options.polygon && pcset.size > 1 ) {
-            const points = pcset.to_array().map( (x) => getPoint(x, pc_polygon_distance) );
+            const points = pcset.toArray().map( (x) => getPoint(x, pc_polygon_distance) );
             const polygon_attrs = { 
                 "fill": color(theme.polygon_fill), 
                 "fill-opacity": opacity(theme.polygon_fill)
@@ -219,7 +226,7 @@ class StaticClockfaceView extends PcSetBaseView {
         
         // draw symmetry axes
         if ( options.symmetry_axes && pcset.size > 0 ) {
-            const symmetries = pcset.inversional_symmetry_axes();
+            const symmetries = pcset.getInversionalSymmetryAxes();
             const g_axes = document.createElementNS(GRAPHICS_SVGNS, "g");
             for ( const symmetry of symmetries ) {
                 // calculate dashes
@@ -330,9 +337,9 @@ class StaticRulerPcSetView extends PcSetBaseView {
 
         this.pcset_str = pcset.toString("short-ab", false);
         
-        const scale = (options.scale) ? options.scale : 1.0;
-        const row_height = ( (options.height) ? options.height : 85 ) * scale;
-        const stroke_width = ( (options.stroke_width) ? options.stroke_width : 3.0 ) * scale;
+        const scale = options.scale ?? 1.0;
+        const row_height = ( options.height ?? 85 ) * scale;
+        const stroke_width = ( options.stroke_width ?? 3.0 ) * scale;
 
         theme = PcSetBaseView.getTheme(theme);
 
@@ -450,21 +457,17 @@ class StaticStaffPcSetView extends PcSetBaseView {
     constructor(notes, options = {}, theme = "basic-light") {
         super();
 
-        //this.pcset_str = pcset.toString("short-ab", false);
-        
         theme = PcSetBaseView.getTheme(theme);
 
-        // let notes = pcset.to_array().map((x) =>
-        //     new MusicalNote( (x >= pcset.head) ? x : x+12 ));
         const size = notes.size;
 
-        const clef_str = (options.clef) ? options.clef : "G2";
+        const clef_str = options.clef ?? "G2";
         const clef_type = clef_str[0].toUpperCase();
         const clef_data = SVG_PATHS_CLEFS[clef_type];
         const clef_line = (clef_str.length > 1) ? parseInt(clef_str[1]) : clef_data.l;
         const clef_translate = clef_data.l - clef_line;
-        const notehead = SVG_PATHS_NOTEHEADS[(options.notehead) ? options.notehead : "q"];
-        const scale = (options.scale) ? options.scale : 1.0;
+        const notehead = SVG_PATHS_NOTEHEADS[options.notehead ?? "q"];
+        const scale = options.scale ?? 1.0;
         const note_width = scale * notehead.w;
         const note_height = scale * notehead.h;
         const staff_spacing = scale * 44.646;
@@ -518,12 +521,13 @@ class StaticStaffPcSetView extends PcSetBaseView {
         if ( size > 0 ) {
 
             notes.makeIdealDistribution();
-            notes.adjustToClef(clef_str);
 
             if ( options.accidental_swap )
                 for ( const note of notes )
                     if ( options.accidental_swap.includes(note.class) )
                         note.swapAccidental();
+
+            notes.adjustToClef(clef_str);
 
             // draw notes
             const notes_g = document.createElementNS(GRAPHICS_SVGNS, "g");
@@ -537,10 +541,14 @@ class StaticStaffPcSetView extends PcSetBaseView {
                 note_element.setAttribute("d", notehead.d);
                 const pos = note.staffPosition(clef_str) / 2;
                 const y = staff_y_offset + staff_height - (pos * staff_spacing) - (note_height / 2);
-                if ( note.isAltered() || (previous_note.diatonic_index == note.diatonic_index && previous_note.isAltered() ) ) {
+                if ( note.isAltered() 
+                     || ((previous_note.diatonic_index == note.diatonic_index) && previous_note.isAltered() ) ) {
                     // draw accidental
                     x -= (note_margin/3);
-                    const acc_data = SVG_PATHS_ACCIDENTALS[note.accidental == 1 ? "s" : note.accidental == -1 ? "f" : "n"];
+                    const acc_data = SVG_PATHS_ACCIDENTALS[
+                        (note.accidental == 1) ? "s" : 
+                            (note.accidental == -1) ? "f" : "n"
+                    ];
                     const acc_symbol = document.createElementNS(GRAPHICS_SVGNS, "path");
                     acc_symbol.setAttribute("fill", theme.fg);
                     acc_symbol.setAttribute("d", acc_data.d);

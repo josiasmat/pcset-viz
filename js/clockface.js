@@ -21,10 +21,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 const SVGNS = "http://www.w3.org/2000/svg";
 
 
-//class DynamicClockface {
-//
-//}
-
 const viz = {
     svg_root: null,
     svg_main: null,
@@ -269,7 +265,7 @@ function drawVisualization(options = {}) {
             if ( !options.keep_polygon ) drawPolygon();
             drawSymmetryLines();
             polygon_update_timer = null;
-        }, options.polygon_delay ? options.polygon_delay : 0
+        }, options.polygon_delay ?? 0
     );
     
 }
@@ -285,9 +281,9 @@ function drawPolygon() {
 
     function nearest_index(pc, array) {
         let index = 0;
-        let ic = compute_interval_class(pc, array[0]);
+        let ic = computeIntervalClass(pc, array[0]);
         for ( let i = 1; i < array.length; i++ ) {
-            const new_ic = compute_interval_class(pc, array[i]);
+            const new_ic = computeIntervalClass(pc, array[i]);
             if ( new_ic < ic ) {
                 index = i;
                 ic = new_ic;
@@ -296,7 +292,7 @@ function drawPolygon() {
         return index;
     }
 
-    const normal_array = state.pcset.normal.to_array();
+    const normal_array = state.pcset.normal.toArray();
 
     // Compute points based on operation type
     if ( state.pcset.size != state.polygon.length ) {
@@ -394,7 +390,7 @@ function drawIntervals(intervals = [1,2,3,4,5,6]) {
         const pc1 = state.pcset.at(i);
         for ( let j = i+1; j < state.pcset.size; j++ ) {
             const pc2 = state.pcset.at(j);
-            if ( intervals.includes(compute_interval_class(pc1,pc2)) ) {
+            if ( intervals.includes(computeIntervalClass(pc1,pc2)) ) {
                 let interval_line = document.createElementNS(SVGNS, "path");
                 interval_line.classList.add("interval-line"); 
                 const pi = vizGetPoint(pc1, viz.pitch_circle_border_distance);

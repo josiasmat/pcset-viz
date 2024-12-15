@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 "use strict";
 
-const VERSION = "2024-11-12";
+const VERSION = "2024-11-17";
 
 const config_storage = new LocalStorageHandler("pcsetviz");
 const config_visible_data = new LocalStorageHandler("pcsetviz-visible-data");
@@ -142,7 +142,7 @@ function textOrDash(s) {
  * @returns {String}
  */
 function pcsetHyperlink(pcset, options = {}) {
-    const tx = (options.text) ? options.text : htmlEscape(
+    const tx = options.text ?? htmlEscape(
         (options.normalize) ? pcset.normal.toString(config.set_format, true) : pcset.toString(config.set_format, true)
     );
     let anchor;
@@ -163,7 +163,7 @@ function copyLink(s) {
 
 
 function strWithCopyLink(s, cs = null) {
-    return htmlEscape(s) + " " + copyLink( (cs) ? cs : s );
+    return htmlEscape(s) + " " + copyLink( cs ?? s );
 }
 
 
@@ -196,7 +196,7 @@ function pushSetToHistory(timeout = 0) {
 function showPcset(options = {}) {
     
     if ( !options.no_history )
-        pushSetToHistory(options.history_delay ? options.history_delay : 0);
+        pushSetToHistory(options.history_delay ?? 0);
 
     if ( !options.keep_input )
         input_main.value = state.pcset.toString(config.set_format, false);
@@ -212,18 +212,18 @@ function showPcset(options = {}) {
     const zcorrespondent = prime.zcorrespondent;
     const icvector = state.pcset.icvector();
     const ctvector = state.pcset.ctvector();
-    const transpositions = state.pcset.transpositions_unique(false);
-    const ctts = state.pcset.ctts_unique(false);
-    const ctis = state.pcset.ctis_unique();
-    const rotations = state.pcset.rotations(true).map((x) => x[1]);
-    const inversions = state.pcset.inversions_unique();
-    const inversional_symmetries = state.pcset.inversionally_symmetric_sets();
-    const transpositional_symmetries = state.pcset.transpositionally_symmetric_sets(false);
-    const multiples = state.pcset.multiples_unique();
+    const transpositions = state.pcset.getTranspositionsUnique(false);
+    const ctts = state.pcset.getCttsUnique(false);
+    const ctis = state.pcset.getCtisUnique();
+    const rotations = normal.getRotations(true).map((x) => x[1]);
+    const inversions = state.pcset.getInversionsUnique();
+    const inversional_symmetries = state.pcset.getInversionallySymmetricSets();
+    const transpositional_symmetries = state.pcset.getTranspositionallyEquivalentSets(false);
+    const multiples = state.pcset.getMultiplesUnique();
 
     const is_mirror = reduced.isMirror();
 
-    state.axes = state.pcset.inversional_symmetry_axes();
+    state.axes = state.pcset.getInversionalSymmetryAxes();
 
     function checkmarkIf(cond) {
         return (cond) ? "<small>✔</small> " : "";
@@ -261,54 +261,54 @@ function showPcset(options = {}) {
     data_cells.complement.setHTMLUnsafe(
         pcsetHyperlink(complement) 
         + addEquivIf(!complement.isEqualTo(complement_prime), pcsetHyperlink(complement_prime))
-        + ` (${complement.forte_name(!config.prime_unique)})`
+        + ` (${config.prime_unique ? complement.forte_name : complement.forte_name_ab})`
     );
 
     data_cells.zcorrespondent.setHTMLUnsafe(
-        (zcorrespondent) ? `${pcsetHyperlink(zcorrespondent)} (${zcorrespondent.forte_name(!config.prime_unique)})` : "-"
+        (zcorrespondent) ? `${pcsetHyperlink(zcorrespondent)} (${config.prime_unique ? zcorrespondent.forte_name : zcorrespondent.forte_name_ab})` : "-"
     );
 
     operationUpdate();
 
     data_cells.forte_name.setHTMLUnsafe(
-        strWithCopyLink(normal.forte_name(!config.prime_unique)));
+        strWithCopyLink(config.prime_unique ? normal.forte_name : normal.forte_name_ab));
 
     data_cells.carter_name.setHTMLUnsafe(
         strWithCopyLink(prime.carter_number.toString()));
 
     data_cells.rotations.setHTMLUnsafe(textOrDash(
-        setCollectionToStrWithLinks(rotations)));
+        setCollectionToLinks(rotations, {normalize: false})));
     
     data_cells.transpositions.setHTMLUnsafe(textOrDash(
-        setCollectionToStrWithLinks(transpositions, "Tn", " = ")));
+        taggedSetCollectionToLinks(transpositions, "Tn")));
 
     data_cells.inversions.setHTMLUnsafe(textOrDash(
-        setCollectionToStrWithLinks(inversions, config.inversion_format, " = ")));
+        taggedSetCollectionToLinks(inversions, config.inversion_format)));
     
     data_cells.ctt.setHTMLUnsafe(textOrDash(
-        setCollectionToStrWithLinks(ctts, "Tn", ": ", false)));
+        taggedSetCollectionToLinks(ctts, "Tn", {eq: ": "})));
 
     data_cells.cti_inv_label.setHTMLUnsafe(
         ( config.inversion_format == "In" ) ? "I<sub>n</sub>" : "T<sub>n</sub>I" );
 
     data_cells.cti.setHTMLUnsafe(textOrDash(
-        setCollectionToStrWithLinks(ctis, config.inversion_format, ": ", false)));
+        taggedSetCollectionToLinks(ctis, config.inversion_format, {eq: ": "})));
     
     data_cells.symmetries.setHTMLUnsafe(textOrDash(
-        [setCollectionToStrWithLinks(inversional_symmetries, config.inversion_format, " = "), 
-         setCollectionToStrWithLinks(transpositional_symmetries, "Tn", " = ")]
+        [taggedSetCollectionToLinks(inversional_symmetries, config.inversion_format), 
+         taggedSetCollectionToLinks(transpositional_symmetries, "Tn")]
             .filter((s) => s != "").join(", ")
     ));
     
     data_cells.multiplications.setHTMLUnsafe(textOrDash(
-        setCollectionToStrWithLinks(multiples, "Mn", " = ")));
+        taggedSetCollectionToLinks(multiples, "Mn")));
 
     data_cells.descriptive_name.setHTMLUnsafe(textOrDash(
         pcsetGetDescriptiveNames(reduced).join(", ")));
 
     // Hexacordal combinatorials
 
-    const combs = normal.hexachordalCombinatorials();
+    const combs = normal.getHexachordalCombinations();
     let comb_count = 0;
     function getCombinatorialsStr(combs, type_str) {
         if ( combs.length == 0) return '';
@@ -479,35 +479,44 @@ function pcsetGetDescriptiveNames(pcset) {
 }
 
 
-function setCollectionToStrWithLinks(sets, op = null, sep = " = ", include_op_in_link = true) {
-    if ( op ) {
-        let strings = [];
-        for ( const item of sets ) {
-            const ranges = [];
-            let start = item[0][0];
-            for ( const pair of pairwise(item[0], true) ) {
-                if ( pair[1] != pair[0] + 1 ) {
-                    if ( pair[0] == start )
-                        ranges.push(start.toString());
-                    else if ( pair[0] == start + 1 )
-                        ranges.push([start,pair[0]].join(','))
-                    else
-                        ranges.push([start,pair[0]].join('-'))
-                    start = pair[1];
-                }
-            }
-            if ( item[0].length > 1 ) item[1] = item[1].normal;
-            strings.push(
-                `${op.replace('n', "<sub>" + ranges.join(",") + "</sub>")}${sep.replaceAll(' ',"&nbsp;")}${
-                    include_op_in_link ? 
-                        pcsetHyperlink(item[1], { op: [op,item[0][0]], normalize: true }) :
-                        pcsetHyperlink(item[1], { normalize: true })}`
-            )
-        }
-        return strings.join(", ");
-    } else {
-        return sets.map( (item) => pcsetHyperlink(item, {normalize: true}) ).join(", ");
+/**
+ * Construct a string from a collection os sets, with hyperlinks to the sets.
+ * For tagged collections, use _taggedSetCollectionToStr()_.
+ * @param {PcSet[]} sets - pitch-class sets;
+ * @param {Object} options - Accepts the following properties:
+ * @param {String} options.sep - separator string, defaults to _", "_;
+ * @param {Boolean} options.normalize - normalize set strings; defaults to _true_.
+ * @returns {String}
+ */
+function setCollectionToLinks(sets, options = {}) {
+    return sets.map( 
+        (item) => pcsetHyperlink(item, options.normalize ?? true) 
+    ).join(options.sep ?? ", ");
+}
+
+
+/**
+ * Construct a string from a collection os sets, with hyperlinks to the sets.
+ * @param {[Number[],PcSet][]} sets - pitch-class sets;
+ * @param {String} op - operation string ('Tn','In',...), defaults to _null_;
+ * @param {Object} options - Accepts the following properties:
+ * @param {String} options.eq - separator between operation and set, defaults to _' = '_;
+ * @param {String} options.sep - separator string, defaults to _", "_;
+ * @param {Boolean} options.normalize - normalize set strings; defaults to _true_.
+ * @returns {String}
+ */
+function taggedSetCollectionToLinks(sets, op = null, options = {}) { //} op = null, sep = " = ", include_op_in_link = true) {
+    let strings = [];
+    for ( const item of sets ) {
+        const indexes = integerRangesToStr(item[0]);
+        if ( item[0].length > 1 ) item[1] = item[1].normal;
+        strings.push(
+            `${op.replace('n', "<sub>" + indexes + "</sub>")}${(options.eq ?? " = ").replaceAll(' ',"&nbsp;")}${
+                op ? pcsetHyperlink(item[1], { op: [op,item[0][0]], normalize: options.normalize ?? true })
+                   : pcsetHyperlink(item[1], { normalize: options.normalize ?? true })}`
+        )
     }
+    return strings.join(options.sep ?? ", ");
 }
 
 
@@ -549,8 +558,7 @@ function historyEventHandler(evt) {
     let op;
     if ( evt.state[2] == state.history_index-1 ) {
         // Going back
-        op = ( state.undone_op )
-            ? state.undone_op : state.last_op;
+        op = state.undone_op ?? state.last_op;
         if ( op ) op[1] *= -1;
         state.undone_op = evt.state[1];
     } else if ( evt.state[2] == state.history_index+1 ) {
@@ -776,6 +784,9 @@ function handleKeyboardShortcut(ev) {
             config.fifths = !config.fifths;
             createSvg(document.getElementById("visualization-svg"));
             onVisualizationConfigChange(); 
+            break;
+        case "esc":
+            midiPanic();
             break;
     }
 }
