@@ -106,22 +106,22 @@ class PcSetBaseView {
         if ( !theme.fg ) theme.fg = "#000";
         if ( !theme.bg ) theme.bg = "none";
 
-        if ( !theme.circle_stroke )     theme.circle_stroke = theme.fg;
-        if ( !theme.circle_fill )       theme.circle_fill = theme.bg;
-        if ( !theme.polygon_stroke )    theme.polygon_stroke = theme.fg;
-        if ( !theme.polygon_fill )      theme.polygon_fill = theme.bg;
-        if ( !theme.axis )              theme.axis = theme.fg;
-        if ( !theme.text )              theme.text = theme.fg;
+        if ( !theme.circle_stroke     ) theme.circle_stroke = theme.fg;
+        if ( !theme.circle_fill       ) theme.circle_fill = theme.bg;
+        if ( !theme.polygon_stroke    ) theme.polygon_stroke = theme.fg;
+        if ( !theme.polygon_fill      ) theme.polygon_fill = theme.bg;
+        if ( !theme.axis              ) theme.axis = theme.fg;
+        if ( !theme.text              ) theme.text = theme.fg;
 
-        if ( !theme.on )                theme.on = {};
-        if ( !theme.on.circle_stroke )  theme.on.circle_stroke = theme.circle_stroke;
-        if ( !theme.on.circle_fill )    theme.on.circle_fill = theme.circle_fill;
-        if ( !theme.on.text )           theme.on.text = theme.text;
+        if ( !theme.on                ) theme.on = {};
+        if ( !theme.on.circle_stroke  ) theme.on.circle_stroke = theme.circle_stroke;
+        if ( !theme.on.circle_fill    ) theme.on.circle_fill = theme.circle_fill;
+        if ( !theme.on.text           ) theme.on.text = theme.text;
         
-        if ( !theme.off )               theme.off = {};
+        if ( !theme.off               ) theme.off = {};
         if ( !theme.off.circle_stroke ) theme.off.circle_stroke = "none";
-        if ( !theme.off.circle_fill )   theme.off.circle_fill = "none";
-        if ( !theme.off.text )          theme.off.text = theme.text;
+        if ( !theme.off.circle_fill   ) theme.off.circle_fill = "none";
+        if ( !theme.off.text          ) theme.off.text = theme.text;
 
         return theme;
     }
@@ -259,7 +259,6 @@ class StaticClockfaceView extends PcSetBaseView {
             const p = getPoint(pc, pc_center_distance);
 
             function makeCircle(stroke, fill) {
-                //if ( opacity(stroke) + opacity(fill) == 0 ) return;
                 const circle = document.createElementNS(GRAPHICS_SVGNS, "circle");
                 circle.setAttribute("cx", p.x);
                 circle.setAttribute("cy", p.y);
@@ -269,8 +268,22 @@ class StaticClockfaceView extends PcSetBaseView {
                     circle.setAttribute("stroke-opacity", opacity(stroke));
                     circle.setAttribute("stroke-width", stroke_width);
                 }
-                circle.setAttribute("fill", color(fill));
-                circle.setAttribute("fill-opacity", opacity(fill));
+                if ( opacity(stroke) == 0 ) {
+                    circle.setAttribute("fill", color(fill));
+                    circle.setAttribute("fill-opacity", opacity(fill));
+                } else {
+                    circle.setAttribute("fill", "#000000");
+                    circle.setAttribute("fill-opacity", 0);
+                    if ( opacity(fill) > 0 ) {
+                        const inner_circle = document.createElementNS(GRAPHICS_SVGNS, "circle");
+                        inner_circle.setAttribute("cx", p.x);
+                        inner_circle.setAttribute("cy", p.y);
+                        inner_circle.setAttribute("r", pc_radius - clamp(stroke_width * 1.5, pc_radius / 12, Math.max(pc_radius / 8, stroke_width / 2)));
+                        inner_circle.setAttribute("fill", color(fill));
+                        inner_circle.setAttribute("fill-opacity", opacity(fill));
+                        g_pc.appendChild(inner_circle);
+                    }
+                }
                 g_pc.appendChild(circle);
             }
 
@@ -655,8 +668,8 @@ function makeSvgLine(x1, y1, x2, y2, attributes) {
     line.setAttribute("y1", y1);
     line.setAttribute("x2", x2);
     line.setAttribute("y2", y2);
-    for ( const attr of Object.entries(attributes) )
-        line.setAttribute(attr[0], attr[1]);
+    for ( const [attr, value] of Object.entries(attributes) )
+        line.setAttribute(attr, value);
     return line;
 }
 
@@ -670,8 +683,8 @@ function makeSvgPolygon(points, attributes) {
             d += ` L ${points[i].x} ${points[i].y}`;
         if ( count > 2 ) d += " Z";
         polygon.setAttribute("d", d);
-        for ( const attr of Object.entries(attributes) )
-            polygon.setAttribute(attr[0], attr[1]);
+        for ( const [attr, value] of Object.entries(attributes) )
+            polygon.setAttribute(attr, value);
     }
     return polygon;
 }
@@ -680,12 +693,9 @@ function makeSvgPolygon(points, attributes) {
 function createSvgElement(width, height, attributes = {}) {
     const svg = document.createElementNS(GRAPHICS_SVGNS, "svg");
     svg.setAttribute("version", "1.1");
-    // svg.setAttribute("width", width);
-    // svg.setAttribute("height", height);
     svg.setAttribute("viewbox", [0,0,width,height].join(" "));
-    //svg.setAttribute("xmlns", GRAPHICS_SVGNS);
-    for ( const attr of Object.entries(attributes) ) {
-        svg.setAttribute(attr[0], attr[1]);
+    for ( const [attr, value] of Object.entries(attributes) ) {
+        svg.setAttribute(attr, value);
     }
     return svg;
 }
@@ -696,8 +706,8 @@ function createSvgPathFromData(d, x = 0, y = 0, attributes = {}) {
     path.setAttribute("x", x);
     path.setAttribute("y", y);
     path.setAttribute("d", d);
-    for ( const attr of Object.entries(attributes) )
-        path.setAttribute(attr[0], attr[1]);
+    for ( const [attr, value] of Object.entries(attributes) )
+        path.setAttribute(attr, value);
     return path;
 }
 
@@ -804,7 +814,7 @@ const GRAPHICS_THEMES = {
         polygon_stroke: "#77fa", polygon_fill: "#77f2", axis: "#fffa", off: { text: "#fffa" }
     },
     "hard-light": {
-        bg_type: "light", fg: "#000", bg: "none", circle_stroke: "#000", circle_fill: "#444", 
+        bg_type: "light", fg: "#000", bg: "none", circle_stroke: "#000", circle_fill: "#000", 
         polygon_stroke: "#000", on: { text: "#fff" }, off: { circle_stroke: "#000" }
     },
     "hard-light-red": {
@@ -820,7 +830,7 @@ const GRAPHICS_THEMES = {
         polygon_stroke: "#00f",on: { text: "#fff" }, off: { circle_stroke: "#000" }
     },
     "hard-dark": {
-        bg_type: "dark", fg: "#fff", bg: "none", circle_stroke: "#fff", circle_fill: "#ccc",
+        bg_type: "dark", fg: "#fff", bg: "none", circle_stroke: "#fff", circle_fill: "#fff",
         polygon_stroke: "#fff", on: { text: "#000" }, off: { circle_stroke: "#fff" }
     },
     "hard-dark-red": {
