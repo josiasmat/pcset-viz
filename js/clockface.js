@@ -18,9 +18,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 "use strict";
 
 
-const SVGNS = "http://www.w3.org/2000/svg";
-
-
 const viz = {
     svg_root: null,
     svg_main: null,
@@ -46,11 +43,11 @@ const pc_drag_state = {
 var polygon_update_timer = null;
 
 
-function createSvg(element) {
+function createMainClockfaceSvg(element) {
 
     viz.svg_root = element;
     if (viz.svg_main) viz.svg_root.removeChild(viz.svg_main);
-    viz.svg_main = document.createElementNS(SVGNS, "g");
+    viz.svg_main = SvgTools.createGroup();
     viz.svg_root.appendChild(viz.svg_main);
     
     viz.viewport.w = Number(viz.svg_root.getAttribute("width"));
@@ -64,45 +61,46 @@ function createSvg(element) {
     viz.pitch_circle_border_distance = 
         viz.pitch_circle_center_distance - viz.pitch_circle_radius - Math.round(viz.pitch_circle_radius / 3);
 
-    viz.defs = document.createElementNS(SVGNS, "defs");
+    viz.defs = SvgTools.createElement("defs");
     viz.svg_main.appendChild(viz.defs);
 
-    viz.arrow_marker = document.createElementNS(SVGNS, "marker");
-    viz.arrow_marker.id = "marker-arrow";
-    viz.arrow_marker.setAttribute("viewBox", "0 0 10 10");
-    viz.arrow_marker.setAttribute("refX", 5);
-    viz.arrow_marker.setAttribute("refY", 5);
-    viz.arrow_marker.setAttribute("markerWidth", 4);
-    viz.arrow_marker.setAttribute("markerHeight", 4);
-    viz.arrow_marker.setAttribute("orient", "auto-start-reverse");
+    viz.arrow_marker = SvgTools.createElement("marker", {
+        id: "marker-arrow",
+        viewBox: [0,0,10,10].join(' '),
+        refX: 5,
+        refY: 5,
+        markerWidth: 4,
+        markerHeight: 4,
+        orient: "auto-start-reverse"
+    });
     viz.defs.appendChild(viz.arrow_marker);
 
-    const arrow_marker_path = document.createElementNS(SVGNS, "path");
-    arrow_marker_path.setAttribute("fill", "var(--pc-moving-to-stroke)");
-    arrow_marker_path.setAttribute("d", "M 0 0 L 10 5 L 0 10 z");
+    const arrow_marker_path = SvgTools.makePath(
+        "M 0 0 L 10 5 L 0 10 Z", {
+            fill: "var(--pc-moving-to-stroke)"
+        }
+    );
     viz.arrow_marker.appendChild(arrow_marker_path);
 
-    viz.polygon = document.createElementNS(SVGNS, "path");
-    viz.polygon.setAttribute("id", "polygon");
+    viz.polygon = SvgTools.createElement("path", { id: "polygon" });
     viz.svg_main.appendChild(viz.polygon);
 
-    viz.intervals_group = document.createElementNS(SVGNS, "g");
-    viz.intervals_group.setAttribute("id", "viz-intervals");
+    viz.intervals_group = SvgTools.createGroup({id: "viz-intervals"});
     viz.svg_main.appendChild(viz.intervals_group);
 
-    viz.sym_lines_group = document.createElementNS(SVGNS, "g");
-    viz.sym_lines_group.setAttribute("id", "symmetry-lines");
+    viz.sym_lines_group = SvgTools.createGroup({id: "symmetry-lines"});
     viz.svg_main.appendChild(viz.sym_lines_group);
         
     for (let i = 0; i < 12; i++) {
         const p = vizGetPoint(i, viz.pitch_circle_center_distance);
 
-        const new_group = document.createElementNS(SVGNS, "g");
-        new_group.setAttribute("id", `pc${i}`);
-        new_group.setAttribute("pc", i);
-        new_group.setAttribute("x", p.x);
-        new_group.setAttribute("y", p.y);
-        new_group.setAttribute("onclick", `togglePcs([${i}])`);
+        const new_group = SvgTools.createGroup({
+            "id": `pc${i}`,
+            "pc": i,
+            "x": p.x,
+            "y": p.y,
+            "onclick": `togglePcs([${i}])`,
+        });
         new_group.addEventListener("mousedown", pcMouseDown, { capture: true, passive: false });
 
         new_group.classList.add("pc");
@@ -112,38 +110,32 @@ function createSvg(element) {
             new_group.classList.add("black-key");
         }
 
-        const new_circle = document.createElementNS(SVGNS, "circle");
-        new_circle.setAttribute("pc", i);
-        new_circle.setAttribute("cx", p.x);
-        new_circle.setAttribute("cy", p.y);
-        new_circle.setAttribute("r", viz.pitch_circle_radius);
+        const new_circle = SvgTools.createElement("circle", {
+            "pc": i, "cx": p.x, "cy": p.y, "r": viz.pitch_circle_radius
+        });
 
-        const new_text_number = document.createElementNS(SVGNS, "text");
-        new_text_number.setAttribute("pc", i);
+        const new_text_number = SvgTools.createElement("text", {
+            "pc": i, "x": p.x, "y": p.y
+        });
         new_text_number.innerHTML = i.toString();
-        new_text_number.setAttribute("x", p.x);
-        new_text_number.setAttribute("y", p.y);
         new_text_number.classList.add("pc-text-number");
 
-        const new_text_note = document.createElementNS(SVGNS, "text");
-        new_text_note.setAttribute("pc", i);
-        new_text_note.setAttribute("x", p.x);
-        new_text_note.setAttribute("y", p.y);
+        const new_text_note = SvgTools.createElement("text", {
+            "pc": i, "x": p.x, "y": p.y
+        });
         new_text_note.classList.add("pc-text-note");
         if ( [0,2,4,5,7,9,11].includes(i) ) {
             new_text_note.innerHTML = ["C",,"D",,"E","F",,"G",,"A",,"B"][i];
         } else {
-            const sharp_note = document.createElementNS(SVGNS, "tspan");
-            sharp_note.setAttribute("pc", i);
-            sharp_note.setAttribute("x", p.x);
-            sharp_note.setAttribute("y", p.y-11);
+            const sharp_note = SvgTools.createElement("tspan", {
+                "pc": i, "x": p.x, "y": p.y-11
+            });
             sharp_note.classList.add("pc-text-note-sharp");
             sharp_note.innerHTML = [,"C♯",,"D♯",,,"F♯",,"G♯",,"A♯"][i];
             new_text_note.appendChild(sharp_note);
-            const flat_note = document.createElementNS(SVGNS, "tspan");
-            flat_note.setAttribute("pc", i);
-            flat_note.setAttribute("x", p.x);
-            flat_note.setAttribute("y", p.y+9);
+            const flat_note = SvgTools.createElement("tspan", {
+                "pc": i, "x": p.x, "y": p.y+9
+            });
             flat_note.classList.add("pc-text-note-flat");
             flat_note.innerHTML = [,"D♭",,"E♭",,,"G♭",,"A♭",,"B♭"][i];
             new_text_note.appendChild(flat_note);
@@ -157,8 +149,7 @@ function createSvg(element) {
 
     }
 
-    viz.move_line = document.createElementNS(SVGNS, "path");
-    viz.move_line.setAttribute("id", "move-line");
+    viz.move_line = SvgTools.createElement("path", { id: "move-line" });
     viz.svg_main.appendChild(viz.move_line);
     
 }
@@ -378,8 +369,6 @@ function drawPolygon() {
 
 function drawIntervals(intervals = [1,2,3,4,5,6]) {
 
-    const SVGNS = "http://www.w3.org/2000/svg";
-
     while (viz.intervals_group.firstChild)
         viz.intervals_group.removeChild(viz.intervals_group.lastChild);
 
@@ -391,11 +380,10 @@ function drawIntervals(intervals = [1,2,3,4,5,6]) {
         for ( let j = i+1; j < state.pcset.size; j++ ) {
             const pc2 = state.pcset.at(j);
             if ( intervals.includes(computeIntervalClass(pc1,pc2)) ) {
-                let interval_line = document.createElementNS(SVGNS, "path");
-                interval_line.classList.add("interval-line"); 
                 const pi = vizGetPoint(pc1, viz.pitch_circle_border_distance);
                 const pj = vizGetPoint(pc2, viz.pitch_circle_border_distance);
-                interval_line.setAttribute("d", `M ${pi.x} ${pi.y} L ${pj.x} ${pj.y}`);
+                let interval_line = SvgTools.makePath(['M', pi.x, pi.y, 'L', pj.x, pj.y]);
+                interval_line.classList.add("interval-line"); 
                 viz.intervals_group.appendChild(interval_line);
             }
         }
@@ -413,11 +401,10 @@ function drawSymmetryLines() {
         return;
 
     for ( const axis of state.axes ) {
-        let axis_line = document.createElementNS(SVGNS, "path");
-        axis_line.classList.add("symmetry-axis");
         const pa = vizGetPoint(axis.a, viz.pitch_circle_center_distance);
         const pb = vizGetPoint(axis.b, viz.pitch_circle_center_distance);
-        axis_line.setAttribute("d", `M ${pa.x} ${pa.y} L ${pb.x} ${pb.y}`);
+        let axis_line = SvgTools.makePath(['M', pa.x, pa.y, 'L', pb.x, pb.y]);
+        axis_line.classList.add("symmetry-axis");
         viz.sym_lines_group.appendChild(axis_line);
     }
 
