@@ -650,7 +650,7 @@ function updateConfigFromInterface() {
     const fifths = document.getElementById("chk-fifths").checked;
     if ( config.fifths != fifths ) {
         config.fifths = fifths;
-        createSvg(document.getElementById("visualization-svg"));
+        createMainClockfaceSvg(document.getElementById("visualization-svg"));
     }
     config.theme = document.querySelector('input[name="theme"]:checked').value;
     updateColorTheme();
@@ -672,7 +672,7 @@ function readConfig() {
     const fifths = config_storage.readBool("fifths", false);
     if ( config.fifths != fifths ) {
         config.fifths = fifths;
-        createSvg(document.getElementById("visualization-svg"));
+        createMainClockfaceSvg(document.getElementById("visualization-svg"));
     }
     config.theme = config_storage.readString("theme", "auto");
     for ( let row of data_rows )
@@ -782,7 +782,7 @@ function handleKeyboardShortcut(ev) {
         case "alt+5":
             ev.preventDefault();
             config.fifths = !config.fifths;
-            createSvg(document.getElementById("visualization-svg"));
+            createMainClockfaceSvg(document.getElementById("visualization-svg"));
             onVisualizationConfigChange(); 
             break;
         case "esc":
@@ -806,7 +806,7 @@ addEventListener("popstate", historyEventHandler);
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener("change", on_system_theme_change_event_handler);
 
 fetchDataFiles(["data/en.json"]);
-createSvg(document.getElementById("visualization-svg"));
+createMainClockfaceSvg(document.getElementById("visualization-svg"));
 enableKeyboardShortcuts();
 
 {
@@ -824,11 +824,12 @@ enableKeyboardShortcuts();
 
 
 for ( const elm of document.querySelectorAll(".icon-search") ) {
-    const svg = createSvgElement(SVG_ICONS.magnifier.w, SVG_ICONS.magnifier.h,
-        { "class": "svg-icon" }
-    );
+    const svg = SvgTools.createRootElement({
+        "class": "svg-icon",
+        "viewbox": [0, 0, SVG_ICONS.magnifier.w, SVG_ICONS.magnifier.h].join(' ')
+    });
     svg.appendChild(
-        createSvgPathFromData(SVG_ICONS.magnifier.d, 0, 0, {
+        SvgTools.makePath(SVG_ICONS.magnifier.d, {
             "class": "svg-hyperlink"
         })
     );
