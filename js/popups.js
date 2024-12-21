@@ -471,6 +471,9 @@ function loadImageExportPopupSettings() {
     document.getElementById("chk-export-ic4").checked = config_export_image.readBool("ic4", false);
     document.getElementById("chk-export-ic5").checked = config_export_image.readBool("ic5", false);
     document.getElementById("chk-export-ic6").checked = config_export_image.readBool("ic6", false);
+    document.getElementById("expimg-inversion-index").value = config_export_image.readNumber("inversion-index", 0);
+    document.getElementById("chk-export-inversion-axis").checked = config_export_image.readBool("inversion-axis", true);
+    document.getElementById("chk-inversion-all-paths").checked = config_export_image.readBool("inversion-all-paths", true);
     document.getElementById("expimg-select-theme").value = config_export_image.readString("theme", "basic");
     document.getElementById("expimg-select-theme-color").value = config_export_image.readString("theme-color", "");
     document.getElementById("expimg-select-theme-bg").value = config_export_image.readString("theme-bg", "light");
@@ -496,6 +499,9 @@ function saveImageExportPopupSettings() {
     config_export_image.writeBool("ic4", document.getElementById("chk-export-ic4").checked);
     config_export_image.writeBool("ic5", document.getElementById("chk-export-ic5").checked);
     config_export_image.writeBool("ic6", document.getElementById("chk-export-ic6").checked);
+    config_export_image.writeNumber("inversion-index", parseInt(document.getElementById("expimg-inversion-index").value));
+    config_export_image.writeBool("inversion-axis", document.getElementById("chk-export-inversion-axis").checked);
+    config_export_image.writeBool("inversion-all-paths", document.getElementById("chk-inversion-all-paths").checked);
     config_export_image.writeString("theme", document.getElementById("expimg-select-theme").value);
     config_export_image.writeString("theme-color", document.getElementById("expimg-select-theme-color").value);
     config_export_image.writeString("theme-bg", document.getElementById("expimg-select-theme-bg").value);
