@@ -1318,6 +1318,10 @@ class Axis {
         this.b = mod12( (b == null) ? a+6 : b );
     }
 
+    static fromIndex(i) {
+        return new Axis(i/2, i/2+6);
+    }
+
     /** @returns {[Number, Number]} */
     get pair() {
         return [this.a, this.b];
