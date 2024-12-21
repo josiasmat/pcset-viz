@@ -376,6 +376,16 @@ function showExportImagePopup() {
 }
 
 
+function imageExportPopupValidateControls() {
+    const input_inversion_index = document.getElementById("expimg-inversion-index");
+    const inversion_index = parseInt(input_inversion_index.value);
+    if ( inversion_index < 0 )
+        input_inversion_index.value = 12 + inversion_index;
+    else if ( inversion_index > 11 )
+        input_inversion_index.value = inversion_index - 12;
+}
+
+
 function updateImageExportPopup() {
     const popup_export = document.getElementById("popup-export-image");
     const file_type = document.querySelector('input[name="export-file-type"]:checked').value;
@@ -401,11 +411,14 @@ function updateImageExportPopup() {
             elm.setAttribute("onclick", `exportStaffNoteClick(${index})`);
         }
     }
+
+    imageExportPopupValidateControls();
     
     let preview;
     switch ( graphics_type ) {
         case "clockface-set": preview = makeClockfaceSvgFromParams(theme); break;
         case "clockface-intervals": preview = makeClockfaceIntervalsSvgFromParams(theme); break;
+        case "clockface-inversion": preview = makeClockfaceInversionSvgFromParams(theme); break;
         case "ruler-set": preview = makeRulerSvgFromParams(theme); break;
         case "staff-set": preview = makeStaffSvgFromParams(theme, exportStaffPreviewClick); break;
     }
@@ -532,6 +545,21 @@ function makeClockfaceIntervalsSvgFromParams(theme) {
     );
 }
 
+function makeClockfaceInversionSvgFromParams(theme) {
+    return new StaticClockfaceView(
+        export_data.pcset.normal, 
+        {
+            inversion: parseInt(document.getElementById("expimg-inversion-index").value),
+            inversion_set_only: !document.getElementById("chk-inversion-all-paths").checked,
+            inversion_axis: document.getElementById("chk-export-inversion-axis").checked,
+            note_names: document.getElementById("chk-export-note-names").checked,
+            scale: parseFloat(document.getElementById("expimg-scale").value),
+            stroke_width: parseFloat(document.getElementById("expimg-stroke").value),
+        },
+        theme
+    );
+}
+
 function makeRulerSvgFromParams(theme) {
     return new StaticRulerPcSetView(
         export_data.pcset.normal, 
@@ -571,6 +599,7 @@ function downloadImage(type) {
     switch ( graphics_type ) {
         case "clockface-set"      : svg = makeClockfaceSvgFromParams(theme); break;
         case "clockface-intervals": svg = makeClockfaceIntervalsSvgFromParams(theme); break;
+        case "clockface-inversion": svg = makeClockfaceInversionSvgFromParams(theme); break;
         case "ruler-set"          : svg = makeRulerSvgFromParams(theme); break;
         case "staff-set"          : svg = makeStaffSvgFromParams(theme); break;
     }
@@ -589,6 +618,7 @@ function copyImageToClipboard() {
     switch ( graphics_type ) {
         case "clockface-set"      : svg = makeClockfaceSvgFromParams(theme); break;
         case "clockface-intervals": svg = makeClockfaceIntervalsSvgFromParams(theme); break;
+        case "clockface-inversion": svg = makeClockfaceInversionSvgFromParams(theme); break;
         case "ruler-set"          : svg = makeRulerSvgFromParams(theme); break;
         case "staff-set"          : svg = makeStaffSvgFromParams(theme); break;
     }
@@ -650,11 +680,12 @@ for ( const dg of document.querySelectorAll("dialog.popup-container") ) {
 
 // Make close buttons
 for ( const elm of document.querySelectorAll(".close-button") ) {
-    const svg = createSvgElement(SVG_ICONS.close.w, SVG_ICONS.close.h,
-        { "class": "svg-icon" }
-    );
+    const svg = SvgTools.createRootElement({
+         "class": "svg-icon",
+         "viewbox": [0, 0, SVG_ICONS.close.w, SVG_ICONS.close.h].join(' ')
+    });
     svg.appendChild(
-        createSvgPathFromData(SVG_ICONS.close.d, 0, 0)
+        SvgTools.makePath(SVG_ICONS.close.d)
     );
     elm.setHTMLUnsafe(svg.outerHTML);
 }

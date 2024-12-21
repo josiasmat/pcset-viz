@@ -27,6 +27,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         <script type="text/javascript" src="js/clockface.js"></script>
         <script type="text/javascript" src="js/popups.js" async></script>
         <script type="text/javascript" src="js/midi.js" async></script>
+        <script type="text/javascript" src="js/svgtools.js" defer></script>
         <script type="text/javascript" src="js/graphics.js" defer></script>
         <script type="text/javascript" src="js/utils.js"></script>
         <script type="text/javascript" src="js/i18n.js" defer></script>
@@ -422,9 +423,43 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     <td><select name="expimg-type" id="expimg-select-type" onchange="updateImageExportPopup()" autofocus>
                                         <option value="clockface-set">Clockface (set)</option>
                                         <option value="clockface-intervals">Clockface (intervals)</option>
+                                        <option value="clockface-inversion">Clockface (inversion)</option>
                                         <option value="ruler-set">Ruler (set)</option>
                                         <option value="staff-set">Staff (set)</option>
                                     </select></td>
+                                </tr>
+                                <tr includetype="clockface-inversion">
+                                    <td>Inversion</td>
+                                    <td>
+                                        <label for="expimg-inversion-index">Index:</label>
+                                        <input type="number" id="expimg-inversion-index" name="expimg-inversion-index" oninput="updateImageExportPopup()" 
+                                            value="0" min="-1" max="12" step="1" list="expimg-inversion-index-list"/>
+                                    </td>
+                                    <datalist id="expimg-inversion-index-list">
+                                        <option value="0"></option><option value="1"></option>
+                                        <option value="2"></option><option value="3"></option>
+                                        <option value="4"></option><option value="5"></option>
+                                        <option value="6"></option><option value="7"></option>
+                                        <option value="8"></option><option value="9"></option>
+                                        <option value="10"></option><option value="11"></option>
+                                    </datalist>
+                                </tr>
+                                <tr includetype="ruler-set">
+                                    <td><label for="expimg-first-pc">Start at</label></td>
+                                    <td>
+                                        <span class="range-label">0</span>
+                                        <input type="range" id="expimg-first-pc" name="expimg-first-pc" oninput="updateImageExportPopup()" 
+                                        value="0" min="0" max="11" step="1" list="expimg-first-pc-list"/>
+                                        <span class="range-label">11</span>
+                                    </td>
+                                    <datalist id="expimg-first-pc-list">
+                                        <option value="0"></option><option value="1"></option>
+                                        <option value="2"></option><option value="3"></option>
+                                        <option value="4"></option><option value="5"></option>
+                                        <option value="6"></option><option value="7"></option>
+                                        <option value="8"></option><option value="9"></option>
+                                        <option value="10"></option><option value="11"></option>
+                                    </datalist>
                                 </tr>
                                 <tr>
                                     <td>Elements</td>
@@ -453,7 +488,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                             <input id="chk-export-ic6" type="checkbox" onchange="updateImageExportPopup()">
                                             <label for="chk-export-ic6">IC6</label>
                                         </span>
-                                        <span includetype="clockface-set clockface-intervals ruler-set">
+                                        <span includetype="clockface-set clockface-intervals clockface-inversion ruler-set">
                                             <input id="chk-export-note-names" type="checkbox" onchange="updateImageExportPopup()">
                                             <label for="chk-export-note-names">Note names instead of numbers</label>
                                         </span>
@@ -464,6 +499,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                         <span includetype="clockface-set">
                                             <input id="chk-export-sym-axes" type="checkbox" onchange="updateImageExportPopup()">
                                             <label for="chk-export-sym-axes">Axes of symmetry</label>
+                                        </span>
+                                        <span includetype="clockface-inversion">
+                                            <input id="chk-export-inversion-axis" type="checkbox" onchange="updateImageExportPopup()">
+                                            <label for="chk-export-inversion-axis">Inversion axis</label>
+                                        </span>
+                                        <span>
+                                            <input id="chk-inversion-all-paths" type="checkbox" onchange="updateImageExportPopup()">
+                                            <label for="chk-inversion-all-paths">All paths</label>
                                         </span>
                                         <span includetype="clockface-set clockface-intervals">
                                             <input id="chk-export-fifths" type="checkbox" onchange="updateImageExportPopup()">
@@ -536,24 +579,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                         </span>
                                     </td>
                                 </tr>
-                                <tr includetype="ruler-set">
-                                    <td><label for="expimg-first-pc">Start at</label></td>
-                                    <td>
-                                        <span class="range-label">0</span>
-                                        <input type="range" id="expimg-first-pc" name="expimg-first-pc" oninput="updateImageExportPopup()" 
-                                        value="0" min="0" max="11" step="1" list="expimg-first-pc-list"/>
-                                        <span class="range-label">11</span>
-                                    </td>
-                                    <datalist id="expimg-first-pc-list">
-                                        <option value="0"></option><option value="1"></option>
-                                        <option value="2"></option><option value="3"></option>
-                                        <option value="4"></option><option value="5"></option>
-                                        <option value="6"></option><option value="7"></option>
-                                        <option value="8"></option><option value="9"></option>
-                                        <option value="10"></option><option value="11"></option>
-                                    </datalist>
-                                </tr>
-                                <tr includetype="clockface-set clockface-intervals">
+                                <tr includetype="clockface-set clockface-intervals clockface-inversion">
                                     <td><label for="expimg-scale">Scaling</label></td>
                                     <td>
                                         <span class="range-label">Small</span>

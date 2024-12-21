@@ -18,7 +18,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 "use strict";
 
 
-const GRAPHICS_SVGNS = "http://www.w3.org/2000/svg";
 const SVG_MIME = "image/svg+xml";
 const PNG_MIME = "image/png";
 
@@ -135,9 +134,11 @@ class StaticClockfaceView extends PcSetBaseView {
      * suitable for saving and downloading.
      * @param {PcSet} pcset a pitch-class set object.
      * @param {Object} options optional; a dictionary accepting the following properties:
-     *      *note_names* (true or false), *polygon* (true or false),
-     *      *symmetry_axes* (true or false), *scale* (number),
-     *      *stroke_width* (number), *size* (number).
+     *      *note_names* (boolean), *polygon* (boolean),
+     *      *symmetry_axes* (boolean), *scale* (number),
+     *      *stroke_width* (number), *size* (number),
+     *      *intervals* (array of number), *inversion* (number),
+     *      *inversion_set_only* (boolean), *inversion_axis* (boolean).
      * @param {String} theme optional; name of a theme.
      */
     constructor(pcset, options = {}, theme = "basic-light") {
@@ -160,19 +161,49 @@ class StaticClockfaceView extends PcSetBaseView {
         const pc_polygon_distance = pc_border_distance - (pc_radius/2);
         const pc_interval_distance = pc_border_distance - (pc_radius/8);
 
+        const dashes = {
+            count: 30,
+            space_ratio: 1.5,
+            dash_width: null,
+            space_width: null,
+            extra_dash: null
+        }
+        dashes.dash_width = (pc_center_distance*2) / (dashes.count+((dashes.count-1)*dashes.space_ratio));
+        dashes.space_width = dashes.dash_width * dashes.space_ratio;
+        dashes.extra_dash = dashes.dash_width + dashes.space_width;
+
         function getPoint(pc, from_center) {
             const angle = degToRad((pc * ( options.fifths ? 210 : 30 )) - 90);
             return { x: Math.cos(angle) * from_center + center, 
                     y: Math.sin(angle) * from_center + center };
         }
-        
+
         // create root svg element
-        this.svg = document.createElementNS(GRAPHICS_SVGNS, "svg");
-        this.svg.setAttribute("version", "1.1");
-        this.svg.setAttribute("width", size.toString());
-        this.svg.setAttribute("height", size.toString());
-        this.svg.setAttribute("viewbox", [0,0,size,size].join(" "));
-        this.svg.setAttribute("xmlns", GRAPHICS_SVGNS);
+        this.svg = SvgTools.createRootElement({
+            "width": size.toString(),
+            "height": size.toString(),
+            "viewbox": [0,0,size,size].join(" ")
+        });
+
+        function makeAxis(axis, dashed) {
+            // calculate line radius
+            let distance = pc_axis_distance;
+            if ( axis.a != Math.trunc(axis.a) ) {
+                while ( distance < pc_center_distance )
+                    distance += dashes.extra_dash;
+            }
+            const p1 = getPoint(axis.a, distance);
+            const p2 = getPoint(axis.b, distance);
+            const axis_line = SvgTools.makeLine(p1.x, p1.y, p2.x, p2.y, { 
+                "stroke": color(theme.axis), 
+                "opacity": opacity(theme.axis),
+                "stroke-width": stroke_width 
+            });
+            if ( dashed ) {
+                axis_line.setAttribute("stroke-dasharray", `${dashes.dash_width} ${dashes.space_width}`);
+            }
+            return axis_line;
+        }
 
         // draw polygon
         if ( options.polygon && pcset.size > 1 ) {
@@ -186,13 +217,13 @@ class StaticClockfaceView extends PcSetBaseView {
                 polygon_attrs["stroke-opacity"] = opacity(theme.polygon_stroke);
                 polygon_attrs["stroke-width"] = stroke_width;
             }
-            const polygon = makeSvgPolygon(points, polygon_attrs);
+            const polygon = SvgTools.makePolygon(points, polygon_attrs);
             this.svg.appendChild(polygon);
         }
 
         // draw intervals
         if ( options.intervals && Array.isArray(options.intervals) ) {
-            const g_intervals = document.createElementNS(GRAPHICS_SVGNS, "g");
+            const g_intervals = SvgTools.createGroup();
             for ( const pc1 of pcset ) {
                 for ( const interval of options.intervals ) {
                     const pc2 = mod12(pc1 + interval);
@@ -211,58 +242,112 @@ class StaticClockfaceView extends PcSetBaseView {
                             pq.x = (pm.x + pq.x) / 2;
                             pq.y = (pm.y + pq.y) / 2;
                         }
-                        const line = document.createElementNS(GRAPHICS_SVGNS, "path");
-                        line.setAttribute("fill", "none");
-                        line.setAttribute("stroke", color(theme.polygon_stroke));
-                        line.setAttribute("stroke-opacity", opacity(theme.polygon_stroke));
-                        line.setAttribute("stroke-width", stroke_width);
-                        line.setAttribute("d", `M ${p1.x} ${p1.y} Q ${pq.x} ${pq.y} ${p2.x} ${p2.y}`);
-                        g_intervals.appendChild(line);
+                        const interval_line = SvgTools.makePath(
+                            ['M', p1.x, p1.y, 'Q', pq.x, pq.y, p2.x, p2.y],
+                            {
+                                "fill": "none",
+                                "stroke": color(theme.polygon_stroke),
+                                "stroke-width": stroke_width,
+                                "opacity": opacity(theme.polygon_stroke)
+                            }
+                        );
+                        g_intervals.appendChild(interval_line);
                     }
                 }
             }
             this.svg.appendChild(g_intervals);
         }
+
+        // draw inversion lines
+        if ( options.inversion != null ) {
+            if ( options.inversion_axis ) {
+                const axis_line = makeAxis(Axis.fromIndex(options.inversion), false);
+                axis_line.setAttribute("stroke-opacity", 0.5);
+                this.svg.appendChild(axis_line);
+            }
+            const g_inv_lines = SvgTools.createGroup();
+            if ( pcset.size > 0 ) {
+                const df = SvgTools.createElement("defs");
+                const mk = SvgTools.makeSimpleArrowMarker("arrow", 
+                    size / 25 / Math.sqrt(stroke_width), {
+                        "fill": color(theme.polygon_stroke),
+                    }
+                );
+                mk.setAttribute("refX", 9);
+                df.appendChild(mk);
+                this.svg.appendChild(df);
+            }
+            const first_pitch = Math.ceil(options.inversion / 2);
+            const end_pitch = first_pitch + 6 ;
+            for ( let pitch = first_pitch; pitch < end_pitch; pitch++ ) {
+                const pc = mod12(pitch);
+                const pci = mod12(options.inversion - pc);
+                if ( pc == pci ) continue;
+                const ic = computeIntervalClass(pc, pci);
+                const p1 = getPoint(pc, pc_axis_distance);
+                const p2 = getPoint(pci, pc_axis_distance);
+                const pm = {
+                    x: (p1.x + p2.x) / 2, 
+                    y: (p1.y + p2.y) / 2
+                }
+                let pq = { 
+                    x: ( pm.x + (center * 3) ) / 4, 
+                    y: ( pm.y + (center * 3) ) / 4
+                };
+                if ( ic <= 2 ) {
+                    pq.x = (pm.x + (pq.x * (ic+1))) / (ic+2);
+                    pq.y = (pm.y + (pq.y * (ic+1))) / (ic+2);
+                }
+                if ( pcset.has(pc) || pcset.has(pci) ) {
+                    const line = SvgTools.makePath(
+                        ['M', p1.x, p1.y, 'Q', pq.x, pq.y, p2.x, p2.y],
+                        {
+                            "fill": "none",
+                            "stroke": color(theme.polygon_stroke),
+                            "stroke-width": stroke_width,
+                            "opacity": opacity(theme.polygon_stroke)
+                        }
+                    );
+                    if ( pcset.has(pc) ) line.setAttribute("marker-end", "url(#arrow)");
+                    if ( pcset.has(pci) ) line.setAttribute("marker-start", "url(#arrow)");
+                    g_inv_lines.appendChild(line);
+                } else if ( ! options.inversion_set_only ) {
+                    const line = SvgTools.makePath(
+                        ['M', p1.x, p1.y, 'Q', pq.x, pq.y, p2.x, p2.y],
+                        {
+                            "fill": "none",
+                            "stroke": color(theme.polygon_stroke),
+                            "stroke-width": stroke_width,
+                            "stroke-dasharray": `${dashes.dash_width} ${dashes.space_width}`,
+                            "opacity": opacity(theme.polygon_stroke)
+                        }
+                    );
+                    g_inv_lines.appendChild(line);
+                }
+            }
+            this.svg.appendChild(g_inv_lines);
+        }
         
         // draw symmetry axes
         if ( options.symmetry_axes && pcset.size > 0 ) {
             const symmetries = pcset.getInversionalSymmetryAxes();
-            const g_axes = document.createElementNS(GRAPHICS_SVGNS, "g");
+            const g_axes = SvgTools.createGroup();
             for ( const symmetry of symmetries ) {
-                // calculate dashes
-                const dashes = 30;
-                const space_ratio = 1.5;
-                const dash_width = (pc_center_distance*2) / (dashes+((dashes-1)*space_ratio));
-                const space_width = dash_width*space_ratio;
-                const extra_dash = dash_width + space_width;
-                // calculate line radius
-                let distance = pc_axis_distance;
-                if ( symmetry.a != Math.trunc(symmetry.a) ) {
-                    while ( distance < pc_center_distance )
-                        distance += extra_dash;
-                }
-                // set line properties
-                const p1 = getPoint(symmetry.a, distance);
-                const p2 = getPoint(symmetry.b, distance);
-                const line = makeSvgLine(p1.x, p1.y, p2.x, p2.y, { 
-                    "stroke": color(theme.axis), "stroke-opacity": opacity(theme.axis),
-                    "stroke-width": stroke_width, "stroke-dasharray": `${dash_width} ${space_width}` 
-                });
-                g_axes.appendChild(line);
+                const axis_line = makeAxis(symmetry, true);
+                g_axes.appendChild(axis_line);
             }
             this.svg.appendChild(g_axes);
         }
 
         // draw circles and text
         for ( let pc = 0; pc < 12; pc++ ) {
-            const g_pc = document.createElementNS(GRAPHICS_SVGNS, "g");
+            const g_pc = SvgTools.createGroup();
             const p = getPoint(pc, pc_center_distance);
 
             function makeCircle(stroke, fill) {
-                const circle = document.createElementNS(GRAPHICS_SVGNS, "circle");
-                circle.setAttribute("cx", p.x);
-                circle.setAttribute("cy", p.y);
-                circle.setAttribute("r", pc_radius);
+                const circle = SvgTools.createElement("circle", {
+                    "cx": p.x, "cy": p.y, "r": pc_radius
+                });
                 if ( opacity(stroke) > 0 ) {
                     circle.setAttribute("stroke", color(stroke));
                     circle.setAttribute("stroke-opacity", opacity(stroke));
@@ -275,12 +360,13 @@ class StaticClockfaceView extends PcSetBaseView {
                     circle.setAttribute("fill", "#000000");
                     circle.setAttribute("fill-opacity", 0);
                     if ( opacity(fill) > 0 ) {
-                        const inner_circle = document.createElementNS(GRAPHICS_SVGNS, "circle");
-                        inner_circle.setAttribute("cx", p.x);
-                        inner_circle.setAttribute("cy", p.y);
-                        inner_circle.setAttribute("r", pc_radius - clamp(stroke_width * 1.5, pc_radius / 12, Math.max(pc_radius / 8, stroke_width / 2)));
-                        inner_circle.setAttribute("fill", color(fill));
-                        inner_circle.setAttribute("fill-opacity", opacity(fill));
+                        const inner_circle = SvgTools.createElement("circle", {
+                            "cx": p.x, 
+                            "cy": p.y,
+                            "r": pc_radius - clamp(stroke_width * 1.5, pc_radius / 12, Math.max(pc_radius / 8, stroke_width / 2)),
+                            "fill": color(fill),
+                            "fill-opacity": opacity(fill)
+                        });
                         g_pc.appendChild(inner_circle);
                     }
                 }
@@ -294,19 +380,15 @@ class StaticClockfaceView extends PcSetBaseView {
                 makeCircle(theme.off.circle_stroke, theme.off.circle_fill);
 
             // text
-            const text = document.createElementNS(GRAPHICS_SVGNS, "path");
-            const text_data = ( options.note_names ) 
-                ? SVG_PATHS_NOTES[pc.toString()] : SVG_PATHS_NUMBERS[pc.toString()];
+            const text_data = ( options.note_names 
+                ? SVG_PATHS_NOTES[pc.toString()] : SVG_PATHS_NUMBERS[pc.toString()] );
+            const text_theme = ( pcset.has(pc) ? theme.on : theme.off );
             const text_scale = (scale-0.05)**1.5;
-            text.setAttribute("d", text_data.d);
-            text.setAttribute("transform", `translate(${p.x - text_data.w/2*text_scale} ${p.y - text_data.h/2*text_scale}),scale(${text_scale})`);
-            if ( pcset.has(pc) ) {
-                text.setAttribute("fill", color(theme.on.text));
-                text.setAttribute("fill-opacity", opacity(theme.on.text));
-            } else {
-                text.setAttribute("fill", color(theme.off.text));
-                text.setAttribute("fill-opacity", opacity(theme.off.text));
-            }
+            const text = SvgTools.makePath(text_data.d, {
+                "transform": `translate(${p.x - text_data.w/2*text_scale} ${p.y - text_data.h/2*text_scale}),scale(${text_scale})`,
+                "fill": color(text_theme.text),
+                "fill-opacity": opacity(text_theme.text)
+            });
             g_pc.appendChild(text);
 
             this.svg.appendChild(g_pc);
@@ -371,12 +453,11 @@ class StaticRulerPcSetView extends PcSetBaseView {
         const total_height = row_height + row_diff;
 
         // create root svg element
-        this.svg = document.createElementNS(GRAPHICS_SVGNS, "svg");
-        this.svg.setAttribute("version", "1.1");
-        this.svg.setAttribute("width", total_width.toString());
-        this.svg.setAttribute("height", total_height.toString());
-        this.svg.setAttribute("viewbox", [0,0,total_width,row_height].join(" "));
-        this.svg.setAttribute("xmlns", GRAPHICS_SVGNS);
+        this.svg = SvgTools.createRootElement({
+            "width": total_width.toString(),
+            "height": total_height.toString(),
+            "viewbox": [0,0,total_width,row_height].join(" ")
+        });
 
         if ( options.fn ) options.fn(this.svg, "svg", 0);
 
@@ -386,7 +467,7 @@ class StaticRulerPcSetView extends PcSetBaseView {
                 .map((x) => mod(x-DOUBLE_ROW_FACTORS[first_pc],7));
         for ( let i = 0; i < 12; i++ ) {
             const pc = mod12(first_pc+i);
-            const g_pc = document.createElementNS(GRAPHICS_SVGNS, "g");
+            const g_pc = SvgTools.createGroup();
             const py = (options.double_row) 
                 ? ( isWhiteKey(pc) ? v_center + row_diff : v_center )
                 : v_center;
@@ -396,17 +477,18 @@ class StaticRulerPcSetView extends PcSetBaseView {
 
             function makeCircle(stroke, fill) {
                 //if ( opacity(stroke) + opacity(fill) == 0 ) return;
-                const circle = document.createElementNS(GRAPHICS_SVGNS, "circle");
-                circle.setAttribute("cx", px);
-                circle.setAttribute("cy", py);
-                circle.setAttribute("r", pc_radius - stroke_width);
+                const circle = SvgTools.createElement("circle", {
+                    "cx": px, 
+                    "cy": py, 
+                    "r": pc_radius - stroke_width,
+                    "fill": color(fill),
+                    "fill-opacity": opacity(fill)
+                });
                 if ( opacity(stroke) > 0 ) {
                     circle.setAttribute("stroke", color(stroke));
                     circle.setAttribute("stroke-opacity", opacity(stroke));
                     circle.setAttribute("stroke-width", stroke_width);
                 }
-                circle.setAttribute("fill", color(fill));
-                circle.setAttribute("fill-opacity", opacity(fill));
                 g_pc.appendChild(circle);
             }
 
@@ -417,19 +499,15 @@ class StaticRulerPcSetView extends PcSetBaseView {
                 makeCircle(theme.off.circle_stroke, theme.off.circle_fill);
 
             // text
-            const text = document.createElementNS(GRAPHICS_SVGNS, "path");
-            const text_data = ( options.note_names ) 
-                ? SVG_PATHS_NOTES[pc.toString()] : SVG_PATHS_NUMBERS[pc.toString()];
+            const text_data = ( options.note_names 
+                ? SVG_PATHS_NOTES[pc.toString()] : SVG_PATHS_NUMBERS[pc.toString()] );
+            const text_theme = ( pcset.has(pc) ? theme.on : theme.off );
             const text_scale = scale*1.3;
-            text.setAttribute("d", text_data.d);
-            text.setAttribute("transform", `translate(${px - text_data.w/2*text_scale} ${py - text_data.h/2*text_scale}),scale(${text_scale})`);
-            if ( pcset.has(pc) ) {
-                text.setAttribute("fill", color(theme.on.text));
-                text.setAttribute("fill-opacity", opacity(theme.on.text));
-            } else {
-                text.setAttribute("fill", color(theme.off.text));
-                text.setAttribute("fill-opacity", opacity(theme.off.text));
-            }
+            const text = SvgTools.makePath(text_data.d, {
+                "transform": `translate(${px - text_data.w/2*text_scale} ${py - text_data.h/2*text_scale}),scale(${text_scale})`,
+                "fill": color(text_theme.text),
+                "fill-opacity": opacity(text_theme.text)
+            });
             g_pc.appendChild(text);
 
             this.svg.appendChild(g_pc);
@@ -505,18 +583,17 @@ class StaticStaffPcSetView extends PcSetBaseView {
                 + (black_key_count * (scale * SVG_PATHS_ACCIDENTALS["s"].w + accidental_margin - (note_margin/3)));
 
         // create root svg element
-        this.svg = document.createElementNS(GRAPHICS_SVGNS, "svg");
-        this.svg.setAttribute("version", "1.1");
-        this.svg.setAttribute("height", height.toString());
-        this.svg.setAttribute("xmlns", GRAPHICS_SVGNS);
+        this.svg = SvgTools.createRootElement({
+            "height": height.toString(),
+        });
 
         if ( options.fn ) options.fn(this.svg, "svg", 0);
 
         // draw staff
-        const staff_g = document.createElementNS(GRAPHICS_SVGNS, "g");
+        const staff_g = SvgTools.createGroup();
         for ( let i = 0; i < 5; i++ ) {
             const y = staff_y_offset + (staff_spacing * i);
-            const line = makeSvgLine(0, y, 0, y, {"stroke-width": staff_line_width, "stroke": color(theme.axis)});
+            const line = SvgTools.makeLine(0, y, 0, y, {"stroke-width": staff_line_width, "stroke": color(theme.axis)});
             staff_g.appendChild(line);
             if ( options.fn ) options.fn(line, "staff_line", i);
         }
@@ -524,10 +601,10 @@ class StaticStaffPcSetView extends PcSetBaseView {
         if ( options.fn ) options.fn(staff_g, "staff", 0);
 
         // draw clef
-        const clef = document.createElementNS(GRAPHICS_SVGNS, "path");
-        clef.setAttribute("fill", theme.fg);
-        clef.setAttribute("d", clef_data.d);
-        clef.setAttribute("transform", `translate(${clef_margin_left} ${clef_y}),scale(${scale})`);
+        const clef = SvgTools.makePath(clef_data.d, {
+            "fill": theme.fg,
+            "transform": `translate(${clef_margin_left} ${clef_y}),scale(${scale})`
+        });
         this.svg.appendChild(clef);
         if ( options.fn ) options.fn(clef, "clef", 0);
 
@@ -543,15 +620,13 @@ class StaticStaffPcSetView extends PcSetBaseView {
             notes.adjustToClef(clef_str);
 
             // draw notes
-            const notes_g = document.createElementNS(GRAPHICS_SVGNS, "g");
+            const notes_g = SvgTools.createGroup();
 
             let x = clef_margin_left + clef_width + clef_margin_right;
             let previous_note = notes.note(0);
             for ( const note of notes ) {
-                const this_note_g = document.createElementNS(GRAPHICS_SVGNS, "g");
-                const note_element = document.createElementNS(GRAPHICS_SVGNS, "path");
-                note_element.setAttribute("fill", theme.fg);
-                note_element.setAttribute("d", notehead.d);
+                const this_note_g = SvgTools.createGroup();
+                const note_element = SvgTools.makePath(notehead.d, {"fill": theme.fg});
                 const pos = note.staffPosition(clef_str) / 2;
                 const y = staff_y_offset + staff_height - (pos * staff_spacing) - (note_height / 2);
                 if ( note.isAltered() 
@@ -562,9 +637,7 @@ class StaticStaffPcSetView extends PcSetBaseView {
                         (note.accidental == 1) ? "s" : 
                             (note.accidental == -1) ? "f" : "n"
                     ];
-                    const acc_symbol = document.createElementNS(GRAPHICS_SVGNS, "path");
-                    acc_symbol.setAttribute("fill", theme.fg);
-                    acc_symbol.setAttribute("d", acc_data.d);
+                    const acc_symbol = SvgTools.makePath(acc_data.d, {"fill": theme.fg});
                     const acc_y = staff_y_offset + staff_height - (pos * staff_spacing) - (acc_data.h * scale / 2) + (acc_data.y * scale);
                     acc_symbol.setAttribute("transform", `translate(${x} ${acc_y}),scale(${scale})`);
                     x += (acc_data.w * scale) + accidental_margin;
@@ -576,7 +649,7 @@ class StaticStaffPcSetView extends PcSetBaseView {
                     for ( let j = (pos <= 0 ? 0 : 6); pos <= 0 ? j >= pos : j <= pos; pos <= 0 ? j-- : j++ ) {
                         // draw supplemental line
                         const y = staff_y_offset + (staff_spacing * (5-j));
-                        const line = makeSvgLine(
+                        const line = SvgTools.makeLine(
                             x - (note_margin/4), y, 
                             x + (notehead.w*scale) + (note_margin/4), y,
                             { "stroke": color(theme.axis), "stroke-width": supplemental_line_width }
@@ -603,13 +676,13 @@ class StaticStaffPcSetView extends PcSetBaseView {
         // draw barline
         if ( options.barline && options.barline != "none" ) {
             width += staff_spacing / 2;
-            const barline_g = document.createElementNS(GRAPHICS_SVGNS, "g");
+            const barline_g = SvgTools.createGroup();
             const thin_barline_width = staff_spacing * 0.18;
             const barline_gap = staff_spacing * 0.37;
             //width += note_margin / 2;
 
             function drawBarline(x, stroke_width) {
-                const barline = makeSvgLine(
+                const barline = SvgTools.makeLine(
                     x, staff_y_offset - (staff_line_width / 2), 
                     x, staff_y_offset + (staff_spacing * 4) + (staff_line_width / 2), 
                     { "stroke": color(theme.fg), "stroke-width": stroke_width }
@@ -656,59 +729,6 @@ class StaticStaffPcSetView extends PcSetBaseView {
         super.downloadSvg(filename);
     }
 
-}
-
-
-// UTILITY FUNCTIONS
-
-
-function makeSvgLine(x1, y1, x2, y2, attributes) {
-    const line = document.createElementNS(GRAPHICS_SVGNS, "line");
-    line.setAttribute("x1", x1);
-    line.setAttribute("y1", y1);
-    line.setAttribute("x2", x2);
-    line.setAttribute("y2", y2);
-    for ( const [attr, value] of Object.entries(attributes) )
-        line.setAttribute(attr, value);
-    return line;
-}
-
-
-function makeSvgPolygon(points, attributes) {
-    const count = points.length;
-    const polygon = document.createElementNS(GRAPHICS_SVGNS, "path");
-    let d = `M ${points[0].x} ${points[0].y}`;
-    if ( count > 1 ) {
-        for ( let i = 1; i < count; i++ )
-            d += ` L ${points[i].x} ${points[i].y}`;
-        if ( count > 2 ) d += " Z";
-        polygon.setAttribute("d", d);
-        for ( const [attr, value] of Object.entries(attributes) )
-            polygon.setAttribute(attr, value);
-    }
-    return polygon;
-}
-
-
-function createSvgElement(width, height, attributes = {}) {
-    const svg = document.createElementNS(GRAPHICS_SVGNS, "svg");
-    svg.setAttribute("version", "1.1");
-    svg.setAttribute("viewbox", [0,0,width,height].join(" "));
-    for ( const [attr, value] of Object.entries(attributes) ) {
-        svg.setAttribute(attr, value);
-    }
-    return svg;
-}
-
-
-function createSvgPathFromData(d, x = 0, y = 0, attributes = {}) {
-    const path = document.createElementNS(GRAPHICS_SVGNS, "path");
-    path.setAttribute("x", x);
-    path.setAttribute("y", y);
-    path.setAttribute("d", d);
-    for ( const [attr, value] of Object.entries(attributes) )
-        path.setAttribute(attr, value);
-    return path;
 }
 
 
