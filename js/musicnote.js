@@ -537,12 +537,12 @@ class MusicalScale {
 
             if ( size <= 2 ) {
 
-                console.log(
-                    "makeIdealDistribution():\n" +
-                    "Using Algorithm 1 (singletons/dyads)\n" +
-                    `set=[${this.#notes.map((note)=>note.class).join()}] ` +
-                    `size=${size}, thirdsCount=${thirdsCount}`
-                );
+                // console.log(
+                //     "makeIdealDistribution():\n" +
+                //     "Using Algorithm 1 (singletons/dyads)\n" +
+                //     `set=[${this.#notes.map((note)=>note.class).join()}] ` +
+                //     `size=${size}, thirdsCount=${thirdsCount}`
+                // );
 
                 for ( const [a,b] of pairwise(this.#notes) )
                     makeIntervalGoodExceptBCEF(b, a, true);
@@ -552,12 +552,12 @@ class MusicalScale {
                 // Algorithm for chords made of stacked thirds. Creates two 
                 // different versions and selects the best of them.
 
-                console.log(
-                    "makeIdealDistribution():\n" +
-                    "Using Algorithm 3 (thirds-based chord)\n" +
-                    `set=[${this.#notes.map((note)=>note.class).join()}] ` +
-                    `size=${size}, thirdsCount=${thirdsCount}`
-                );
+                // console.log(
+                //     "makeIdealDistribution():\n" +
+                //     "Using Algorithm 3 (thirds-based chord)\n" +
+                //     `set=[${this.#notes.map((note)=>note.class).join()}] ` +
+                //     `size=${size}, thirdsCount=${thirdsCount}`
+                // );
 
                 const notesv1 = this.#notes.map( (note) => note.clone() );
                 notesv1[0].lock();
@@ -589,12 +589,12 @@ class MusicalScale {
                 // 2 or more consecutive semitones. Avoids aug/dim
                 // intervals while keeping BCEF intact.
 
-                console.log(
-                    "makeIdealDistribution():\n" +
-                    "Using Algorithm 2 (big or chromatic sets)\n" +
-                    `set=[${this.#notes.map((note)=>note.class).join()}] ` +
-                    `size=${size}, thirdsCount=${thirdsCount}`
-                );
+                // console.log(
+                //     "makeIdealDistribution():\n" +
+                //     "Using Algorithm 2 (big or chromatic sets)\n" +
+                //     `set=[${this.#notes.map((note)=>note.class).join()}] ` +
+                //     `size=${size}, thirdsCount=${thirdsCount}`
+                // );
 
                 if ( BCEF.includes(this.#notes[0].class) ) this.#notes[0].lock();
                 for ( const [a,b] of pairwise(this.#notes) )
@@ -607,12 +607,12 @@ class MusicalScale {
                 // Algorithm for scales with less than 8 notes. Creates 
                 // three different versions and selects the best of them.
 
-                console.log(
-                    "makeIdealDistribution():\n" +
-                    "Using Algorithm 4 (scales up to 7 notes)\n" +
-                    `set=[${this.#notes.map((note)=>note.class).join()}] ` +
-                    `size=${size}, thirdsCount=${thirdsCount}`
-                );
+                // console.log(
+                //     "makeIdealDistribution():\n" +
+                //     "Using Algorithm 4 (scales up to 7 notes)\n" +
+                //     `set=[${this.#notes.map((note)=>note.class).join()}] ` +
+                //     `size=${size}, thirdsCount=${thirdsCount}`
+                // );
 
                 const notesv1 = this.#notes.map( (note) => note.clone() );
                 for ( const [a,b] of pairwise(notesv1) )
