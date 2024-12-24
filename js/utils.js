@@ -412,6 +412,10 @@ function integerRangesToStr(numbers, discrete_sep = ',', range_sep = '-') {
 }
 
 
+/**
+ * @param {Number} n 
+ * @returns {String}
+ */
 function romanize(n) {
     const ROMAN_DIGITS = [
         [1000,'M'], [900,'CM'], [500,'D'], [400,'CD'], [100,'C'], [90,'XC'],
