@@ -318,22 +318,30 @@ class MusicalScale {
     /** @type {MusicalNote[]} */
     #notes = [];
 
+    descending = false;
+
     /** 
      * An ordered collection of MusicalNote objects.
      * @param {MusicalNote[]} notes 
      * @returns {MusicalScale}
      */
-    constructor(notes) { this.#notes = notes; }
+    constructor(notes, descending = false) { 
+        this.#notes = notes; 
+        this.descending = this.descending;
+    }
     
     /**
      * Constructs a new MusicalScale object from a PcSet object.
      * @param {PcSet} pcset 
      * @returns {MusicalScale}
      */
-    static fromPcset(pcset) {
-        const notes = pcset.toArray().map((x) =>
-            new MusicalNote( (x >= pcset.head) ? x : x+12 ));
-        return new MusicalScale(notes);
+    static fromPcset(pcset, descending = false) {
+        const notes = descending
+            ? pcset.toArray().reverse().map((x) =>
+                new MusicalNote( (x >= pcset.head) ? x : x+12 ))
+            : pcset.toArray().map((x) =>
+                new MusicalNote( (x >= pcset.head) ? x : x+12 ));
+        return new MusicalScale(notes, descending);
     }
 
     [Symbol.iterator]() {
@@ -365,6 +373,14 @@ class MusicalScale {
      * */
     clone() { return new MusicalScale(this.#notes.map( (note) => note.clone() )); }
 
+    get lowest() {
+        return ( this.descending ) ? this.#notes.at(-1) : this.#notes[0];
+    }
+
+    get highest() {
+        return ( this.descending ) ? this.#notes[0] : this.#notes.at(-1);
+    }
+
     /**
      * Transpose notes so that they fit best to the staff with given clef.
      * @param {String} clef_str Common clefs: "G2", "F4", "C3", "C4". Any
@@ -375,9 +391,9 @@ class MusicalScale {
         const locks = this.#notes.map( (note) => note.locked );
         this.#notes.forEach( (note) => note.unlock() );
         // Lowest note position must be equal or above -1
-        while ( this.#notes.at(-1).staffPosition(clef_str) > 10 )
+        while ( this.highest.staffPosition(clef_str) > 10 )
             this.#notes.forEach( (note) => note.transposeOctaves(-1) );
-        while ( this.#notes[0].staffPosition(clef_str) < -1 )
+        while ( this.lowest.staffPosition(clef_str) < -1 )
             this.#notes.forEach( (note) => note.transposeOctaves(1) );
         // Get best position
         const staff_center = ( clef_str == "G2" ) ? 4.5 : 6;
