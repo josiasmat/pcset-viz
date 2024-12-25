@@ -383,6 +383,13 @@ function imageExportPopupValidateControls() {
         input_inversion_index.value = 12 + inversion_index;
     else if ( inversion_index > 11 )
         input_inversion_index.value = inversion_index - 12;
+    
+    const input_tonnetz_topleft = document.getElementById("expimg-tonnetz-topleft");
+    const tonnetz_topleft = parseInt(input_tonnetz_topleft.value);
+    if ( tonnetz_topleft < 0 )
+        input_tonnetz_topleft.value = 12 + tonnetz_topleft;
+    else if ( tonnetz_topleft > 11 )
+        input_tonnetz_topleft.value = tonnetz_topleft - 12;
 }
 
 
@@ -414,14 +421,7 @@ function updateImageExportPopup() {
 
     imageExportPopupValidateControls();
     
-    let preview;
-    switch ( graphics_type ) {
-        case "clockface-set": preview = makeClockfaceSvgFromParams(theme); break;
-        case "clockface-intervals": preview = makeClockfaceIntervalsSvgFromParams(theme); break;
-        case "clockface-inversion": preview = makeClockfaceInversionSvgFromParams(theme); break;
-        case "ruler-set": preview = makeRulerSvgFromParams(theme); break;
-        case "staff-set": preview = makeStaffSvgFromParams(theme, exportStaffPreviewClick); break;
-    }
+    const preview = makeSetImage(graphics_type);
     preview.svg.setAttribute("width", "100%");
     preview.svg.setAttribute("height", "100%");
     preview.svg.setAttribute("max-width", "100%");
@@ -474,6 +474,8 @@ function loadImageExportPopupSettings() {
     document.getElementById("expimg-inversion-index").value = config_export_image.readNumber("inversion-index", 0);
     document.getElementById("chk-export-inversion-axis").checked = config_export_image.readBool("inversion-axis", true);
     document.getElementById("chk-inversion-all-paths").checked = config_export_image.readBool("inversion-all-paths", true);
+    document.getElementById("chk-tonnetz-show-all-pcs").checked = config_export_image.readBool("tonnetz-all-pcs", true);
+    document.getElementById("chk-tonnetz-show-all-connections").checked = config_export_image.readBool("tonnetz-all-connections", true);
     document.getElementById("expimg-select-theme").value = config_export_image.readString("theme", "basic");
     document.getElementById("expimg-select-theme-color").value = config_export_image.readString("theme-color", "");
     document.getElementById("expimg-select-theme-bg").value = config_export_image.readString("theme-bg", "light");
@@ -502,6 +504,8 @@ function saveImageExportPopupSettings() {
     config_export_image.writeNumber("inversion-index", parseInt(document.getElementById("expimg-inversion-index").value));
     config_export_image.writeBool("inversion-axis", document.getElementById("chk-export-inversion-axis").checked);
     config_export_image.writeBool("inversion-all-paths", document.getElementById("chk-inversion-all-paths").checked);
+    config_export_image.writeBool("tonnetz-all-pcs", document.getElementById("chk-tonnetz-show-all-pcs").checked);
+    config_export_image.writeBool("tonnetz-all-connections", document.getElementById("chk-tonnetz-show-all-connections").checked);
     config_export_image.writeString("theme", document.getElementById("expimg-select-theme").value);
     config_export_image.writeString("theme-color", document.getElementById("expimg-select-theme-color").value);
     config_export_image.writeString("theme-bg", document.getElementById("expimg-select-theme-bg").value);
@@ -598,17 +602,39 @@ function makeStaffSvgFromParams(theme, callback = null) {
     );
 }
 
+function makeTonnetzSvgFromParams(theme) {
+    return new StaticTonnetzPcSetView(
+        export_data.pcset.normal, 
+        {
+            width: parseInt(document.getElementById("expimg-tonnetz-width").value),
+            height: parseInt(document.getElementById("expimg-tonnetz-height").value),
+            first: parseInt(document.getElementById("expimg-tonnetz-topleft").value),
+            note_names: document.getElementById("chk-export-note-names").checked,
+            show_all_pcs: document.getElementById("chk-tonnetz-show-all-pcs").checked,
+            show_all_connections: document.getElementById("chk-tonnetz-show-all-connections").checked,
+            scale: parseFloat(document.getElementById("expimg-scale").value),
+            stroke_width: parseFloat(document.getElementById("expimg-stroke").value),
+        },
+        theme
+    );
+}
+
+function makeSetImage(graphics_type) {
+    const theme = getImageExportTheme();
+    switch ( graphics_type ) {
+        case "clockface-set"      : return makeClockfaceSvgFromParams(theme);
+        case "clockface-intervals": return makeClockfaceIntervalsSvgFromParams(theme);
+        case "clockface-inversion": return makeClockfaceInversionSvgFromParams(theme);
+        case "ruler-set"          : return makeRulerSvgFromParams(theme);
+        case "staff-set"          : return makeStaffSvgFromParams(theme);
+        case "tonnetz-set"        : return makeTonnetzSvgFromParams(theme);
+    }
+    return null;
+}
+
 function downloadImage(type) {
     const graphics_type = document.getElementById("expimg-select-type").value;
-    const theme = getImageExportTheme();
-    let svg;
-    switch ( graphics_type ) {
-        case "clockface-set"      : svg = makeClockfaceSvgFromParams(theme); break;
-        case "clockface-intervals": svg = makeClockfaceIntervalsSvgFromParams(theme); break;
-        case "clockface-inversion": svg = makeClockfaceInversionSvgFromParams(theme); break;
-        case "ruler-set"          : svg = makeRulerSvgFromParams(theme); break;
-        case "staff-set"          : svg = makeStaffSvgFromParams(theme); break;
-    }
+    const svg = makeSetImage(graphics_type);
     const image_size = document.getElementById("input-export-file-png-size").value;
     switch ( type ) {
         case "svg": svg.downloadSvg(); break;
@@ -619,15 +645,7 @@ function downloadImage(type) {
 function copyImageToClipboard() {
     const type = document.querySelector('input[name="export-file-type"]:checked').value;
     const graphics_type = document.getElementById("expimg-select-type").value;
-    const theme = getImageExportTheme();
-    let svg;
-    switch ( graphics_type ) {
-        case "clockface-set"      : svg = makeClockfaceSvgFromParams(theme); break;
-        case "clockface-intervals": svg = makeClockfaceIntervalsSvgFromParams(theme); break;
-        case "clockface-inversion": svg = makeClockfaceInversionSvgFromParams(theme); break;
-        case "ruler-set"          : svg = makeRulerSvgFromParams(theme); break;
-        case "staff-set"          : svg = makeStaffSvgFromParams(theme); break;
-    }
+    const svg = makeSetImage(graphics_type);
     if ( type == "svg" )
         svg.svgToClipboard();
     else {

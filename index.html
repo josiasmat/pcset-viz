@@ -427,6 +427,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                         <option value="clockface-inversion">Clockface (inversion)</option>
                                         <option value="ruler-set">Ruler (set)</option>
                                         <option value="staff-set">Staff (set)</option>
+                                        <option value="tonnetz-set">Tonnetz (set)</option>
                                     </select></td>
                                 </tr>
                                 <tr includetype="clockface-inversion">
@@ -462,6 +463,34 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                         <option value="10"></option><option value="11"></option>
                                     </datalist>
                                 </tr>
+                                <tr includetype="tonnetz-set">
+                                    <td>Options</td>
+                                    <td>
+                                        <span>
+                                            <label for="expimg-tonnetz-width">Width:</label>
+                                            <input type="number" id="expimg-tonnetz-width" name="expimg-tonnetz-width" oninput="updateImageExportPopup()" 
+                                                value="6" min="2" max="20" step="1" />
+                                        </span>
+                                        <span>
+                                            <label for="expimg-tonnetz-height">Height:</label>
+                                            <input type="number" id="expimg-tonnetz-height" name="expimg-tonnetz-height" oninput="updateImageExportPopup()" 
+                                                value="5" min="2" max="20" step="1" />
+                                        </span>
+                                        <span>
+                                            <label for="expimg-tonnetz-topleft">Top-left corner:</label>
+                                            <input type="number" id="expimg-tonnetz-topleft" name="expimg-tonnetz-topleft" oninput="updateImageExportPopup()" 
+                                                value="4" min="-1" max="12" step="1" />
+                                        </span>
+                                    </td>
+                                    <datalist id="expimg-tonnetz-size-list">
+                                        <option value="2"></option><option value="3"></option>
+                                        <option value="4"></option><option value="5"></option>
+                                        <option value="6"></option><option value="7"></option>
+                                        <option value="8"></option><option value="9"></option>
+                                        <option value="10"></option><option value="11"></option>
+                                        <option value="12"></option>
+                                    </datalist>
+                                </tr>
                                 <tr>
                                     <td>Elements</td>
                                     <td id="expimg-elements-area">
@@ -489,9 +518,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                             <input id="chk-export-ic6" type="checkbox" onchange="updateImageExportPopup()">
                                             <label for="chk-export-ic6">IC6</label>
                                         </span>
-                                        <span includetype="clockface-set clockface-intervals clockface-inversion ruler-set">
+                                        <span excludetype="staff-set">
                                             <input id="chk-export-note-names" type="checkbox" onchange="updateImageExportPopup()">
-                                            <label for="chk-export-note-names">Note names</label>
+                                            <label for="chk-export-note-names">Note names instead of numbers</label>
                                         </span>
                                         <span includetype="clockface-set">
                                             <input id="chk-export-polygon" type="checkbox" onchange="updateImageExportPopup()">
@@ -508,6 +537,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                         <span includetype="clockface-inversion">
                                             <input id="chk-inversion-all-paths" type="checkbox" onchange="updateImageExportPopup()">
                                             <label for="chk-inversion-all-paths">All paths</label>
+                                        </span>
+                                        <span includetype="tonnetz-set">
+                                            <input id="chk-tonnetz-show-all-pcs" type="checkbox" onchange="updateImageExportPopup()">
+                                            <label for="chk-tonnetz-show-all-pcs">All pitch classes</label>
+                                        </span>
+                                        <span includetype="tonnetz-set">
+                                            <input id="chk-tonnetz-show-all-connections" type="checkbox" onchange="updateImageExportPopup()">
+                                            <label for="chk-tonnetz-show-all-connections">All connections</label>
                                         </span>
                                         <span includetype="clockface-set clockface-intervals">
                                             <input id="chk-export-fifths" type="checkbox" onchange="updateImageExportPopup()">
@@ -582,7 +619,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                         </span>
                                     </td>
                                 </tr>
-                                <tr includetype="clockface-set clockface-intervals clockface-inversion">
+                                <tr includetype="clockface-set clockface-intervals clockface-inversion tonnetz-set">
                                     <td><label for="expimg-scale">Scaling</label></td>
                                     <td>
                                         <span class="range-label">Small</span>
