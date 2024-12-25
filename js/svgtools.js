@@ -60,6 +60,14 @@ const SvgTools = {
         line.setAttribute("y2", y2);
         return line;
     },
+
+    makeCircle(x, y, r, attributes) {
+        attributes.cx = x;
+        attributes.cy = y;
+        attributes.r = r;
+        const circle = this.createElement("circle", attributes);
+        return circle;
+    },
     
     makePolygon(points, attributes = {}) {
         const count = points.length;
