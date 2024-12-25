@@ -102,14 +102,15 @@ class PcSetBaseView {
     static getTheme(theme_name) {
         let theme = GRAPHICS_THEMES[theme_name];
 
-        if ( !theme.fg ) theme.fg = black;
+        if ( !theme.fg ) theme.fg = blackf();
         if ( !theme.bg ) theme.bg = nocolor;
 
         if ( !theme.circle_stroke     ) theme.circle_stroke = theme.fg;
         if ( !theme.circle_fill       ) theme.circle_fill = theme.bg;
         if ( !theme.polygon_stroke    ) theme.polygon_stroke = theme.fg;
         if ( !theme.polygon_fill      ) theme.polygon_fill = theme.bg;
-        if ( !theme.axis              ) theme.axis = theme.fg;
+        if ( !theme.paths             ) theme.paths = theme.fg;
+        if ( !theme.axis              ) theme.axis = theme.paths;
         if ( !theme.text              ) theme.text = theme.fg;
 
         if ( !theme.on                ) theme.on = {};
@@ -159,7 +160,8 @@ class StaticClockfaceView extends PcSetBaseView {
 
         const center = size/2;
         const pc_radius = size / 14.5 * scale;
-        const pc_center_distance = center - pc_radius - stroke_width;
+        const pc_center_distance = center - pc_radius 
+            - ( (theme.on.circle_stroke().alpha > 0 || theme.off.circle_stroke().alpha > 0) ? stroke_width : 0 );
         const pc_border_distance = pc_center_distance - pc_radius;
         const pc_axis_distance = pc_border_distance - (pc_radius/4);
         const pc_polygon_distance = pc_border_distance - (pc_radius/2);
@@ -210,19 +212,31 @@ class StaticClockfaceView extends PcSetBaseView {
         }
 
         // draw polygon
-        if ( options.polygon && pcset.size > 1 ) {
+        if ( options.polygon ) {
             const points = pcset.toArray().map( (x) => getPoint(x, pc_polygon_distance) );
-            const polygon_attrs = { 
-                "fill": theme.polygon_fill().css_color, 
-                "fill-opacity": theme.polygon_fill().css_opacity
-            };
-            if ( theme.polygon_stroke().a > 0 ) {
-                polygon_attrs["stroke"] = theme.polygon_stroke().css_color;
-                polygon_attrs["stroke-opacity"] = theme.polygon_stroke().css_opacity;
-                polygon_attrs["stroke-width"] = stroke_width;
+            if ( pcset.size > 2 ) {
+                const polygon_attrs = { 
+                    "fill": theme.polygon_fill().css_color, 
+                    "fill-opacity": theme.polygon_fill().css_opacity
+                };
+                if ( theme.polygon_stroke().alpha > 0 ) {
+                    polygon_attrs["stroke"] = theme.polygon_stroke().css_color;
+                    polygon_attrs["stroke-opacity"] = theme.polygon_stroke().css_opacity;
+                    polygon_attrs["stroke-width"] = stroke_width;
+                }
+                const polygon = SvgTools.makePolygon(points, polygon_attrs);
+                this.svg.appendChild(polygon);
+            } else if ( pcset.size == 2 ) {
+                const polygon_color = ( theme.polygon_stroke().alpha > 0 )
+                    ? theme.polygon_stroke() : theme.polygon_fill();
+                const polygon = SvgTools.makeLine(
+                    points[0].x, points[0].y, points[1].x, points[1].y, { 
+                        "stroke": polygon_color.css_color,
+                        "stroke-opacity": polygon_color.css_opacity,
+                        "stroke-width": stroke_width
+                });
+                this.svg.appendChild(polygon);
             }
-            const polygon = SvgTools.makePolygon(points, polygon_attrs);
-            this.svg.appendChild(polygon);
         }
 
         // draw intervals
@@ -250,9 +264,9 @@ class StaticClockfaceView extends PcSetBaseView {
                             ['M', p1.x, p1.y, 'Q', pq.x, pq.y, p2.x, p2.y],
                             {
                                 "fill": "none",
-                                "stroke": theme.polygon_stroke().css_color,
+                                "stroke": theme.paths().css_color,
                                 "stroke-width": stroke_width,
-                                "opacity": theme.polygon_stroke().css_opacity
+                                "opacity": theme.paths().css_opacity
                             }
                         );
                         g_intervals.appendChild(interval_line);
@@ -274,7 +288,7 @@ class StaticClockfaceView extends PcSetBaseView {
                 const df = SvgTools.createElement("defs");
                 const mk = SvgTools.makeSimpleArrowMarker("arrow", 
                     size / 25 / Math.sqrt(stroke_width), {
-                        "fill": theme.polygon_stroke().css_color,
+                        "fill": theme.paths().css_color,
                     }
                 );
                 mk.setAttribute("refX", 9);
@@ -307,9 +321,9 @@ class StaticClockfaceView extends PcSetBaseView {
                         ['M', p1.x, p1.y, 'Q', pq.x, pq.y, p2.x, p2.y],
                         {
                             "fill": "none",
-                            "stroke": theme.polygon_stroke().css_color,
+                            "stroke": theme.paths().css_color,
                             "stroke-width": stroke_width,
-                            "opacity": theme.polygon_stroke().css_opacity
+                            "opacity": theme.paths().css_opacity
                         }
                     );
                     if ( pcset.has(pc) ) line.setAttribute("marker-end", "url(#arrow)");
@@ -320,10 +334,10 @@ class StaticClockfaceView extends PcSetBaseView {
                         ['M', p1.x, p1.y, 'Q', pq.x, pq.y, p2.x, p2.y],
                         {
                             "fill": "none",
-                            "stroke": theme.polygon_stroke().css_color,
+                            "stroke": theme.paths().css_color,
                             "stroke-width": stroke_width,
                             "stroke-dasharray": `${dashes.dash_width} ${dashes.space_width}`,
-                            "opacity": theme.polygon_stroke().css_opacity
+                            "opacity": theme.paths().css_opacity
                         }
                     );
                     g_inv_lines.appendChild(line);
@@ -348,38 +362,39 @@ class StaticClockfaceView extends PcSetBaseView {
             const g_pc = SvgTools.createGroup();
             const p = getPoint(pc, pc_center_distance);
 
-            function makeCircle(stroke, fill) {
-                const circle = SvgTools.createElement("circle", {
-                    "cx": p.x, "cy": p.y, "r": pc_radius
-                });
-                if ( stroke.a == 0 ) {
-                    circle.setAttribute("fill", fill.css_color);
-                    circle.setAttribute("fill-opacity", fill.css_opacity);
-                } else {
-                    circle.setAttribute("stroke", stroke.css_color);
-                    circle.setAttribute("stroke-opacity", stroke.css_opacity);
-                    circle.setAttribute("stroke-width", stroke_width);
-                    circle.setAttribute("fill", "none");
-                    circle.setAttribute("fill-opacity", 0);
-                    if ( fill.a > 0 ) {
-                        const inner_circle = SvgTools.createElement("circle", {
-                            "cx": p.x, 
-                            "cy": p.y,
-                            "r": pc_radius - clamp(stroke_width * 1.5, pc_radius / 12, Math.max(pc_radius / 8, stroke_width / 2)),
-                            "fill": fill.css_color,
-                            "fill-opacity": fill.css_opacity
-                        });
-                        g_pc.appendChild(inner_circle);
-                    }
-                }
-                g_pc.appendChild(circle);
-            }
-
             // circle
-            if ( pcset.has(pc) )
-                makeCircle(theme.on.circle_stroke(pc), theme.on.circle_fill(pc));
-            else
-                makeCircle(theme.off.circle_stroke(pc), theme.off.circle_fill(pc));
+            const [stroke,fill] = ( pcset.has(pc) )
+                ? [theme.on.circle_stroke(pc), theme.on.circle_fill(pc)]
+                : [theme.off.circle_stroke(pc), theme.off.circle_fill(pc)];
+
+            const circle = SvgTools.createElement("circle", {
+                "cx": p.x, "cy": p.y, "r": pc_radius
+            });
+            if ( stroke.alpha > 0 ) {
+                circle.setAttribute("stroke", stroke.css_color);
+                circle.setAttribute("stroke-opacity", stroke.css_opacity);
+                circle.setAttribute("stroke-width", stroke_width);
+            }
+            if ( stroke.alpha == 0 ) {
+                circle.setAttribute("fill", fill.css_color);
+                circle.setAttribute("fill-opacity", fill.css_opacity);
+            } else {
+                circle.setAttribute("fill", "none");
+                circle.setAttribute("fill-opacity", 0);
+                if ( fill.alpha > 0 ) {
+                    const inner_circle = SvgTools.createElement("circle", {
+                        "cx": p.x, 
+                        "cy": p.y,
+                        "r": pc_radius - ( (stroke.alpha > 0)
+                            ? clamp(stroke_width * 1.5, pc_radius / 12, Math.max(pc_radius / 8, stroke_width / 2))
+                            : 0 ),
+                        "fill": fill.css_color,
+                        "fill-opacity": fill.css_opacity
+                    });
+                    g_pc.appendChild(inner_circle);
+                }
+            }
+            g_pc.appendChild(circle);
 
             // text
             const text_data = ( options.note_names 
@@ -477,28 +492,24 @@ class StaticRulerPcSetView extends PcSetBaseView {
                 ? ( double_row_factors_shifted[pc] * (pc_diameter+pc_gap) )
                 : i * (pc_diameter+pc_gap) );
 
-            function makeCircle(stroke, fill) {
-                //if ( opacity(stroke) + opacity(fill) == 0 ) return;
-                const circle = SvgTools.createElement("circle", {
-                    "cx": px, 
-                    "cy": py, 
-                    "r": pc_radius - stroke_width,
-                    "fill": fill.css_color,
-                    "fill-opacity": fill.css_opacity
-                });
-                if ( stroke.a > 0 ) {
-                    circle.setAttribute("stroke", stroke.css_color);
-                    circle.setAttribute("stroke-opacity", stroke.css_opacity);
-                    circle.setAttribute("stroke-width", stroke_width);
-                }
-                g_pc.appendChild(circle);
-            }
-
             // circle
-            if ( pcset.has(pc) ) 
-                makeCircle(theme.on.circle_stroke(pc), theme.on.circle_fill(pc));
-            else
-                makeCircle(theme.off.circle_stroke(pc), theme.off.circle_fill(pc));
+            const [stroke,fill] = ( pcset.has(pc) )
+                ? [theme.on.circle_stroke(pc), theme.on.circle_fill(pc)]
+                : [theme.off.circle_stroke(pc), theme.off.circle_fill(pc)];
+
+            const circle = SvgTools.createElement("circle", {
+                "cx": px, 
+                "cy": py, 
+                "r": pc_radius - (stroke.alpha > 0 ? stroke_width : 1),
+                "fill": fill.css_color,
+                "fill-opacity": fill.css_opacity
+            });
+            if ( stroke.alpha > 0 ) {
+                circle.setAttribute("stroke", stroke.css_color);
+                circle.setAttribute("stroke-opacity", stroke.css_opacity);
+                circle.setAttribute("stroke-width", stroke_width);
+            }
+            g_pc.appendChild(circle);
 
             // text
             const text_data = ( options.note_names 
@@ -792,118 +803,166 @@ const GRAPHICS_THEMES = {
     },
     "basic-light-red": { 
         bg_type: "light", fg: redf(), bg: transparent, 
-        text: blackf(), axis: blackf(), note_stroke: black
+        text: blackf(), paths: blackf(), note_stroke: black
     },
     "basic-light-green": { 
-        bg_type: "light", fg: greenf({l:0.25}), bg: nocolor, text: blackf(), axis: blackf(),
+        bg_type: "light", fg: greenf({l:0.25}), bg: nocolor, text: blackf(), paths: blackf(),
         note_stroke: black
     },
     "basic-light-blue": { 
-        bg_type: "light", fg: bluef(), bg: nocolor, text: blackf(), axis: blackf(),
+        bg_type: "light", fg: bluef(), bg: nocolor, text: blackf(), paths: blackf(),
         note_stroke: black
     },
     "basic-light-colorful": { 
-        bg_type: "light", fg: pcToHueF({l:0.4}), bg: nocolor, text: blackf(), axis: blackf(), 
+        bg_type: "light", fg: pcToHueF({l:0.4}), bg: nocolor, text: blackf(), paths: blackf(), 
         polygon_stroke: blackf(), note_fill: pcToHueF({l:0.6}), note_stroke: black
     },
     "basic-dark": { 
         bg_type: "dark", fg: whitef(), bg: nocolor
     },
     "basic-dark-red": { 
-        bg_type: "dark", fg: redf({l:0.75}), bg: nocolor, text: whitef(), axis: whitef(), 
+        bg_type: "dark", fg: redf({l:0.75}), bg: nocolor, text: whitef(), paths: whitef(), 
         note_fill: redf(), note_stroke: white
     },
     "basic-dark-green": { 
-        bg_type: "dark", fg: greenf({l:0.6}), bg: nocolor, text: whitef(), axis: whitef(), 
+        bg_type: "dark", fg: greenf({l:0.6}), bg: nocolor, text: whitef(), paths: whitef(), 
         note_fill: greenf(), note_stroke: white
     },
     "basic-dark-blue": { 
-        bg_type: "dark", fg: bluef({l:0.75}), bg: nocolor, text: whitef(), axis: whitef(), 
+        bg_type: "dark", fg: bluef({l:0.75}), bg: nocolor, text: whitef(), paths: whitef(), 
         note_fill: bluef(), note_stroke: white
     },
     "basic-dark-colorful": { 
-        bg_type: "dark", fg: pcToHueF({l:0.9}), bg: nocolor, text: whitef(), axis: whitef(),
+        bg_type: "dark", fg: pcToHueF({l:0.9}), bg: nocolor, text: whitef(), paths: whitef(),
         polygon_stroke: whitef(), note_fill: pcToHueF({l:0.7}), note_stroke: white
     },
     "soft-light": {
         bg_type: "light", fg: blackf(), bg: nocolor, circle_stroke: nocolor, circle_fill: blackf(0.15),
-        polygon_stroke: blackf(0.4), polygon_fill: blackf(0.1), axis: blackf(0.5), off: { text: blackf(0.5) }
+        polygon_stroke: blackf(0.4), polygon_fill: blackf(0.1), paths: blackf(0.5), off: { text: blackf(0.5) }
     },
     "soft-light-red": {
         bg_type: "light", fg: blackf(), bg: nocolor, circle_stroke: nocolor, circle_fill: redf({a:0.15}),
-        polygon_stroke: redf({a:0.4}), polygon_fill: redf({a:0.1}), axis: blackf(0.5), off: { text: blackf(0.5) }
+        polygon_stroke: redf({a:0.4}), polygon_fill: redf({a:0.1}), paths: blackf(0.5), off: { text: blackf(0.5) }
     },
     "soft-light-green": {
         bg_type: "light", fg: blackf(), bg: nocolor, circle_stroke: nocolor, circle_fill: greenf({a:0.1,l:0.15}),
-        polygon_stroke: greenf({a:0.4,l:0.25}), polygon_fill: greenf({a:0.1,l:0.25}), axis: blackf(0.5), off: { text: blackf(0.5) }
+        polygon_stroke: greenf({a:0.4,l:0.25}), polygon_fill: greenf({a:0.1,l:0.25}), paths: blackf(0.5), off: { text: blackf(0.5) }
     },
     "soft-light-blue": {
         bg_type: "light", fg: blackf(), bg: nocolor, circle_stroke: nocolor, circle_fill: bluef({a:0.15}),
-        polygon_stroke: bluef({a:0.4}), polygon_fill: bluef({a:0.1}), axis: blackf(0.5), off: { text: blackf(0.5) }
+        polygon_stroke: bluef({a:0.4}), polygon_fill: bluef({a:0.1}), paths: blackf(0.5), off: { text: blackf(0.5) }
     },
     "soft-light-colorful": {
         bg_type: "light", fg: blackf(), bg: nocolor, circle_stroke: nocolor, circle_fill: pcToHueF({l:0.6,a:0.3}),
-        polygon_stroke: blackf(0.4), polygon_fill: blackf(0.1), axis: blackf(0.5), off: { text: blackf(0.5) }
+        polygon_stroke: blackf(0.4), polygon_fill: blackf(0.1), paths: blackf(0.5), off: { text: blackf(0.5) }
     },
     "soft-dark": {
         bg_type: "dark", fg: whitef(), bg: nocolor, circle_stroke: nocolor, circle_fill: whitef(0.2),
-        polygon_stroke: whitef(0.5), polygon_fill: whitef(0.1), axis: whitef(0.8), off: { text: whitef(0.8) }
+        polygon_stroke: whitef(0.5), polygon_fill: whitef(0.1), paths: whitef(0.8), off: { text: whitef(0.8) }
     },
     "soft-dark-red": {
         bg_type: "dark", fg: whitef(), bg: nocolor, circle_stroke: nocolor, circle_fill: redf({a:0.4,l:0.75}),
-        polygon_stroke: redf({a:0.5,l:0.75}), polygon_fill: redf({a:0.1,l:0.75}), axis: whitef(0.8), off: { text: whitef(0.8) }
+        polygon_stroke: redf({a:0.5,l:0.75}), polygon_fill: redf({a:0.1,l:0.75}), paths: whitef(0.8), off: { text: whitef(0.8) }
     },
     "soft-dark-green": {
         bg_type: "dark", fg: whitef(), bg: nocolor, circle_stroke: nocolor, circle_fill: greenf({a:0.4,l:0.6}),
-        polygon_stroke: greenf({a:0.5,l:0.6}), polygon_fill: greenf({a:0.1,l:0.6}), axis: whitef(0.8), off: { text: whitef(0.8) }
+        polygon_stroke: greenf({a:0.5,l:0.6}), polygon_fill: greenf({a:0.1,l:0.6}), paths: whitef(0.8), off: { text: whitef(0.8) }
     },
     "soft-dark-blue": {
         bg_type: "dark", fg: whitef(), bg: nocolor, circle_stroke: nocolor, circle_fill: bluef({a:0.4,l:0.75}),
-        polygon_stroke: bluef({a:0.5,l:0.75}), polygon_fill: bluef({a:0.1,l:0.75}), axis: whitef(0.8), off: { text: whitef(0.8) }
+        polygon_stroke: bluef({a:0.5,l:0.75}), polygon_fill: bluef({a:0.1,l:0.75}), paths: whitef(0.8), off: { text: whitef(0.8) }
     },
     "soft-dark-colorful": {
         bg_type: "dark", fg: whitef(), bg: nocolor, circle_stroke: nocolor, circle_fill: pcToHueF({l:0.7,a:0.3}),
-        polygon_stroke: whitef(0.5), polygon_fill: whitef(0.1), axis: whitef(0.8), off: { text: whitef(0.8) }
+        polygon_stroke: whitef(0.5), polygon_fill: whitef(0.1), paths: whitef(0.8), off: { text: whitef(0.8) }
     },
     "hard-light": {
         bg_type: "light", fg: blackf(), bg: nocolor, circle_stroke: blackf(), circle_fill: blackf(), 
-        polygon_stroke: blackf(), on: { text: white }, off: { circle_stroke: black }
+        polygon_stroke: blackf(), polygon_fill: blackf(0.25), on: { text: whitef() }, off: { circle_stroke: blackf() }
     },
     "hard-light-colorful": {
         bg_type: "light", fg: blackf(), bg: nocolor, circle_stroke: blackf(), circle_fill: pcToHueF({l:0.4}), 
-        polygon_stroke: blackf(), on: { text: white }, off: { circle_stroke: black }
+        polygon_stroke: blackf(), polygon_fill: blackf(0.25), on: { text: whitef() }, off: { circle_stroke: blackf() }
     },
     "hard-light-red": {
         bg_type: "light", fg: blackf(), bg: nocolor, circle_stroke: blackf(), circle_fill: redf(),
-        polygon_stroke: nocolor, polygon_fill: redf(), on: { text: white }, off: { circle_stroke: black }
+        polygon_stroke: blackf(), polygon_fill: redf(), on: { text: whitef() }, off: { circle_stroke: blackf() }
     },
     "hard-light-green": {
         bg_type: "light", fg: blackf(), bg: nocolor, circle_stroke: blackf(), circle_fill: greenf({l:0.25}),
-        polygon_stroke: nocolor, polygon_fill: greenf({l:0.25}), on: { text: white }, off: { circle_stroke: black }
+        polygon_stroke: blackf(), polygon_fill: greenf({l:0.25}), on: { text: whitef() }, off: { circle_stroke: blackf() }
     },
     "hard-light-blue": {
         bg_type: "light", fg: blackf(), bg: nocolor, circle_stroke: blackf(), circle_fill: bluef(),
-        polygon_stroke: nocolor, polygon_fill: bluef(),on: { text: white }, off: { circle_stroke: black }
+        polygon_stroke: blackf(), polygon_fill: bluef(),on: { text: whitef() }, off: { circle_stroke: blackf() }
     },
     "hard-dark": {
         bg_type: "dark", fg: whitef(), bg: nocolor, circle_stroke: whitef(), circle_fill: whitef(),
-        polygon_stroke: whitef(), on: { text: black }, off: { circle_stroke: white }
+        polygon_stroke: whitef(), polygon_fill: whitef(0.25), on: { text: blackf() }, off: { circle_stroke: whitef() }
     },
     "hard-dark-colorful": {
         bg_type: "dark", fg: whitef(), bg: nocolor, circle_stroke: whitef(), circle_fill: pcToHueF({l:0.8}),
-        polygon_stroke: whitef(), on: { text: black }, off: { circle_stroke: white }
+        polygon_stroke: whitef(), polygon_fill: whitef(0.25), on: { text: blackf() }, off: { circle_stroke: whitef() }
     },
     "hard-dark-red": {
         bg_type: "dark", fg: whitef(), bg: nocolor, circle_stroke: whitef(), circle_fill: redf(), 
-        polygon_stroke: nocolor, polygon_fill: redf(), off: { circle_stroke: white }
+        polygon_stroke: whitef(), polygon_fill: redf(), off: { circle_stroke: whitef() }
     },
     "hard-dark-green": {
-        bg_type: "dark", fg: whitef(), bg: nocolor, circle_stroke: whitef(), circle_fill: greenf({l:0.7}),
-        polygon_stroke: nocolor, polygon_fill: greenf({l:0.7}), on: { text: black }, off: { circle_stroke: white }
+        bg_type: "dark", fg: whitef(), bg: nocolor, circle_stroke: whitef(), circle_fill: greenf({l:0.25}),
+        polygon_stroke: whitef(), polygon_fill: greenf({l:0.25}), on: { text: whitef() }, off: { circle_stroke: whitef() }
     },
     "hard-dark-blue": {
         bg_type: "dark", fg: whitef(), bg: nocolor, circle_stroke: whitef(), circle_fill: bluef(),
-        polygon_stroke: nocolor, polygon_fill: bluef(), off: { circle_stroke: white }
+        polygon_stroke: whitef(), polygon_fill: bluef(), off: { circle_stroke: whitef() }
+    },
+    "solid-light": {
+        bg_type: "light", fg: blackf(), bg: nocolor, circle_stroke: nocolor, circle_fill: blackf(), paths: blackf(),
+        polygon_stroke: nocolor, polygon_fill: blackf(0.4), on: { text: whitef() }, off: { circle_fill: blackf(0.2) }
+    },
+    "solid-light-colorful": {
+        bg_type: "light", fg: blackf(), bg: nocolor, circle_stroke: nocolor, circle_fill: pcToHueF(), 
+        polygon_stroke: nocolor, polygon_fill: blackf(0.4), paths: blackf(),
+        on: { text: whitef() }, off: { text: blackf(), circle_fill: blackf(0.2) }
+    },
+    "solid-light-red": {
+        bg_type: "light", fg: blackf(), bg: nocolor, circle_stroke: nocolor, circle_fill: redf(), 
+        polygon_stroke: nocolor, polygon_fill: redf(), paths: blackf(),
+        on: { text: whitef() }, off: { text: blackf(), circle_fill: blackf(0.2) }
+    },
+    "solid-light-green": {
+        bg_type: "light", fg: blackf(), bg: nocolor, circle_stroke: nocolor, circle_fill: greenf({l:0.25}), 
+        polygon_stroke: nocolor, polygon_fill: greenf({l:0.25}), paths: blackf(),
+        on: { text: whitef() }, off: { text: blackf(), circle_fill: blackf(0.2) }
+    },
+    "solid-light-blue": {
+        bg_type: "light", fg: blackf(), bg: nocolor, circle_stroke: nocolor, circle_fill: bluef(), 
+        polygon_stroke: nocolor, polygon_fill: bluef(), paths: blackf(),
+        on: { text: whitef() }, off: { text: blackf(), circle_fill: blackf(0.2) }
+    },
+    "solid-dark": {
+        bg_type: "dark", fg: whitef(), bg: nocolor, circle_stroke: nocolor, circle_fill: whitef(), 
+        polygon_stroke: nocolor, polygon_fill: whitef(0.4), on: { text: blackf() }, off: { circle_fill: whitef(0.2) }
+    },
+    "solid-dark-colorful": {
+        bg_type: "dark", fg: whitef(), bg: nocolor, circle_stroke: nocolor, circle_fill: pcToHueF({l:0.8}), 
+        polygon_stroke: nocolor, polygon_fill: whitef(0.4), paths: whitef(),
+        on: { text: blackf() }, off: { text: whitef(), circle_fill: whitef(0.2) }
+    },
+    "solid-dark-red": {
+        bg_type: "dark", fg: whitef(), bg: nocolor, circle_stroke: nocolor, circle_fill: redf(), 
+        polygon_stroke: nocolor, polygon_fill: redf(), paths: whitef(),
+        on: { text: whitef() }, off: { text: whitef(), circle_fill: whitef(0.2) }
+    },
+    "solid-dark-green": {
+        bg_type: "dark", fg: whitef(), bg: nocolor, circle_stroke: nocolor, circle_fill: greenf({l:0.25}), 
+        polygon_stroke: nocolor, polygon_fill: greenf({l:0.25}), paths: whitef(),
+        on: { text: whitef() }, off: { text: whitef(), circle_fill: whitef(0.2) }
+    },
+    "solid-dark-blue": {
+        bg_type: "dark", fg: whitef(), bg: nocolor, circle_stroke: nocolor, circle_fill: bluef(), 
+        polygon_stroke: nocolor, polygon_fill: bluef(), paths: whitef(),
+        on: { text: whitef() }, off: { text: whitef(), circle_fill: whitef(0.2) }
     },
 }
 
