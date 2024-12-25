@@ -444,6 +444,10 @@ dialog.popup-container[open] {
     }
 }
 
+dialog {
+    user-select: none;
+}
+
 table {
     table-layout: fixed;
     width: 100%;
