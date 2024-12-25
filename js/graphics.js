@@ -428,6 +428,10 @@ class StaticClockfaceView extends PcSetBaseView {
         if ( !filename ) filename = this.getStandardFilename("svg", "-clockface");
         super.downloadSvg(filename);
     }
+
+    pngToClipboard(width_height) {
+        super.pngToClipboard(width_height, width_height);
+    }
     
 }
 
@@ -530,6 +534,12 @@ class StaticRulerPcSetView extends PcSetBaseView {
     downloadSvg(filename = null) {
         if ( !filename ) filename = this.getStandardFilename("svg", "-ruler");
         super.downloadSvg(filename);
+    }
+
+    pngToClipboard(height) {
+        const width = Math.round(parseInt(this.svg.getAttribute("width")) 
+                        * height / parseInt(this.svg.getAttribute("height")));
+        super.pngToClipboard(width, height);
     }
 
 }
@@ -744,6 +754,12 @@ class StaticStaffPcSetView extends PcSetBaseView {
         super.downloadSvg(filename);
     }
 
+    pngToClipboard(height) {
+        const width = Math.round(parseInt(this.svg.getAttribute("width")) 
+                        * height / parseInt(this.svg.getAttribute("height")));
+        super.pngToClipboard(width, height);
+    }
+
 }
 
 
@@ -896,11 +912,12 @@ class StaticTonnetzPcSetView extends PcSetBaseView {
 
     }
 
-    downloadPng(height, filename = null) {
-        const width = Math.round(parseInt(this.svg.getAttribute("width")) 
-                        * height / parseInt(this.svg.getAttribute("height")));
+    downloadPng(size, filename = null) {
+        const width = parseInt(this.svg.getAttribute("width"));
+        const height = parseInt(this.svg.getAttribute("height"));
+        const scale = size / Math.max(width, height);
         if ( !filename ) filename = this.getStandardFilename("png", "-tonnetz");
-        super.downloadPng(width, height, filename);
+        super.downloadPng(width*scale, height*scale, filename);
     }
 
     downloadSvg(filename = null) {
@@ -908,6 +925,12 @@ class StaticTonnetzPcSetView extends PcSetBaseView {
         super.downloadSvg(filename);
     }
 
+    pngToClipboard(size) {
+        const width = parseInt(this.svg.getAttribute("width"));
+        const height = parseInt(this.svg.getAttribute("height"));
+        const scale = size / Math.max(width, height);
+        super.pngToClipboard(width*scale, height*scale);
+    }
 }
 
 
