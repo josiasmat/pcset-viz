@@ -384,17 +384,27 @@ function imageExportPopupValidateControls() {
     else if ( inversion_index > 11 )
         input_inversion_index.value = inversion_index - 12;
     
-    const input_tonnetz_topleft = document.getElementById("expimg-tonnetz-topleft");
-    const tonnetz_topleft = parseInt(input_tonnetz_topleft.value);
-    if ( tonnetz_topleft < 0 )
-        input_tonnetz_topleft.value = 12 + tonnetz_topleft;
-    else if ( tonnetz_topleft > 11 )
-        input_tonnetz_topleft.value = tonnetz_topleft - 12;
+    const input_transposition_index = document.getElementById("expimg-transposition-index");
+    let transposition_index = parseInt(input_transposition_index.value);
+    const transposition_previous = parseInt(input_transposition_index.getAttribute("previous"));
+    if ( transposition_index < -11 )
+        input_transposition_index.value = transposition_index = -1;
+    else if ( transposition_index > 11 )
+        input_transposition_index.value = transposition_index = 1;
+    else if ( transposition_index == 0 )
+        input_transposition_index.value = transposition_index = ( (transposition_previous > 0) ? -1 : 1 );
+    input_transposition_index.setAttribute("previous", transposition_index);
+    
+    const input_tonnetz_centerpc = document.getElementById("expimg-tonnetz-centerpc");
+    const tonnetz_centerpc = parseInt(input_tonnetz_centerpc.value);
+    if ( tonnetz_centerpc < 0 )
+        input_tonnetz_centerpc.value = 12 + tonnetz_centerpc;
+    else if ( tonnetz_centerpc > 11 )
+        input_tonnetz_centerpc.value = tonnetz_centerpc - 12;
 }
 
 
 function updateImageExportPopup() {
-    const popup_export = document.getElementById("popup-export-image");
     const file_type = document.querySelector('input[name="export-file-type"]:checked').value;
     document.getElementById("export-image-download-svg-link").hidden = (file_type != "svg");
     document.getElementById("export-image-download-png-link").hidden = (file_type != "png");
@@ -408,6 +418,9 @@ function updateImageExportPopup() {
         elm.hidden = !(elm.getAttribute("includetype").includes(graphics_type));
     for ( const elm of document.querySelectorAll("#popup-export-options *[excludetype]") )
         elm.hidden = (elm.getAttribute("excludetype").includes(graphics_type));
+
+    document.getElementById("chk-export-note-names").disabled = 
+        ( document.querySelector('input[name="expimg-show-text"]:checked').value == "never" );
 
     const theme = getImageExportTheme();
 
@@ -461,6 +474,7 @@ function exportStaffNoteClick(pc) {
 
 function loadImageExportPopupSettings() {
     document.getElementById("chk-export-note-names").checked = config_export_image.readBool("note-names", config.note_names);
+    document.querySelector(`input[name="expimg-show-text"][value="${config_export_image.readString("text-show", "always")}"]`).checked = true;
     document.getElementById("chk-export-polygon").checked = config_export_image.readBool("polygon", config.polygon);
     document.getElementById("chk-export-sym-axes").checked = config_export_image.readBool("symmetry_axes", config.symmetry_axes);
     document.getElementById("chk-export-fifths").checked = config_export_image.readBool("fifths", config.fifths);
@@ -473,7 +487,8 @@ function loadImageExportPopupSettings() {
     document.getElementById("chk-export-ic6").checked = config_export_image.readBool("ic6", false);
     document.getElementById("expimg-inversion-index").value = config_export_image.readNumber("inversion-index", 0);
     document.getElementById("chk-export-inversion-axis").checked = config_export_image.readBool("inversion-axis", true);
-    document.getElementById("chk-inversion-all-paths").checked = config_export_image.readBool("inversion-all-paths", true);
+    document.getElementById("chk-all-paths").checked = config_export_image.readBool("inv-transp-all-paths", true);
+    document.getElementById("expimg-tonnetz-centerpc").value = config_export_image.readNumber("tonnetz-centerpc", 0);
     document.getElementById("chk-tonnetz-show-all-pcs").checked = config_export_image.readBool("tonnetz-all-pcs", true);
     document.getElementById("chk-tonnetz-show-all-connections").checked = config_export_image.readBool("tonnetz-all-connections", true);
     document.getElementById("expimg-select-theme").value = config_export_image.readString("theme", "basic");
@@ -491,6 +506,7 @@ function loadImageExportPopupSettings() {
 
 function saveImageExportPopupSettings() {
     config_export_image.writeBool("note-names", document.getElementById("chk-export-note-names").checked);
+    config_export_image.writeString("text-show", document.querySelector('input[name="expimg-show-text"]:checked').value);
     config_export_image.writeBool("polygon", document.getElementById("chk-export-polygon").checked);
     config_export_image.writeBool("symmetry_axes", document.getElementById("chk-export-sym-axes").checked);
     config_export_image.writeBool("fifths", document.getElementById("chk-export-fifths").checked);
@@ -503,7 +519,8 @@ function saveImageExportPopupSettings() {
     config_export_image.writeBool("ic6", document.getElementById("chk-export-ic6").checked);
     config_export_image.writeNumber("inversion-index", parseInt(document.getElementById("expimg-inversion-index").value));
     config_export_image.writeBool("inversion-axis", document.getElementById("chk-export-inversion-axis").checked);
-    config_export_image.writeBool("inversion-all-paths", document.getElementById("chk-inversion-all-paths").checked);
+    config_export_image.writeBool("inv-transp-all-paths", document.getElementById("chk-all-paths").checked);
+    config_export_image.writeNumber("tonnetz-centerpc", parseInt(document.getElementById("expimg-tonnetz-centerpc").value));
     config_export_image.writeBool("tonnetz-all-pcs", document.getElementById("chk-tonnetz-show-all-pcs").checked);
     config_export_image.writeBool("tonnetz-all-connections", document.getElementById("chk-tonnetz-show-all-connections").checked);
     config_export_image.writeString("theme", document.getElementById("expimg-select-theme").value);
@@ -524,6 +541,7 @@ function makeClockfaceSvgFromParams(theme) {
         export_data.pcset.normal, 
         {
             note_names: document.getElementById("chk-export-note-names").checked,
+            show_text: document.querySelector('input[name="expimg-show-text"]:checked').value,
             polygon: document.getElementById("chk-export-polygon").checked, 
             symmetry_axes: document.getElementById("chk-export-sym-axes").checked,
             fifths: document.getElementById("chk-export-fifths").checked,
@@ -546,6 +564,7 @@ function makeClockfaceIntervalsSvgFromParams(theme) {
         export_data.pcset.normal, 
         {
             note_names: document.getElementById("chk-export-note-names").checked,
+            show_text: document.querySelector('input[name="expimg-show-text"]:checked').value,
             fifths: document.getElementById("chk-export-fifths").checked,
             scale: parseFloat(document.getElementById("expimg-scale").value),
             stroke_width: parseFloat(document.getElementById("expimg-stroke").value),
@@ -560,9 +579,27 @@ function makeClockfaceInversionSvgFromParams(theme) {
         export_data.pcset.normal, 
         {
             inversion: parseInt(document.getElementById("expimg-inversion-index").value),
-            inversion_set_only: !document.getElementById("chk-inversion-all-paths").checked,
+            active_paths_only: !document.getElementById("chk-all-paths").checked,
             inversion_axis: document.getElementById("chk-export-inversion-axis").checked,
             note_names: document.getElementById("chk-export-note-names").checked,
+            show_text: document.querySelector('input[name="expimg-show-text"]:checked').value,
+            fifths: document.getElementById("chk-export-fifths").checked,
+            scale: parseFloat(document.getElementById("expimg-scale").value),
+            stroke_width: parseFloat(document.getElementById("expimg-stroke").value),
+        },
+        theme
+    );
+}
+
+function makeClockfaceTranspositionSvgFromParams(theme) {
+    return new StaticClockfaceView(
+        export_data.pcset.normal, 
+        {
+            transposition: parseInt(document.getElementById("expimg-transposition-index").value),
+            active_paths_only: !document.getElementById("chk-all-paths").checked,
+            note_names: document.getElementById("chk-export-note-names").checked,
+            show_text: document.querySelector('input[name="expimg-show-text"]:checked').value,
+            fifths: document.getElementById("chk-export-fifths").checked,
             scale: parseFloat(document.getElementById("expimg-scale").value),
             stroke_width: parseFloat(document.getElementById("expimg-stroke").value),
         },
@@ -575,6 +612,7 @@ function makeRulerSvgFromParams(theme) {
         export_data.pcset.normal, 
         {
             note_names: document.getElementById("chk-export-note-names").checked,
+            show_text: document.querySelector('input[name="expimg-show-text"]:checked').value,
             symmetry_axes: document.getElementById("chk-export-sym-axes").checked,
             stroke_width: parseFloat(document.getElementById("expimg-stroke").value),
             start: parseInt(document.getElementById("expimg-first-pc").value),
@@ -608,8 +646,9 @@ function makeTonnetzSvgFromParams(theme) {
         {
             width: parseInt(document.getElementById("expimg-tonnetz-width").value),
             height: parseInt(document.getElementById("expimg-tonnetz-height").value),
-            first: parseInt(document.getElementById("expimg-tonnetz-topleft").value),
+            centerpc: parseInt(document.getElementById("expimg-tonnetz-centerpc").value),
             note_names: document.getElementById("chk-export-note-names").checked,
+            show_text: document.querySelector('input[name="expimg-show-text"]:checked').value,
             show_all_pcs: document.getElementById("chk-tonnetz-show-all-pcs").checked,
             show_all_connections: document.getElementById("chk-tonnetz-show-all-connections").checked,
             scale: parseFloat(document.getElementById("expimg-scale").value),
@@ -622,12 +661,13 @@ function makeTonnetzSvgFromParams(theme) {
 function makeSetImage(graphics_type) {
     const theme = getImageExportTheme();
     switch ( graphics_type ) {
-        case "clockface-set"      : return makeClockfaceSvgFromParams(theme);
-        case "clockface-intervals": return makeClockfaceIntervalsSvgFromParams(theme);
-        case "clockface-inversion": return makeClockfaceInversionSvgFromParams(theme);
-        case "ruler-set"          : return makeRulerSvgFromParams(theme);
-        case "staff-set"          : return makeStaffSvgFromParams(theme);
-        case "tonnetz-set"        : return makeTonnetzSvgFromParams(theme);
+        case "clockface-set"          : return makeClockfaceSvgFromParams(theme);
+        case "clockface-intervals"    : return makeClockfaceIntervalsSvgFromParams(theme);
+        case "clockface-inversion"    : return makeClockfaceInversionSvgFromParams(theme);
+        case "clockface-transposition": return makeClockfaceTranspositionSvgFromParams(theme);
+        case "ruler-set"              : return makeRulerSvgFromParams(theme);
+        case "staff-set"              : return makeStaffSvgFromParams(theme);
+        case "tonnetz-set"            : return makeTonnetzSvgFromParams(theme);
     }
     return null;
 }

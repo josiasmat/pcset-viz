@@ -425,13 +425,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                         <option value="clockface-set">Clockface (set)</option>
                                         <option value="clockface-intervals">Clockface (intervals)</option>
                                         <option value="clockface-inversion">Clockface (inversion)</option>
+                                        <option value="clockface-transposition">Clockface (transposition)</option>
                                         <option value="ruler-set">Ruler (set)</option>
                                         <option value="staff-set">Staff (set)</option>
                                         <option value="tonnetz-set">Tonnetz (set)</option>
                                     </select></td>
                                 </tr>
                                 <tr includetype="clockface-inversion">
-                                    <td>Inversion</td>
+                                    <td>Invert</td>
                                     <td>
                                         <label for="expimg-inversion-index">Index:</label>
                                         <input type="number" id="expimg-inversion-index" name="expimg-inversion-index" oninput="updateImageExportPopup()" 
@@ -445,6 +446,22 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                         <option value="8"></option><option value="9"></option>
                                         <option value="10"></option><option value="11"></option>
                                     </datalist>
+                                </tr>
+                                <tr includetype="clockface-transposition">
+                                    <td>Transpose</td>
+                                    <td>
+                                        <label for="expimg-transposition-index">Index:</label>
+                                        <input type="number" id="expimg-transposition-index" name="expimg-transposition-index" oninput="updateImageExportPopup()" 
+                                            value="1" min="-12" max="12" step="1" previous="1" list="expimg-transposition-index-list"/>
+                                    </td>
+                                    <!-- <datalist id="expimg-transposition-index-list">
+                                        <option value="0"></option><option value="1"></option>
+                                        <option value="2"></option><option value="3"></option>
+                                        <option value="4"></option><option value="5"></option>
+                                        <option value="6"></option><option value="7"></option>
+                                        <option value="8"></option><option value="9"></option>
+                                        <option value="10"></option><option value="11"></option>
+                                    </datalist> -->
                                 </tr>
                                 <tr includetype="ruler-set">
                                     <td><label for="expimg-first-pc">Start at</label></td>
@@ -464,7 +481,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     </datalist>
                                 </tr>
                                 <tr includetype="tonnetz-set">
-                                    <td>Options</td>
+                                    <td>Tonnetz</td>
                                     <td>
                                         <span>
                                             <label for="expimg-tonnetz-width">Width:</label>
@@ -477,8 +494,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                                 value="5" min="2" max="20" step="1" />
                                         </span>
                                         <span>
-                                            <label for="expimg-tonnetz-topleft">Top-left corner:</label>
-                                            <input type="number" id="expimg-tonnetz-topleft" name="expimg-tonnetz-topleft" oninput="updateImageExportPopup()" 
+                                            <label for="expimg-tonnetz-centerpc">PC at center:</label>
+                                            <input type="number" id="expimg-tonnetz-centerpc" name="expimg-tonnetz-centerpc" oninput="updateImageExportPopup()" 
                                                 value="4" min="-1" max="12" step="1" />
                                         </span>
                                     </td>
@@ -518,10 +535,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                             <input id="chk-export-ic6" type="checkbox" onchange="updateImageExportPopup()">
                                             <label for="chk-export-ic6">IC6</label>
                                         </span>
-                                        <span excludetype="staff-set">
-                                            <input id="chk-export-note-names" type="checkbox" onchange="updateImageExportPopup()">
-                                            <label for="chk-export-note-names">Note names instead of numbers</label>
-                                        </span>
                                         <span includetype="clockface-set">
                                             <input id="chk-export-polygon" type="checkbox" onchange="updateImageExportPopup()">
                                             <label for="chk-export-polygon">Set geometry</label>
@@ -534,9 +547,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                             <input id="chk-export-inversion-axis" type="checkbox" onchange="updateImageExportPopup()">
                                             <label for="chk-export-inversion-axis">Inversion axis</label>
                                         </span>
-                                        <span includetype="clockface-inversion">
-                                            <input id="chk-inversion-all-paths" type="checkbox" onchange="updateImageExportPopup()">
-                                            <label for="chk-inversion-all-paths">All paths</label>
+                                        <span includetype="clockface-inversion clockface-transposition">
+                                            <input id="chk-all-paths" type="checkbox" onchange="updateImageExportPopup()">
+                                            <label for="chk-all-paths">All paths</label>
                                         </span>
                                         <span includetype="tonnetz-set">
                                             <input id="chk-tonnetz-show-all-pcs" type="checkbox" onchange="updateImageExportPopup()">
@@ -546,7 +559,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                             <input id="chk-tonnetz-show-all-connections" type="checkbox" onchange="updateImageExportPopup()">
                                             <label for="chk-tonnetz-show-all-connections">All connections</label>
                                         </span>
-                                        <span includetype="clockface-set clockface-intervals">
+                                        <span includetype="clockface-set clockface-intervals clockface-inversion clockface-transposition">
                                             <input id="chk-export-fifths" type="checkbox" onchange="updateImageExportPopup()">
                                             <label for="chk-export-fifths">Circle of fifths</label>
                                         </span>
@@ -579,6 +592,30 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                                 <option value="double">Double</option>
                                                 <option value="final">Final</option>
                                             </select> 
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr excludetype="staff-set">
+                                    <td>Text</td>
+                                    <td id="expimg-text-options-area">
+                                        <span>
+                                            <input id="rad-expimg-text-always" name="expimg-show-text" type="radio" 
+                                                value="always" checked onchange="updateImageExportPopup()">
+                                            <label for="rad-expimg-text-always">Show all</label>
+                                        </span>
+                                        <span>
+                                            <input id="rad-expimg-text-enabled" name="expimg-show-text" type="radio" 
+                                                value="enabled" onchange="updateImageExportPopup()">
+                                            <label for="rad-expimg-text-enabled">Only enabled</label>
+                                        </span>
+                                        <span>
+                                            <input id="rad-expimg-text-never" name="expimg-show-text" type="radio"
+                                                value="never" onchange="updateImageExportPopup()">
+                                            <label for="rad-expimg-text-never">Hide all</label>
+                                        </span>
+                                        <span>
+                                            <input id="chk-export-note-names" type="checkbox" onchange="updateImageExportPopup()">
+                                            <label for="chk-export-note-names">Note names instead of numbers</label>
                                         </span>
                                     </td>
                                 </tr>
