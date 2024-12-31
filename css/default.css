@@ -407,7 +407,7 @@ dialog.popup-container[open] {
 }
 
 #popup-export-image {
-    width: 70%;
+    width: 80%;
     min-width: min(110ch, 95%);
     max-width: 95%;
     max-height: 95%;
