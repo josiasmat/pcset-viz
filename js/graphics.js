@@ -1184,8 +1184,7 @@ const GRAPHICS_THEMES = {
     "solid-light": {
         bg_type: "light", fg: blackf(), bg: nocolor, circle_stroke: nocolor, circle_fill: blackf(), path: blackf(),
         polygon_stroke: nocolor, polygon_fill: blackf(0.4), on: { text: whitef() }, 
-        tnz_connector: blackf(0.2), 
-        off: { circle_fill: blackf(0.2), path: blackf(0.4) }
+        off: { tnz_connector: blackf(0.2), circle_fill: blackf(0.2), path: blackf(0.4) }
     },
     "solid-light-colorful": {
         bg_type: "light", fg: blackf(), bg: nocolor, circle_stroke: nocolor, circle_fill: pcToHueF(), 
