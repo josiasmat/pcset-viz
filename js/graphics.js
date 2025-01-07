@@ -449,7 +449,8 @@ class StaticClockfaceView extends PcSetBaseView {
                             "opacity": theme.on.path().css_opacity
                         }
                     );
-                    line.setAttribute("marker-end", "url(#arrow)");
+                    if ( pcset.has(pc) )
+                        line.setAttribute("marker-end", "url(#arrow)");
                     if ( options.transposition == 6 && pcset.has(pct) )
                         line.setAttribute("marker-start", "url(#arrow)");
                     g_transp_lines.appendChild(line);
