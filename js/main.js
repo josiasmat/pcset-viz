@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 "use strict";
 
-const VERSION = "2024-12-31";
+const VERSION = "2025-01-09";
 
 const config_storage = new LocalStorageHandler("pcsetviz");
 const config_visible_data = new LocalStorageHandler("pcsetviz-visible-data");
@@ -330,6 +330,11 @@ function showPcset(options = {}) {
     //    "Octachord","Nonachord","Decachord","Undecachord","Dodechachord"][state.pcset.size]);
     if ( icvector.count_value(1) == 6 ) features.push("All-interval");
     if ( is_mirror ) features.push("Mirror");
+    if ( prime.isMaximallyEven() ) features.push("Maximally even");
+    const generators = prime.getGenerators();
+    if ( generators.length > 0 ) features.push(`Generated (${integerRangesToStr(generators)})`);
+    if ( prime.isDeepScale() ) features.push("Deep scale");
+    if ( prime.hasMyhillProperty() ) features.push("Myhill's property");
     if ( zcorrespondent ) features.push("Z-set");
     if ( comb_count > 0 ) features.push(( comb_count >= 3 ? "All&#8209;combinatorial&nbsp;(" : "Combinatorial&nbsp;(" ) + combs_str + ")");
 

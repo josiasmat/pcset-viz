@@ -45,11 +45,22 @@ class PcSet {
 
     static #cache = {};
 
+    /**
+     * @param {Number} binv 
+     * @param {String} type 
+     * @returns {Boolean}
+     */
     static #cacheHas(binv, type) {
         return Object.hasOwn(PcSet.#cache, binv) 
            && !Object.hasOwn(PcSet.#cache[binv], type);
     }
 
+    /**
+     * @param {Number} binv 
+     * @param {String} type 
+     * @param {any} value 
+     * @returns {any}
+     */
     static #cacheWrite(binv, type, value) {
         if ( !Object.hasOwn(PcSet.#cache, binv) )
             PcSet.#cache[binv] = {};
@@ -57,12 +68,18 @@ class PcSet {
         return value;
     }
 
+    /**
+     * @param {Number} binv 
+     * @param {String} type 
+     * @returns {any|null}
+     */
     static #cacheRead(binv, type) {
         if ( PcSet.#cacheHas(binv, type) )
             return PcSet.#cache[binv][type];
         return null;
     }
 
+    /** @param {Number} binv */
     static #cacheInvalidate(binv) {
         PcSet.#cache[binv] = {};
     }
@@ -95,6 +112,14 @@ class PcSet {
         }
         this.#removeDuplicates();
         this.#sortFromFirst();
+    }
+
+    static generate(count, interval, first = 0) {
+        const pcs = [];
+        for ( let i = 0; i < count; i++ ) {
+            pcs.push(mod12((interval*i)+first));
+        }
+        return new PcSet(pcs);
     }
 
     [Symbol.iterator]() {
@@ -239,6 +264,79 @@ class PcSet {
     get tail() {
         const len = this.size;
         return ( len == 0 ) ? null : this.#data[len-1];
+    }
+
+    /** @returns {Boolean} */
+    isMaximallyEven() {
+        if ( [0,1].includes(this.size) )   return false;
+        if ( [11,12].includes(this.size) ) return true;
+        const cache_key = "maximally_even";
+        const cached = PcSet.#cacheRead(this.binary_value, cache_key);
+        if ( cached ) return cached;
+        for ( let d = 1; d < this.size; d++ ) {
+            const first_interval = computeInterval(this.#data[0], this.#data[d]);
+            let [min,max] = [first_interval,first_interval];
+            for ( let i = 1; i < this.size; i++ ) {
+                const j = (i+d) % this.size;
+                const interval = computeInterval(this.#data[i], this.#data[j]);
+                [min,max] = [Math.min(min,interval), Math.max(max,interval)];
+            }
+            if ( max-min > 1 ) 
+                return PcSet.#cacheWrite(this.binary_value, cache_key, false);
+        }
+        return PcSet.#cacheWrite(this.binary_value, cache_key, true);
+    }
+
+    /** @returns {Boolean} */
+    isDeepScale() {
+        const cache_key = "deep_scale";
+        const cached = PcSet.#cacheRead(this.binary_value, cache_key);
+        if ( cached ) return cached;
+        const icv = this.icvector();
+        for ( let [a,b] of pairs(icv.data) ) {
+            if ( a == b ) 
+                return PcSet.#cacheWrite(this.binary_value, cache_key, false);
+        }
+        return PcSet.#cacheWrite(this.binary_value, cache_key, true);;
+    }
+
+    hasMyhillProperty() {
+        if ( this.size < 3 ) return false;
+        const cache_key = "myhill";
+        const cached = PcSet.#cacheRead(this.binary_value, cache_key);
+        if ( cached ) return cached;
+        for ( let d = 1; d < this.size; d++ ) {
+            let c = new Set();
+            for ( let i = 0; i < this.size; i++ )
+                c.add(computeIntervalClass(this.at(i), this.at(i+d)));
+            if ( c.size != 2 ) 
+                return PcSet.#cacheWrite(this.binary_value, cache_key, false);
+        }
+        return PcSet.#cacheWrite(this.binary_value, cache_key, true);
+    }
+
+    /** 
+     * @param {Number} interval
+     * @returns {Boolean} 
+     */
+    isGenerated(interval) {
+        if ( this.size < 3 ) return false;
+        const cache_key = `generated(${interval})`;
+        const cached = PcSet.#cacheRead(this.binary_value, cache_key);
+        if ( cached ) return cached;
+        for ( let i = 0; i < this.size; i++ ) {
+            if ( this.isSameSetClass(PcSet.generate(this.size, interval, this.at(i))) )
+                return PcSet.#cacheWrite(this.binary_value, cache_key, true);
+        }
+        return PcSet.#cacheWrite(this.binary_value, cache_key, false);
+    }
+
+    /** @returns {Number[]} */
+    getGenerators() {
+        const generators = [];
+        for ( let i = 0; i < 6; i++ )
+            if ( this.isGenerated(i) ) generators.push(i);
+        return generators;
     }
 
     /** 
@@ -1133,7 +1231,8 @@ class PcSet {
  */
 class IntervalClassVector {
 
-    #data = Array(6).fill(0);
+    /** @type {[Number]} */
+    data = Array(6).fill(0);
 
     get size() {
         return 6;
@@ -1143,7 +1242,7 @@ class IntervalClassVector {
         const count = Math.min(6, array.length);
         for ( let i = 0; i < count; i++ )
             if ( typeof(array[i]) == "number" )
-                this.#data[i] = Math.trunc(array[i]);
+                this.data[i] = Math.trunc(array[i]);
     }
 
     /**
@@ -1164,15 +1263,26 @@ class IntervalClassVector {
         return new IntervalClassVector(icvec);
     }
 
+    [Symbol.iterator]() {
+        let index = 0;
+        return {
+            next: () => {
+                if ( index == this.size )
+                    return { done: true };
+                return { value: this.data[index++], done: false };
+            },
+        };
+    };
+
     /** @returns {String} */
     str_hex(include_brackets = false) {
-        const s = this.#data.map((x) => x.toString(16)).join("").toUpperCase();
+        const s = this.data.map((x) => x.toString(16)).join("").toUpperCase();
         return (include_brackets) ? this.#enclose_str(s) : s;
     }
 
     /** @returns {String} */
     str_numbers(include_brackets = false) {
-        const s = this.#data.map((x) => x.toString()).join(",").toUpperCase();
+        const s = this.data.map((x) => x.toString()).join(",").toUpperCase();
         return (include_brackets) ? this.#enclose_str(s) : s;
     }
 
@@ -1193,26 +1303,26 @@ class IntervalClassVector {
 
     /** @returns {IntervalClassVector} */
     copy() {
-        return new IntervalClassVector(this.#data);
+        return new IntervalClassVector(this.data);
     }
 
     /** @returns {Number} */
     at(interval) {
         const ic = intervalClassOf(interval);
-        return ( ic == 0 ) ? 0 : this.#data[ic-1];
+        return ( ic == 0 ) ? 0 : this.data[ic-1];
     }
 
     /** @returns {Number} */
     count_value(value, double6 = false) {
         if ( !double6 ) 
-            return this.#data.filter((x)=>x==value).length;
-        return this.#data.slice(0,5).filter( (x) => x == value ).lenth 
-            + ( 2*this.#data[5] == value ) ? 1 : 0;
+            return this.data.filter((x)=>x==value).length;
+        return this.data.slice(0,5).filter( (x) => x == value ).lenth 
+            + ( 2*this.data[5] == value ) ? 1 : 0;
     }
 
     /** @returns {Number} */
     sum() {
-        return this.#data.reduce((sum, x) => sum + x, 0);
+        return this.data.reduce((sum, x) => sum + x, 0);
     }
 
 }
@@ -1220,7 +1330,7 @@ class IntervalClassVector {
 
 class CommonToneVector {
 
-    #data = Array(12).fill(0);
+    data = Array(12).fill(0);
 
     get size() {
         return 12;
@@ -1230,7 +1340,7 @@ class CommonToneVector {
         const count = Math.min(12, array.length);
         for ( let i = 0; i < count; i++ )
             if ( typeof(array[i]) == "number" )
-                this.#data[i] = Math.trunc(array[i]);
+                this.data[i] = Math.trunc(array[i]);
     }
 
     /** 
@@ -1248,7 +1358,7 @@ class CommonToneVector {
     /** @returns {String} */
     str_hex(include_brackets = false) {
         let s = "";
-        for ( let x of this.#data )
+        for ( let x of this.data )
             switch (x) {
                 case 10: s += 'A'; break;
                 case 11: s += 'B'; break;
@@ -1262,7 +1372,7 @@ class CommonToneVector {
 
     /** @returns {String} */
     str_numbers(include_brackets = false) {
-        const s = this.#data.map((x) => x.toString()).join(',');
+        const s = this.data.map((x) => x.toString()).join(',');
         return (include_brackets) ? this.#enclose_str(s) : s;
     }
 
@@ -1283,22 +1393,22 @@ class CommonToneVector {
 
     /** @returns {CommonToneVector} */
     copy() {
-        return new CommonToneVector(this.#data);
+        return new CommonToneVector(this.data);
     }
 
     /** @returns {Number} */
     at(pitch) {
-        return this.#data[mod12(pitch)];
+        return this.data[mod12(pitch)];
     }
 
     /** @returns {Number} */
     count_value(value) {
-        return this.#data.filter( (x) => x == value ).length;
+        return this.data.filter( (x) => x == value ).length;
     }
 
     /** @returns {Number} */
     sum() {
-        return this.#data.reduce((sum, x) => sum + x, 0);
+        return this.data.reduce((sum, x) => sum + x, 0);
     }
 
 }
