@@ -339,6 +339,28 @@ class PcSet {
         return generators;
     }
 
+    /** @returns {Number} - _2_ if it is a strictly proper scale, _1_ if proper, _0_ if improper.*/
+    isProperScale() {
+        // Don't count sets with less than 5 notes as scales
+        if ( this.size < 5 ) return 0;
+        const cache_key = "proper_scale";
+        const cached = PcSet.#cacheRead(this.binary_value, cache_key);
+        if ( cached ) return cached;
+        let strict = true;
+        for ( let d = 1; d < this.size-1; d++ ) {
+            for ( let i = 0; i < this.size; i++ ) {
+                for ( let j = 0; j < this.size; j++ ) {
+                    const int_minor = computeInterval(this.at(i), this.at(i+d));
+                    const int_major = computeInterval(this.at(j), this.at(j+d+1));
+                    if ( int_minor > int_major ) 
+                        return PcSet.#cacheWrite(this.binary_value, cache_key, 0);
+                    if ( int_minor == int_major && strict ) strict = false;
+                }
+            }
+        }
+        return PcSet.#cacheWrite(this.binary_value, cache_key, ( strict ) ? 2 : 1);
+    }
+
     /** 
      * Returns the pitch-class set at given index. Accepts negative indexes.
      * @param {Number} index

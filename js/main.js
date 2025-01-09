@@ -331,9 +331,11 @@ function showPcset(options = {}) {
     if ( icvector.count_value(1) == 6 ) features.push("All-interval");
     if ( is_mirror ) features.push("Mirror");
     if ( prime.isMaximallyEven() ) features.push("Maximally even");
+    const proper_scale = prime.isProperScale();
+    if ( proper_scale ) features.push((proper_scale == 2) ? "Strictly proper scale" : "Proper scale");
+    if ( prime.isDeepScale() ) features.push("Deep scale");
     const generators = prime.getGenerators();
     if ( generators.length > 0 ) features.push(`Generated (${integerRangesToStr(generators)})`);
-    if ( prime.isDeepScale() ) features.push("Deep scale");
     if ( prime.hasMyhillProperty() ) features.push("Myhill's property");
     if ( zcorrespondent ) features.push("Z-set");
     if ( comb_count > 0 ) features.push(( comb_count >= 3 ? "All&#8209;combinatorial&nbsp;(" : "Combinatorial&nbsp;(" ) + combs_str + ")");
