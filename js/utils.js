@@ -112,13 +112,10 @@ function clamp(value, min, max) {
  */
 function htmlEscape(str) {
     let i = str.length, r = [];
-    while (i--) {
-        var c = str[i].charCodeAt();
-        if ( !between(c,31,127) || "<>\\".includes(c) ) {
-            r[i] = '&#'+c+';';
-        } else {
-            r[i] = str[i];
-        }
+    while ( i-- ) {
+        var c = str.charCodeAt(i);
+        r[i] = ( !between(c,31,127) || "<>\\".includes(str[i]) )
+            ? '&#'+c+';' : str[i];
     }
     return r.join('');
 }
