@@ -107,17 +107,25 @@ function clamp(value, min, max) {
 
 /**
  * Escapes special characters for HTML.
- * @param {String} str
+ * @param {String} s
  * @returns {String}
  */
-function htmlEscape(str) {
-    let i = str.length, r = [];
+function htmlEscape(s) {
+    let i = s.length, r = [];
     while ( i-- ) {
-        var c = str.charCodeAt(i);
-        r[i] = ( !between(c,31,127) || "<>\\".includes(str[i]) )
-            ? '&#'+c+';' : str[i];
+        var c = s.charCodeAt(i);
+        r[i] = ( !between(c,31,127) || "<>\\".includes(s[i]) )
+            ? '&#'+c+';' : s[i];
     }
     return r.join('');
+}
+
+/**
+ * @param {String} s
+ * @returns {String}
+ */
+function htmlNonBreakingSpaces(s) {
+    return s.replace(' ', "&nbsp;").replace('-', "&#8209;");
 }
 
 
@@ -426,4 +434,15 @@ function romanize(n) {
         }
     }
     return s;
+}
+
+
+/**
+ * 
+ * @param {Number} n 
+ * @param {Number} min_digits 
+ * @returns {String}
+ */
+function toBinary(n, min_digits = 0) {
+    return n.toString(2).padStart(min_digits, '0');
 }

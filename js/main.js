@@ -71,6 +71,7 @@ var data_rows = [];
 var data_cells = {
     ruler_view: document.getElementById("ruler-view"),
     staff_view: document.getElementById("staff-view"),
+    binary_value: document.getElementById("binary-value"),
     normal_form: document.getElementById("normal-form"),
     prime_form: document.getElementById("prime-form"),
     forte_name: document.getElementById("forte-name"),
@@ -233,6 +234,10 @@ function showPcset(options = {}) {
         return (cond) ? "&nbsp;=&nbsp;" + s : "";
     }
 
+    data_cells.binary_value.setHTMLUnsafe(
+        `${strWithCopyLink(toBinary(state.pcset.binary_value, 12))} = ${strWithCopyLink(state.pcset.binary_value.toString())}`
+    );
+
     data_cells.normal_form.setHTMLUnsafe(
         checkmarkIf(state.pcset.isEqualTo(normal)) + pcsetHyperlink(normal, {copy: true}));
 
@@ -328,15 +333,15 @@ function showPcset(options = {}) {
     //features.push([
     //    "Null set","Singleton","Dyad","Trichord","Tetrachord","Pentachord","Hexachord","Heptachord",
     //    "Octachord","Nonachord","Decachord","Undecachord","Dodechachord"][state.pcset.size]);
-    if ( icvector.count_value(1) == 6 ) features.push("All-interval");
+    if ( icvector.count_value(1) == 6 ) features.push(htmlNonBreakingSpaces("All-interval"));
     if ( is_mirror ) features.push("Mirror");
-    if ( prime.isMaximallyEven() ) features.push("Maximally even");
+    if ( prime.isMaximallyEven() ) features.push(htmlNonBreakingSpaces("Maximally even"));
     const proper_scale = prime.isProperScale();
-    if ( proper_scale ) features.push((proper_scale == 2) ? "Strictly proper scale" : "Proper scale");
-    if ( prime.isDeepScale() ) features.push("Deep scale");
+    if ( proper_scale ) features.push(htmlNonBreakingSpaces((proper_scale == 2) ? "Strictly proper scale" : "Proper scale"));
+    if ( prime.isDeepScale() ) features.push(htmlNonBreakingSpaces("Deep scale"));
     const generators = prime.getGenerators();
-    if ( generators.length > 0 ) features.push(`Generated (${integerRangesToStr(generators)})`);
-    if ( prime.hasMyhillProperty() ) features.push("Myhill's property");
+    if ( generators.length > 0 ) features.push(htmlNonBreakingSpaces(`Generated (${integerRangesToStr(generators)})`));
+    if ( prime.hasMyhillProperty() ) features.push(htmlNonBreakingSpaces("Myhill's property"));
     if ( zcorrespondent ) features.push("Z-set");
     if ( comb_count > 0 ) features.push(( comb_count >= 3 ? "All&#8209;combinatorial&nbsp;(" : "Combinatorial&nbsp;(" ) + combs_str + ")");
 
