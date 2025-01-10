@@ -178,7 +178,7 @@ function pcMouseUp(evt) {
     //pc_circle.notes[pc_drag_state.to].style.cursor = "pointer";
     viz.svg_root.style.removeProperty("cursor");
     //pc_circle.notes[pc].releasePointerCapture(evt.pointerId);
-    if ( pc_drag_state.from != null && pc_drag_state.to != null )
+    if ( pc_drag_state.from != pc_drag_state.to && pc_drag_state.from != null && pc_drag_state.to != null )
         togglePcs([pc_drag_state.from, pc_drag_state.to]);
     if ( pc_drag_state.from != null ) {
         viz.pitches[pc_drag_state.from].classList.remove("pc-moving-from");

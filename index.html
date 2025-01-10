@@ -27,6 +27,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         <script type="text/javascript" src="js/clockface.js"></script>
         <script type="text/javascript" src="js/popups.js" async></script>
         <script type="text/javascript" src="js/midi.js" async></script>
+        <script type="text/javascript" src="js/audio.js" async></script>
         <script type="text/javascript" src="js/svgtools.js" defer></script>
         <script type="text/javascript" src="js/colors.js" defer></script>
         <script type="text/javascript" src="js/graphics.js" defer></script>
@@ -162,6 +163,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                         <tr id="row-misc" always-visible>
                             <td>Misc.:</td>
                             <td id="misc-area">
+                                <span>
+                                    <a href="javascript:playScale()">Play</a>
+                                </span> · 
                                 <span>
                                     <a href="javascript:showExportImagePopup()">Export&nbsp;image</a>
                                 </span> · 
@@ -335,7 +339,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                 <td>
                                     <span>
                                         <input id="chk-note-names" type="checkbox" onchange="onChange()">
-                                        <label for="chk-note-names">Show note names instead of numbers <span class="keyboard-shortcut">(Alt+N)<span></label>
+                                        <label for="chk-note-names">Note names instead of numbers <span class="keyboard-shortcut">(Alt+N)<span></label>
                                     </span>
                                     <span>
                                         <input id="chk-polygon" type="checkbox" onchange="onChange()">
@@ -365,7 +369,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     <span>
                                         <label for="">Mode:</label>
                                         <select name="select-midi-mode" id="select-midi-mode" onchange="selectMidiMode()">
-                                            <option value="accumulate">Accumulate</option>
+                                            <option value="scale">Scale</option>
                                             <option value="chord">Chord</option>
                                             <option value="direct">Direct</option>
                                             <option value="toggle">Toggle</option>
@@ -374,6 +378,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     <span>
                                         <input id="chk-midi-pedal" type="checkbox" onchange="selectMidiMode()">
                                         <label for="chk-midi-pedal">Hold with sustain pedal</label>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Sound</td>
+                                <td>
+                                    <span>
+                                        <input id="chk-sound-toggle" type="checkbox" onchange="updateConfigFromInterface()">
+                                        <label for="chk-sound-toggle">Play sound on pitch-class toggle</label>
+                                    </span>
+                                    <span>
+                                        <input id="chk-sound-midi" type="checkbox" onchange="updateConfigFromInterface()">
+                                        <label for="chk-sound-midi">Play sound on MIDI input</label>
                                     </span>
                                 </td>
                             </tr>

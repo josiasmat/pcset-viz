@@ -31,6 +31,8 @@ const midi = {
         enabled: false,
         pressed: false,
     },
+    on_pc_on: null,
+    on_pc_off: null,
     keyPressed(key) {
         return ( this.pedal.enabled && this.pedal.pressed )
             ? this.keys[key] : this.notes[key];
@@ -40,6 +42,7 @@ const midi = {
         this.keys[key] = true;
         this.pcs[pc] += 1;
         this.notes[key] = true;
+        if ( this.pcs[pc] == 1 && this.on_pc_on ) this.on_pc_on(pc);
     },
     setNoteOff(key) {
         const pc = key % 12;
@@ -47,6 +50,7 @@ const midi = {
         this.pcs[pc] = Math.max(this.pcs[pc]-1, 0);
         if ( !this.pedal.enabled || !this.pedal.pressed )
             this.notes[key] = false;
+        if ( this.pcs[pc] == 0 && this.on_pc_off ) this.on_pc_off(pc);
     },
     setPedal(int_value) {
         this.pedal.pressed = (int_value >= 64);
@@ -59,6 +63,8 @@ const midi = {
         this.notes = Array(128).fill(false);
         this.pedal.pressed = false;
     },
+    last_event_timestamp : 0,
+    last_event_time_delta : 0,
 }
 
 const config_midi_storage = new LocalStorageHandler("pcsetviz-midi");
@@ -165,8 +171,11 @@ function connectMidiDeviceById(port_id, msg_func = null) {
 }
 
 
+/** @param {MIDIMessageEvent} ev */
 function handleMIDIEvent(ev) {
     //console.log(`Received MIDI data: ${ev.data}`);
+    midi.last_event_time_delta = ev.timeStamp - midi.last_event_timestamp;
+    midi.last_event_timestamp = ev.timeStamp;
     for ( const ch of midi.channels ) {
         switch ( ev.data[0] ) {
             case 0x90 + ch:
@@ -237,6 +246,15 @@ function updatePlayedNotes(key = null, note_on = false) {
                 ));
             }
             break;
+        case "scale":
+            if ( key != null ) {
+                const sum = midi.notes.reduce( (sum,k) => sum += (k ? 1 : 0), 0 );
+                if ( sum == 1 && first_on && midi.last_event_time_delta >= 300 )
+                    state.pcset = new PcSet([pc]);
+                else if ( midi.pcs[pc] > 0 )
+                    state.pcset.add(pc);
+            }
+            break;
         case "accumulate":
             if ( key != null ) {
                 const sum = midi.notes.reduce( (sum,k) => sum += (k ? 1 : 0), 0 );
@@ -259,6 +277,8 @@ function loadMidiConfig() {
     const dev_name = config_midi_storage.readString("last-device-name", "");
     if ( dev_name )
         connectMidiDeviceByName(dev_name);
+    midi.on_pc_on = (pc) => { if ( config.sound_midi ) PitchPlayer.playPitch(pc) };
+    midi.on_pc_off = (pc) => { if ( config.sound_midi ) PitchPlayer.stopPitch(pc) };
 }
 
 function saveMidiConfig() {
