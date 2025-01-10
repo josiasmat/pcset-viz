@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 "use strict";
 
-const VERSION = "2025-01-09";
+const VERSION = "2025-01-10";
 
 const config_storage = new LocalStorageHandler("pcsetviz");
 const config_visible_data = new LocalStorageHandler("pcsetviz-visible-data");
@@ -44,6 +44,8 @@ const config = {
     set_format: SET_FORMATS[0],
     vector_format: VECTOR_FORMATS[0],
     inversion_format: INVERSION_FORMATS[0],
+    sound_midi: false,
+    sound_toggle: false
 }
 
 class DataRow {
@@ -336,6 +338,7 @@ function showPcset(options = {}) {
     if ( icvector.count_value(1) == 6 ) features.push(htmlNonBreakingSpaces("All-interval"));
     if ( is_mirror ) features.push("Mirror");
     if ( prime.isMaximallyEven() ) features.push(htmlNonBreakingSpaces("Maximally even"));
+    if ( prime.hasMaximalPolygonalArea() ) features.push(htmlNonBreakingSpaces("Maximal area"));
     const proper_scale = prime.isProperScale();
     if ( proper_scale ) features.push(htmlNonBreakingSpaces((proper_scale == 2) ? "Strictly proper scale" : "Proper scale"));
     if ( prime.isDeepScale() ) features.push(htmlNonBreakingSpaces("Deep scale"));
@@ -556,11 +559,24 @@ function onInput() {
 
 
 function togglePcs(pc_array) {
-    for ( let pc of pc_array )
-        state.pcset.toggle(pc);
+    for ( let i = 0; i < pc_array.length; i++ ) {
+        const pc = pc_array[i];
+        if ( state.pcset.toggle(pc) && config.sound_toggle )
+            PitchPlayer.playPitch(pc, 0.3);
+    }
     state.last_op = null;
     input_main.value = state.pcset.normal.toString(config.set_format, false);
     showPcset();
+}
+
+
+function playScale() {
+    const playing_set = state.pcset.clone();
+    const duration = 0.001*playing_set.size**2 - 0.06 * playing_set.size + 0.75;
+    for ( let i = 0; i < playing_set.size; i++ ) {
+        const delay = i * duration;
+        PitchPlayer.playPitch(playing_set.at(i), duration, delay);
+    }
 }
 
 
@@ -643,6 +659,8 @@ function updateInterfaceFromConfig() {
     document.getElementById("chk-polygon").checked = config.polygon;
     document.getElementById("chk-sym-axes").checked = config.symmetry_axes;
     document.querySelector(`input[name="theme"][value="${config.theme}"]`).checked = true;
+    document.getElementById("chk-sound-midi").checked = config.sound_midi;
+    document.getElementById("chk-sound-toggle").checked = config.sound_toggle;
     updateColorTheme();
     updateLayout();
 }
@@ -665,6 +683,8 @@ function updateConfigFromInterface() {
         createMainClockfaceSvg(document.getElementById("visualization-svg"));
     }
     config.theme = document.querySelector('input[name="theme"]:checked').value;
+    config.sound_midi = document.getElementById("chk-sound-midi").checked;
+    config.sound_toggle = document.getElementById("chk-sound-toggle").checked;
     updateColorTheme();
     updateLayout();
     saveConfig();
@@ -687,6 +707,8 @@ function readConfig() {
         createMainClockfaceSvg(document.getElementById("visualization-svg"));
     }
     config.theme = config_storage.readString("theme", "auto");
+    config.sound_midi = config_storage.readBool("sound-midi", false);
+    config.sound_toggle = config_storage.readBool("sound-toggle", false);
     for ( let row of data_rows )
         row.visible = config_visible_data.readBool(row.id, row.visible);
     updateInterfaceFromConfig();
@@ -704,6 +726,8 @@ function saveConfig() {
     config_storage.writeBool("fifths", config.fifths);
     config_storage.writeString("theme", config.theme);
     config_storage.writeString("staff-clef", config.staff_clef);
+    config_storage.writeBool("sound-midi", config.sound_midi);
+    config_storage.writeBool("sound-toggle", config.sound_toggle);
     for ( let row of data_rows )
         config_visible_data.writeBool(row.id, row.visible);
 }
@@ -847,3 +871,4 @@ for ( const elm of document.querySelectorAll(".icon-search") ) {
     );
     elm.setHTMLUnsafe(svg.outerHTML);
 }
+
