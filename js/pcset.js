@@ -43,6 +43,8 @@ class PcSet {
     /** @type {Number} */
     #binv;
 
+    static #max_poly_areas = null;
+
     static #cache = {};
 
     /**
@@ -300,6 +302,7 @@ class PcSet {
         return PcSet.#cacheWrite(this.binary_value, cache_key, true);;
     }
 
+    /** @returns {Boolean} */
     hasMyhillProperty() {
         if ( this.size < 3 ) return false;
         const cache_key = "myhill";
@@ -308,7 +311,7 @@ class PcSet {
         for ( let d = 1; d < this.size; d++ ) {
             let c = new Set();
             for ( let i = 0; i < this.size; i++ )
-                c.add(computeIntervalClass(this.at(i), this.at(i+d)));
+                c.add(computeInterval(this.at(i), this.at(i+d)));
             if ( c.size != 2 ) 
                 return PcSet.#cacheWrite(this.binary_value, cache_key, false);
         }
@@ -359,6 +362,38 @@ class PcSet {
             }
         }
         return PcSet.#cacheWrite(this.binary_value, cache_key, ( strict ) ? 2 : 1);
+    }
+
+    computePolygonalArea() {
+        if ( this.size < 3 ) return 0;
+        const points = this.#data.map((x) => {
+            const a = degToRad(30*x);
+            return { x: Math.sin(a), y: Math.cos(a) };
+        });
+        const areas = [];
+        for ( const [a,b] of pairwise(points, true) ) {
+            const w = b.x - a.x;
+            const h = (a.y + b.y) / 2;
+            areas.push(w*h);
+        }
+        return areas.reduce((sum,x) => sum += x);
+    }
+
+    hasMaximalPolygonalArea() {
+        if ( this.size < 3 ) return false;
+        if ( PcSet.#max_poly_areas == null )
+            PcSet.computeMaxPolygonalAreas();
+        return ( this.computePolygonalArea() >= PcSet.#max_poly_areas[this.size-3] );
+    }
+
+    static computeMaxPolygonalAreas() {
+        PcSet.#max_poly_areas = [];
+        for ( let i = 3; i <= 12; i++ ) {
+            let max = 0;
+            for ( const s of Object.keys(PCSET_CATALOG[i]) )
+                max = Math.max(max, new PcSet(s).computePolygonalArea());
+            PcSet.#max_poly_areas.push(Math.trunc(max*1000)/1000);
+        }
     }
 
     /** 
@@ -586,9 +621,10 @@ class PcSet {
      * Adds the specified pitch-class to the set if it is not a member of the
      * set; otherwise removes the pitch-class from the set.
      * @param  {Number} pc Pitch-class number.
+     * @returns {Boolean} _true_ if pc was added, _false_ if not.
      */
     toggle(pc) {
-        this.remove(pc) || this.add(pc);
+        return !this.remove(pc) && this.add(pc);
         //if ( !this.remove(pc) ) this.add(pc);
     }
 
