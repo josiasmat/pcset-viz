@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 "use strict";
 
-const VERSION = "2025-01-10";
+const VERSION = "2025-01-11";
 
 const config_storage = new LocalStorageHandler("pcsetviz");
 const config_visible_data = new LocalStorageHandler("pcsetviz-visible-data");
@@ -571,12 +571,9 @@ function togglePcs(pc_array) {
 
 
 function playScale() {
-    const playing_set = state.pcset.clone();
-    const duration = 0.001*playing_set.size**2 - 0.06 * playing_set.size + 0.75;
-    for ( let i = 0; i < playing_set.size; i++ ) {
-        const delay = i * duration;
-        PitchPlayer.playPitch(playing_set.at(i), duration, delay);
-    }
+    const pitches = state.pcset.toArray();
+    const duration = (0.001*pitches.length**2) - (0.06*pitches.length) + 0.75;
+    PitchPlayer.playScale(pitches, duration);
 }
 
 
