@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 "use strict";
 
 
-const POPUP_SET_SEPARATOR = "&nbsp;· ";
+const DIALOG_SET_SEPARATOR = "&nbsp;· ";
 
 var export_data = {
     pcset: null,
@@ -30,10 +30,9 @@ var export_data = {
 }
 
 
-function showConfigPopup() {
-    updateConfigPopup();
-    showPopup("popup-config");
-    //document.getElementById("popup-config").style.display="flex";
+function showConfigDialog() {
+    updateConfigDialog();
+    showDialog("dialog-config");
 }
 
 
@@ -48,7 +47,7 @@ function updateConfigMidiStatus(text, value) {
 }
 
 
-function updateConfigPopup() {
+function updateConfigDialog() {
     const checkboxes = document.querySelectorAll("#visible-data-checkboxes-area input");
     for ( let checkbox of checkboxes ) {
         const target_id = checkbox.getAttribute("target");
@@ -99,24 +98,23 @@ function selectMidiMode() {
 
 function resetVisibleDataRows() {
     data_rows.forEach( (row) => { row.visible = row.default } );
-    updateConfigPopup();
+    updateConfigDialog();
     saveConfig();
 }
 
 function setAllDataRowsVisible() {
     data_rows.forEach( (row) => { row.show() } );
-    updateConfigPopup();
+    updateConfigDialog();
     saveConfig();
 }
 
-function showAboutPopup() {
+function showAboutDialog() {
     document.getElementById("version-number").innerText = VERSION;
-    showPopup("popup-about");
-    //document.getElementById("popup-about").style.display="flex";
+    showDialog("dialog-about");
 }
 
 function showPrimeSelector() {
-    document.getElementById("popup-set-selector-second-column-header").textContent = "Prime forms";
+    document.getElementById("dialog-set-selector-second-column-header").textContent = "Prime forms";
     document.getElementById("table-set-row-filter").hidden = true;
 
     // set of cardinality 0, 1, 11 & 12
@@ -127,7 +125,7 @@ function showPrimeSelector() {
         makeSelectorSetLink("0", new PcSet("0").toString(config.set_format, true)),
         makeSelectorSetLink("0123456789A", new PcSet("0123456789A").toString(config.set_format, true)),
         makeSelectorSetLink("0123456789AB", new PcSet("0123456789AB").toString(config.set_format, true))
-    ].join(POPUP_SET_SEPARATOR);
+    ].join(DIALOG_SET_SEPARATOR);
 
     // remaining sets
     for ( let i = 2; i < 11; i++ ) {
@@ -140,15 +138,15 @@ function showPrimeSelector() {
         const id = `table-set-row${( i>1 && i<11 ) ? i : 0}`;
         const elm = document.getElementById(id);
         elm.parentElement.style.display = "table-row";
-        elm.innerHTML = links.join(POPUP_SET_SEPARATOR);
+        elm.innerHTML = links.join(DIALOG_SET_SEPARATOR);
     }
 
-    showPopup("popup-set-selector");
+    showDialog("dialog-set-selector");
 }
 
 
 function showForteSelector() {
-    document.getElementById("popup-set-selector-second-column-header").textContent = "Forte/Morris names";
+    document.getElementById("dialog-set-selector-second-column-header").textContent = "Forte/Morris names";
     document.getElementById("table-set-row-filter").hidden = true;
 
     // set of cardinality 0, 1, 11 & 12
@@ -159,7 +157,7 @@ function showForteSelector() {
         makeSelectorSetLink("0", "1-1"),
         makeSelectorSetLink("0123456789A", "11-1"),
         makeSelectorSetLink("0123456789AB", "12-1")
-    ].join(POPUP_SET_SEPARATOR);
+    ].join(DIALOG_SET_SEPARATOR);
 
     // remaining sets
     for ( let i = 2; i < 11; i++ ) {
@@ -177,15 +175,15 @@ function showForteSelector() {
         const id = `table-set-row${( i>1 && i<11 ) ? i : 0}`;
         const elm = document.getElementById(id);
         elm.parentElement.style.display = "table-row";
-        elm.innerHTML = links.join(POPUP_SET_SEPARATOR);
+        elm.innerHTML = links.join(DIALOG_SET_SEPARATOR);
     }
 
-    showPopup("popup-set-selector");
+    showDialog("dialog-set-selector");
 }
 
 
 function showCarterSelector() {
-    document.getElementById("popup-set-selector-second-column-header").textContent = "Carter numbers";
+    document.getElementById("dialog-set-selector-second-column-header").textContent = "Carter numbers";
     document.getElementById("table-set-row-filter").hidden = true;
 
     // no carter numbers for cardinality 0, 1, 11 & 12
@@ -203,15 +201,15 @@ function showCarterSelector() {
         const id = `table-set-row${( i>1 && i<11 ) ? i : 0}`;
         const elm = document.getElementById(id);
         elm.parentElement.style.display = "table-row";
-        elm.innerHTML = sets.map((set) => makeSelectorSetLink(set[0], parseInt(set[1]))).join(POPUP_SET_SEPARATOR);
+        elm.innerHTML = sets.map((set) => makeSelectorSetLink(set[0], parseInt(set[1]))).join(DIALOG_SET_SEPARATOR);
     }
 
-    showPopup("popup-set-selector");
+    showDialog("dialog-set-selector");
 }
 
 
 function showDescriptionSelector() {
-    document.getElementById("popup-set-selector-second-column-header").textContent = "Descriptive names";
+    document.getElementById("dialog-set-selector-second-column-header").textContent = "Descriptive names";
     document.getElementById("table-set-row-filter").hidden = false;
 
     const input_filter = recreateNode(document.getElementById("input-set-filter"));
@@ -269,14 +267,13 @@ function showDescriptionSelector() {
         }
     }
 
-    const popup_elm = document.getElementById("popup-set-selector");
-    const popup_style = getComputedStyle(popup_elm);
-    popup_elm.style.width = popup_style.maxWidth;
-    popup_elm.style.height = popup_style.maxHeight;
+    const dialog_elm = document.getElementById("dialog-set-selector");
+    const dialog_style = getComputedStyle(dialog_elm);
+    dialog_elm.style.width = dialog_style.maxWidth;
+    dialog_elm.style.height = dialog_style.maxHeight;
 
     updateDescriptionSelector();
-    showPopup("popup-set-selector");
-    // input_filter.focus();
+    showDialog("dialog-set-selector");
     input_filter.addEventListener("input", updateDescriptionSelector);
 
 }
@@ -284,7 +281,7 @@ function showDescriptionSelector() {
 
 function showSubsetSelector() {
     const superset = state.pcset.normal;
-    document.getElementById("popup-set-selector-second-column-header").setHTMLUnsafe( 
+    document.getElementById("dialog-set-selector-second-column-header").setHTMLUnsafe( 
         `Subsets of <span class="setfont">${superset.toString(config.set_format, true)}</span>`);
     document.getElementById("table-set-row-filter").hidden = true;
 
@@ -303,23 +300,23 @@ function showSubsetSelector() {
     // set of cardinality 0, 1, 11 & 12
     const table_row_0 = document.getElementById("table-set-row0");
     table_row_0.parentElement.style.display = "table-row";
-    table_row_0.innerHTML = links[0].concat(links[1]).concat(links[11]).concat(links[12]).join(POPUP_SET_SEPARATOR);
+    table_row_0.innerHTML = links[0].concat(links[1]).concat(links[11]).concat(links[12]).join(DIALOG_SET_SEPARATOR);
 
     // remaining sets
     for ( let i = 2; i < 11; i++ ) {
         const id = `table-set-row${( i>1 && i<11 ) ? i : 0}`;
         const elm = document.getElementById(id);
         elm.parentElement.style.display = (links[i].length == 0) ? "none" : "table-row";
-        elm.innerHTML = links[i].join(POPUP_SET_SEPARATOR);
+        elm.innerHTML = links[i].join(DIALOG_SET_SEPARATOR);
     }
 
-    showPopup("popup-set-selector");
+    showDialog("dialog-set-selector");
 }
 
 
 function showPrimeSubsetSelector() {
     const superset = state.pcset.prime;
-    document.getElementById("popup-set-selector-second-column-header").setHTMLUnsafe( 
+    document.getElementById("dialog-set-selector-second-column-header").setHTMLUnsafe( 
         `Prime subsets of <span class="setfont">${superset.toString(config.set_format, true)}</span>`);
     document.getElementById("table-set-row-filter").hidden = true;
 
@@ -338,17 +335,17 @@ function showPrimeSubsetSelector() {
     // set of cardinality 0, 1, 11 & 12
     const table_row_0 = document.getElementById("table-set-row0");
     table_row_0.parentElement.style.display = "table-row";
-    table_row_0.innerHTML = links[0].concat(links[1]).concat(links[11]).concat(links[12]).join(POPUP_SET_SEPARATOR);
+    table_row_0.innerHTML = links[0].concat(links[1]).concat(links[11]).concat(links[12]).join(DIALOG_SET_SEPARATOR);
 
     // remaining sets
     for ( let i = 2; i < 11; i++ ) {
         const id = `table-set-row${( i>1 && i<11 ) ? i : 0}`;
         const elm = document.getElementById(id);
         elm.parentElement.style.display = (links[i].length == 0) ? "none" : "table-row";
-        elm.innerHTML = links[i].join(POPUP_SET_SEPARATOR);
+        elm.innerHTML = links[i].join(DIALOG_SET_SEPARATOR);
     }
 
-    showPopup("popup-set-selector");
+    showDialog("dialog-set-selector");
 }
 
 
@@ -367,16 +364,16 @@ function showSetSelector(type = null) {
 }
 
 
-function showExportImagePopup() {
+function showExportImageDialog() {
     export_data.pcset = state.pcset.clone();
     export_data.staff.accidental_swap = Array.from(state.staff_accidental_swap);
-    loadImageExportPopupSettings();
-    showPopup("popup-export-image");
-    updateImageExportPopup();
+    loadImageExportDialogSettings();
+    showDialog("dialog-export-image");
+    updateImageExportDialog();
 }
 
 
-function imageExportPopupValidateControls() {
+function imageExportDialogValidateControls() {
     const input_inversion_index = document.getElementById("expimg-inversion-index");
     const inversion_index = parseInt(input_inversion_index.value);
     if ( inversion_index < 0 )
@@ -404,7 +401,7 @@ function imageExportPopupValidateControls() {
 }
 
 
-function updateImageExportPopup() {
+function updateImageExportDialog() {
     const file_type = document.querySelector('input[name="export-file-type"]:checked').value;
     document.getElementById("export-image-download-svg-link").hidden = (file_type != "svg");
     document.getElementById("export-image-download-png-link").hidden = (file_type != "png");
@@ -414,9 +411,9 @@ function updateImageExportPopup() {
 
     const graphics_type = document.getElementById("expimg-select-type").value;
 
-    for ( const elm of document.querySelectorAll("#popup-export-options *[includetype]") )
+    for ( const elm of document.querySelectorAll("#dialog-export-options *[includetype]") )
         elm.hidden = !(elm.getAttribute("includetype").includes(graphics_type));
-    for ( const elm of document.querySelectorAll("#popup-export-options *[excludetype]") )
+    for ( const elm of document.querySelectorAll("#dialog-export-options *[excludetype]") )
         elm.hidden = (elm.getAttribute("excludetype").includes(graphics_type));
 
     document.getElementById("chk-export-note-names").disabled = 
@@ -432,18 +429,18 @@ function updateImageExportPopup() {
         }
     }
 
-    imageExportPopupValidateControls();
+    imageExportDialogValidateControls();
     
     const preview = makeSetImage(graphics_type);
     preview.svg.setAttribute("width", "100%");
     preview.svg.setAttribute("height", "100%");
     preview.svg.setAttribute("max-width", "100%");
     preview.svg.setAttribute("max-height", "100%");
-    const div_preview = document.getElementById("popup-export-preview");
+    const div_preview = document.getElementById("dialog-export-preview");
     div_preview.style.backgroundColor = ( GRAPHICS_THEMES[theme].bg_type == "dark" )
         ? "var(--bg-dark)" : "var(--bg-light)"
     div_preview.setHTMLUnsafe(preview.svg.outerHTML);
-    saveImageExportPopupSettings();
+    saveImageExportDialogSettings();
 }
 
 
@@ -462,17 +459,17 @@ function getImageExportTheme() {
 
 function exportStaffShiftNotes(amount) {
     export_data.pcset.shift(amount);
-    updateImageExportPopup();
+    updateImageExportDialog();
 }
 
 
 function exportStaffNoteClick(pc) {
     export_data.staff.accidental_swap[pc] = !export_data.staff.accidental_swap[pc];
-    updateImageExportPopup();
+    updateImageExportDialog();
 }
 
 
-function loadImageExportPopupSettings() {
+function loadImageExportDialogSettings() {
     document.getElementById("chk-export-note-names").checked = config_export_image.readBool("note-names", config.note_names);
     document.querySelector(`input[name="expimg-show-text"][value="${config_export_image.readString("text-show", "always")}"]`).checked = true;
     document.getElementById("chk-export-polygon").checked = config_export_image.readBool("polygon", config.polygon);
@@ -504,7 +501,7 @@ function loadImageExportPopupSettings() {
 }
 
 
-function saveImageExportPopupSettings() {
+function saveImageExportDialogSettings() {
     config_export_image.writeBool("note-names", document.getElementById("chk-export-note-names").checked);
     config_export_image.writeString("text-show", document.querySelector('input[name="expimg-show-text"]:checked').value);
     config_export_image.writeBool("polygon", document.getElementById("chk-export-polygon").checked);
@@ -704,23 +701,23 @@ function elementEnableFocus(elm) {
     for ( const child of elm.children ) elementEnableFocus(child);
 }
 
-function showPopup(id) {
-    const popup_elm = document.getElementById(id);
-    popup_elm.addEventListener("close", (e) => {
+function showDialog(id) {
+    const dialog_elm = document.getElementById(id);
+    dialog_elm.addEventListener("close", (e) => {
         e.currentTarget.style.removeProperty("width");
         e.currentTarget.style.removeProperty("height");
     });
-    popup_elm.showModal();
+    dialog_elm.showModal();
 }
 
-function hidePopup(id) {
-    const popup_elm = document.getElementById(id);
-    popup_elm.close();
+function hideDialog(id) {
+    const dialog_elm = document.getElementById(id);
+    dialog_elm.close();
 }
 
-function hideAllPopups() {
-    for ( let popup of document.querySelectorAll(".popup-container") )
-        hidePopup(popup.id);
+function hideAllDialogs() {
+    for ( let dialog of document.querySelectorAll(".dialog-container") )
+        hideDialog(dialog.id);
 }
 
 function makeSelectorSetLink(set, text, options = {}) {
@@ -733,12 +730,12 @@ function handleDialogClick(e) {
     if ( this == e.target ) {
         const rect = this.getBoundingClientRect();
         if ( !isInsideRect(rect, e.clientX, e.clientY) )
-            hidePopup(this.id);
+            hideDialog(this.id);
     }
 }
 
-// Make all popups close when clicked outside them
-for ( const dg of document.querySelectorAll("dialog.popup-container") ) {
+// Make all dialogs close when clicked outside them
+for ( const dg of document.querySelectorAll("dialog.dialog-container") ) {
     dg.addEventListener("click", handleDialogClick, { passive: true });
 }
 

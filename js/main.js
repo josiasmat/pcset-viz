@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 "use strict";
 
-const VERSION = "2025-01-11";
+const VERSION = "2025-01-12";
 
 const config_storage = new LocalStorageHandler("pcsetviz");
 const config_visible_data = new LocalStorageHandler("pcsetviz-visible-data");
@@ -539,7 +539,7 @@ function goto(s, op = null, options = {}) {
     state.pcset = new PcSet(s);
     state.last_op = op;
     //input_main.value = state.pcset.toString(config.set_format, false);
-    typeof(hideAllPopups) === typeof(Function) && hideAllPopups();
+    typeof(hideAllDialogs) === typeof(Function) && hideAllDialogs();
     showPcset(options);
     //showPcset({ no_history: !push_to_history });
 }
@@ -622,7 +622,7 @@ function collectDataRows() {
             data_rows.push(new DataRow(row));
 }
 
-function populatePopupConfigVisibleData() {
+function populateConfigDialogVisibleData() {
     let checkboxes = [];
     for ( let row of data_rows ) {
         let label = row.label;
@@ -832,7 +832,7 @@ function enableKeyboardShortcuts() {
 // Run at load
 
 collectDataRows();
-populatePopupConfigVisibleData();
+populateConfigDialogVisibleData();
 readConfig();
 
 addEventListener("popstate", historyEventHandler);

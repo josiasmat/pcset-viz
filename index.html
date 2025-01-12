@@ -25,7 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         <script type="text/javascript" src="js/musicnote.js"></script>
         <script type="text/javascript" src="js/storage-handler.js"></script>
         <script type="text/javascript" src="js/clockface.js"></script>
-        <script type="text/javascript" src="js/popups.js" async></script>
+        <script type="text/javascript" src="js/dialogs.js" async></script>
         <script type="text/javascript" src="js/midi.js" async></script>
         <script type="text/javascript" src="js/audio.js" async></script>
         <script type="text/javascript" src="js/svgtools.js" defer></script>
@@ -167,42 +167,42 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     <a href="javascript:playScale()">Play</a>
                                 </span> · 
                                 <span>
-                                    <a href="javascript:showExportImagePopup()">Export&nbsp;image</a>
+                                    <a href="javascript:showExportImageDialog()">Export&nbsp;image</a>
                                 </span> · 
                                 <span>
-                                    <a href="javascript:showConfigPopup()">Options</a>
+                                    <a href="javascript:showConfigDialog()">Options</a>
                                 </span> · 
                                 <span>
-                                    <a href="javascript:showAboutPopup()">About</a>
+                                    <a href="javascript:showAboutDialog()">About</a>
                                 </span>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <dialog id="popup-about" class="popup-container">
-                <div class="popup-header">
-                    <span class="popup-title">ABOUT</span>
-                    <a class="close-button" href="javascript:hidePopup('popup-about')" autofocus>&#128473;</a>
+            <dialog id="dialog-about" class="dialog-container">
+                <div class="dialog-header">
+                    <span class="dialog-title">ABOUT</span>
+                    <a class="close-button" href="javascript:hideDialog('dialog-about')" autofocus>&#128473;</a>
                 </div>
-                <div class="popup-main">
+                <div class="dialog-main">
                     <b>Pitch-Class Set Visualizer, version <span id="version-number"></span></b>.<br />
                     Licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">GNU Affero General Public License version 3</a>.<br />
                     &#169;&nbsp;2024 Josias Matschulat.<br /><br />
                     Descriptive names adapted from Larry Solomon, &#169;&nbsp;1997, 2005,<br />with additions from Straus, 2016.
                 </div>
             </dialog>
-            <dialog id="popup-set-selector" class="popup-container">
-                <div class="popup-header">
-                    <span class="popup-title">SET SELECTOR</span>
-                    <a class="close-button" href="javascript:hidePopup('popup-set-selector')">&#128473;</a>
+            <dialog id="dialog-set-selector" class="dialog-container">
+                <div class="dialog-header">
+                    <span class="dialog-title">SET SELECTOR</span>
+                    <a class="close-button" href="javascript:hideDialog('dialog-set-selector')">&#128473;</a>
                 </div>
-                <div class="popup-main">
+                <div class="dialog-main">
                     <table id="table-set-selector">
                         <tbody>
                             <tr>
                                 <th>Type</th>
-                                <th id="popup-set-selector-second-column-header">Sets</th>
+                                <th id="dialog-set-selector-second-column-header">Sets</th>
                             </tr>
                             <tr id="table-set-row-filter">
                                 <td><label for="input-set-filter" i18n="input-set-filter">Filter:</label></td>
@@ -252,13 +252,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                     </table>
                 </div>
             </dialog>
-            <dialog id="popup-config" class="popup-container">
-                <div class="popup-header">
-                    <span class="popup-title">OPTIONS</span>
-                    <a class="close-button" href="javascript:hidePopup('popup-config')">&#128473;</a>
+            <dialog id="dialog-config" class="dialog-container">
+                <div class="dialog-header">
+                    <span class="dialog-title">OPTIONS</span>
+                    <a class="close-button" href="javascript:hideDialog('dialog-config')">&#128473;</a>
                 </div>
-                <div class="popup-main">
-                    <table id="popup-config-table">
+                <div class="dialog-main">
+                    <table id="dialog-config-table">
                         <tbody>
                             <tr>
                                 <td>Visible data<br />
@@ -428,21 +428,21 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                     </table>
                 </div>
             </dialog>
-            <dialog id="popup-export-image" class="popup-container">
-                <div class="popup-header">
-                    <span class="popup-title">EXPORT IMAGE</span>
-                    <a class="close-button" href="javascript:hidePopup('popup-export-image')">&#128473;</a>
+            <dialog id="dialog-export-image" class="dialog-container">
+                <div class="dialog-header">
+                    <span class="dialog-title">EXPORT IMAGE</span>
+                    <a class="close-button" href="javascript:hideDialog('dialog-export-image')">&#128473;</a>
                 </div>
-                <div class="popup-main">
-                    <div id="popup-export-preview">
+                <div class="dialog-main">
+                    <div id="dialog-export-preview">
                         <span></span>
                     </div>
-                    <div id="popup-export-options">
+                    <div id="dialog-export-options">
                         <table>
                             <tbody>
                                 <tr>
                                     <td><label for="expimg-select-type">Type</label></td>
-                                    <td><select name="expimg-type" id="expimg-select-type" onchange="updateImageExportPopup()" autofocus>
+                                    <td><select name="expimg-type" id="expimg-select-type" onchange="updateImageExportDialog()" autofocus>
                                         <option value="clockface-set">Clockface (set)</option>
                                         <option value="clockface-intervals">Clockface (intervals)</option>
                                         <option value="clockface-inversion">Clockface (inversion)</option>
@@ -456,7 +456,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     <td>Invert</td>
                                     <td>
                                         <label for="expimg-inversion-index">Index:</label>
-                                        <input type="number" id="expimg-inversion-index" name="expimg-inversion-index" oninput="updateImageExportPopup()" 
+                                        <input type="number" id="expimg-inversion-index" name="expimg-inversion-index" oninput="updateImageExportDialog()" 
                                             value="0" min="-1" max="12" step="1" list="expimg-inversion-index-list"/>
                                     </td>
                                     <datalist id="expimg-inversion-index-list">
@@ -472,7 +472,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     <td>Transpose</td>
                                     <td>
                                         <label for="expimg-transposition-index">Index:</label>
-                                        <input type="number" id="expimg-transposition-index" name="expimg-transposition-index" oninput="updateImageExportPopup()" 
+                                        <input type="number" id="expimg-transposition-index" name="expimg-transposition-index" oninput="updateImageExportDialog()" 
                                             value="1" min="-12" max="12" step="1" previous="1" list="expimg-transposition-index-list"/>
                                     </td>
                                     <!-- <datalist id="expimg-transposition-index-list">
@@ -488,7 +488,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     <td><label for="expimg-first-pc">Start at</label></td>
                                     <td>
                                         <span class="range-label">0</span>
-                                        <input type="range" id="expimg-first-pc" name="expimg-first-pc" oninput="updateImageExportPopup()" 
+                                        <input type="range" id="expimg-first-pc" name="expimg-first-pc" oninput="updateImageExportDialog()" 
                                         value="0" min="0" max="11" step="1" list="expimg-first-pc-list"/>
                                         <span class="range-label">11</span>
                                     </td>
@@ -506,17 +506,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     <td>
                                         <span>
                                             <label for="expimg-tonnetz-width">Width:</label>
-                                            <input type="number" id="expimg-tonnetz-width" name="expimg-tonnetz-width" oninput="updateImageExportPopup()" 
+                                            <input type="number" id="expimg-tonnetz-width" name="expimg-tonnetz-width" oninput="updateImageExportDialog()" 
                                                 value="6" min="2" max="20" step="1" />
                                         </span>
                                         <span>
                                             <label for="expimg-tonnetz-height">Height:</label>
-                                            <input type="number" id="expimg-tonnetz-height" name="expimg-tonnetz-height" oninput="updateImageExportPopup()" 
+                                            <input type="number" id="expimg-tonnetz-height" name="expimg-tonnetz-height" oninput="updateImageExportDialog()" 
                                                 value="5" min="2" max="20" step="1" />
                                         </span>
                                         <span>
                                             <label for="expimg-tonnetz-centerpc">PC at center:</label>
-                                            <input type="number" id="expimg-tonnetz-centerpc" name="expimg-tonnetz-centerpc" oninput="updateImageExportPopup()" 
+                                            <input type="number" id="expimg-tonnetz-centerpc" name="expimg-tonnetz-centerpc" oninput="updateImageExportDialog()" 
                                                 value="4" min="-1" max="12" step="1" />
                                         </span>
                                     </td>
@@ -533,64 +533,64 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     <td>Elements</td>
                                     <td id="expimg-elements-area">
                                         <span includetype="clockface-intervals">
-                                            <input id="chk-export-ic1" type="checkbox" onchange="updateImageExportPopup()">
+                                            <input id="chk-export-ic1" type="checkbox" onchange="updateImageExportDialog()">
                                             <label for="chk-export-ic1">IC1</label>
                                         </span>
                                         <span includetype="clockface-intervals">
-                                            <input id="chk-export-ic2" type="checkbox" onchange="updateImageExportPopup()">
+                                            <input id="chk-export-ic2" type="checkbox" onchange="updateImageExportDialog()">
                                             <label for="chk-export-ic2">IC2</label>
                                         </span>
                                         <span includetype="clockface-intervals">
-                                            <input id="chk-export-ic3" type="checkbox" onchange="updateImageExportPopup()">
+                                            <input id="chk-export-ic3" type="checkbox" onchange="updateImageExportDialog()">
                                             <label for="chk-export-ic3">IC3</label>
                                         </span>
                                         <span includetype="clockface-intervals">
-                                            <input id="chk-export-ic4" type="checkbox" onchange="updateImageExportPopup()">
+                                            <input id="chk-export-ic4" type="checkbox" onchange="updateImageExportDialog()">
                                             <label for="chk-export-ic4">IC4</label>
                                         </span>
                                         <span includetype="clockface-intervals">
-                                            <input id="chk-export-ic5" type="checkbox" onchange="updateImageExportPopup()">
+                                            <input id="chk-export-ic5" type="checkbox" onchange="updateImageExportDialog()">
                                             <label for="chk-export-ic5">IC5</label>
                                         </span>
                                         <span includetype="clockface-intervals">
-                                            <input id="chk-export-ic6" type="checkbox" onchange="updateImageExportPopup()">
+                                            <input id="chk-export-ic6" type="checkbox" onchange="updateImageExportDialog()">
                                             <label for="chk-export-ic6">IC6</label>
                                         </span>
                                         <span includetype="clockface-set">
-                                            <input id="chk-export-polygon" type="checkbox" onchange="updateImageExportPopup()">
+                                            <input id="chk-export-polygon" type="checkbox" onchange="updateImageExportDialog()">
                                             <label for="chk-export-polygon">Set geometry</label>
                                         </span>
                                         <span includetype="clockface-set">
-                                            <input id="chk-export-sym-axes" type="checkbox" onchange="updateImageExportPopup()">
+                                            <input id="chk-export-sym-axes" type="checkbox" onchange="updateImageExportDialog()">
                                             <label for="chk-export-sym-axes">Axes of symmetry</label>
                                         </span>
                                         <span includetype="clockface-inversion">
-                                            <input id="chk-export-inversion-axis" type="checkbox" onchange="updateImageExportPopup()">
+                                            <input id="chk-export-inversion-axis" type="checkbox" onchange="updateImageExportDialog()">
                                             <label for="chk-export-inversion-axis">Inversion axis</label>
                                         </span>
                                         <span includetype="clockface-inversion clockface-transposition">
-                                            <input id="chk-all-paths" type="checkbox" onchange="updateImageExportPopup()">
+                                            <input id="chk-all-paths" type="checkbox" onchange="updateImageExportDialog()">
                                             <label for="chk-all-paths">All paths</label>
                                         </span>
                                         <span includetype="tonnetz-set">
-                                            <input id="chk-tonnetz-show-all-pcs" type="checkbox" onchange="updateImageExportPopup()">
+                                            <input id="chk-tonnetz-show-all-pcs" type="checkbox" onchange="updateImageExportDialog()">
                                             <label for="chk-tonnetz-show-all-pcs">All pitch classes</label>
                                         </span>
                                         <span includetype="tonnetz-set">
-                                            <input id="chk-tonnetz-show-all-connections" type="checkbox" onchange="updateImageExportPopup()">
+                                            <input id="chk-tonnetz-show-all-connections" type="checkbox" onchange="updateImageExportDialog()">
                                             <label for="chk-tonnetz-show-all-connections">All connections</label>
                                         </span>
                                         <span includetype="clockface-set clockface-intervals clockface-inversion clockface-transposition">
-                                            <input id="chk-export-fifths" type="checkbox" onchange="updateImageExportPopup()">
+                                            <input id="chk-export-fifths" type="checkbox" onchange="updateImageExportDialog()">
                                             <label for="chk-export-fifths">Circle of fifths</label>
                                         </span>
                                         <span includetype="ruler-set">
-                                            <input id="chk-export-double-row" type="checkbox" onchange="updateImageExportPopup()">
+                                            <input id="chk-export-double-row" type="checkbox" onchange="updateImageExportDialog()">
                                             <label for="chk-export-double-row">Double row (as in a keyboard)</label>
                                         </span>
                                         <span includetype="staff-set" style="padding-right: 0.5ch;">
                                             <label for="expimg-select-staff-clef">Clef:</label>
-                                            <select name="expimg-staff-clef" id="expimg-select-staff-clef" onchange="updateImageExportPopup()">
+                                            <select name="expimg-staff-clef" id="expimg-select-staff-clef" onchange="updateImageExportDialog()">
                                                 <option value="G2">Treble</option>
                                                 <option value="C3">Alto</option>
                                                 <option value="C4">Tenor</option>
@@ -599,7 +599,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                         </span>
                                         <span includetype="staff-set" style="padding-right: 0.5ch;">
                                             <label for="expimg-select-staff-notehead">Notehead:</label>
-                                            <select name="expimg-staff-notehead" id="expimg-select-staff-notehead" onchange="updateImageExportPopup()">
+                                            <select name="expimg-staff-notehead" id="expimg-select-staff-notehead" onchange="updateImageExportDialog()">
                                                 <option value="q">Quarter</option>
                                                 <option value="h">Half</option>
                                                 <option value="w">Whole</option>
@@ -607,7 +607,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                         </span>
                                         <span includetype="staff-set">
                                             <label for="expimg-select-staff-barline">Barline:</label>
-                                            <select name="expimg-staff-barline" id="expimg-select-staff-barline" onchange="updateImageExportPopup()">
+                                            <select name="expimg-staff-barline" id="expimg-select-staff-barline" onchange="updateImageExportDialog()">
                                                 <option value="">None</option>
                                                 <option value="single">Single</option>
                                                 <option value="double">Double</option>
@@ -621,21 +621,21 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     <td id="expimg-text-options-area">
                                         <span>
                                             <input id="rad-expimg-text-always" name="expimg-show-text" type="radio" 
-                                                value="always" checked onchange="updateImageExportPopup()">
+                                                value="always" checked onchange="updateImageExportDialog()">
                                             <label for="rad-expimg-text-always">Show all</label>
                                         </span>
                                         <span>
                                             <input id="rad-expimg-text-enabled" name="expimg-show-text" type="radio" 
-                                                value="enabled" onchange="updateImageExportPopup()">
+                                                value="enabled" onchange="updateImageExportDialog()">
                                             <label for="rad-expimg-text-enabled">Only enabled</label>
                                         </span>
                                         <span>
                                             <input id="rad-expimg-text-never" name="expimg-show-text" type="radio"
-                                                value="never" onchange="updateImageExportPopup()">
+                                                value="never" onchange="updateImageExportDialog()">
                                             <label for="rad-expimg-text-never">Hide all</label>
                                         </span>
                                         <span>
-                                            <input id="chk-export-note-names" type="checkbox" onchange="updateImageExportPopup()">
+                                            <input id="chk-export-note-names" type="checkbox" onchange="updateImageExportDialog()">
                                             <label for="chk-export-note-names">Note names instead of numbers</label>
                                         </span>
                                     </td>
@@ -651,7 +651,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     <td><label for="expimg-select-theme">Theme</label></td>
                                     <td>
                                         <span excludetype="staff-set" style="padding-right: 0.5ch;">
-                                            <select name="expimg-theme" id="expimg-select-theme" onchange="updateImageExportPopup()">
+                                            <select name="expimg-theme" id="expimg-select-theme" onchange="updateImageExportDialog()">
                                                 <option value="basic">Simple</option>
                                                 <option value="hard">Strong</option>
                                                 <option value="solid">Solid</option>
@@ -660,7 +660,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                         </span>
                                         <span style="padding-right: 0.5ch;">
                                             <label for="expimg-select-theme-color">Color:</label>
-                                            <select name="expimg-theme-color" id="expimg-select-theme-color" onchange="updateImageExportPopup()">
+                                            <select name="expimg-theme-color" id="expimg-select-theme-color" onchange="updateImageExportDialog()">
                                                 <option value="">None</option>
                                                 <option value="red">Red</option>
                                                 <option value="green">Green</option>
@@ -670,7 +670,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                         </span>
                                         <span>
                                             <label for="expimg-select-theme-bg">Background:</label>
-                                            <select name="expimg-theme-bg" id="expimg-select-theme-bg" onchange="updateImageExportPopup()">
+                                            <select name="expimg-theme-bg" id="expimg-select-theme-bg" onchange="updateImageExportDialog()">
                                                 <option value="light">Light</option>
                                                 <option value="dark">Dark</option>
                                             </select>
@@ -681,7 +681,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     <td><label for="expimg-scale">Scaling</label></td>
                                     <td>
                                         <span class="range-label">Small</span>
-                                        <input type="range" id="expimg-scale" name="expimg-scale" oninput="updateImageExportPopup()" 
+                                        <input type="range" id="expimg-scale" name="expimg-scale" oninput="updateImageExportDialog()" 
                                         value="1.15" min="1.0" max="1.3" step="0.075" list="expimg-scale-list"/>
                                         <span class="range-label">Large</span>
                                     </td>
@@ -697,7 +697,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     <td><label for="expimg-stroke">Strokes</label></td>
                                     <td>
                                         <span class="range-label">Thin</span>
-                                        <input type="range" id="expimg-stroke" name="expimg-stroke" oninput="updateImageExportPopup()" 
+                                        <input type="range" id="expimg-stroke" name="expimg-stroke" oninput="updateImageExportDialog()" 
                                         value="2.0" min="1.25" max="4.25" step="0.75" list="expimg-stroke-list"/>
                                         <span class="range-label">Thick</span>
                                     </td>
@@ -713,16 +713,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     <td>Format</td>
                                     <td>
                                         <span>
-                                            <input id="radio-export-file-svg" type="radio" name="export-file-type" value="svg" onchange="updateImageExportPopup()" checked>
+                                            <input id="radio-export-file-svg" type="radio" name="export-file-type" value="svg" onchange="updateImageExportDialog()" checked>
                                             <label for="radio-export-file-svg">SVG image</label>
                                         </span>
                                         <span>
-                                            <input id="radio-export-file-png" type="radio" name="export-file-type" value="png" onchange="updateImageExportPopup()">
+                                            <input id="radio-export-file-png" type="radio" name="export-file-type" value="png" onchange="updateImageExportDialog()">
                                             <label for="radio-export-file-png">PNG image</label>
                                         </span>
                                         <span id="span-input-export-file-png-size" hidden>
                                             <label for="input-export-file-png-size">Height:</label>
-                                            <input id="input-export-file-png-size" type="number" value="1000" step="100" min="100" max="10000" onchange="updateImageExportPopup()"/>
+                                            <input id="input-export-file-png-size" type="number" value="1000" step="100" min="100" max="10000" onchange="updateImageExportDialog()"/>
                                             <label for="input-export-file-png-size"> pixels</label>
                                         </span>
                                     </td>

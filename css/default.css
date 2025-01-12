@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 :root {
     --serif-font: "Frank Ruhl Libre", serif;
-    --bg-light: white;
+    --bg-light: #fbfbfb;
     --bg-dark: #111;
     --fg-light: black;
     --fg-dark: #eee;
@@ -49,13 +49,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         --pc-moving-from-stroke: red;
         --pc-moving-to-stroke: green;
         --pc-moving-to-fill: #98ffbf;
-        --popup-border-color: var(--bg-color);
-        --popup-bg-dim-color: rgba(63, 63, 63, 0.9);
-        --popup-shadow-color: black;
-        --popup-title-bg-color: #333;
-        --popup-title-fg-color: white;
-        --close-btn-bg-color: var(--popup-title-bg-color);
-        --close-btn-fg-color: var(--popup-title-fg-color);
+        --dialog-border-color: var(--bg-color);
+        --dialog-bg-dim-color: rgba(63, 63, 63, 0.9);
+        --dialog-shadow-color: black;
+        --dialog-title-bg-color: #333;
+        --dialog-title-fg-color: white;
+        --close-btn-bg-color: var(--dialog-title-bg-color);
+        --close-btn-fg-color: var(--dialog-title-fg-color);
     }
     &[theme="dark"] {
         --bg-border-color: #333;
@@ -79,11 +79,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         --pc-moving-from-stroke: red;
         --pc-moving-to-stroke: lightgreen;
         --pc-moving-to-fill: darkgreen;
-        --popup-border-color: #777;
-        --popup-bg-dim-color: rgba(63, 63, 63, 0.9);
-        --popup-shadow-color: black;
-        --popup-title-bg-color: #444;
-        --popup-title-fg-color: var(--fg-color);
+        --dialog-border-color: #777;
+        --dialog-bg-dim-color: rgba(63, 63, 63, 0.9);
+        --dialog-shadow-color: black;
+        --dialog-title-bg-color: #444;
+        --dialog-title-fg-color: var(--fg-color);
     }
 }
 
@@ -139,9 +139,9 @@ main {
 }
 
 #visualization-area, #data-area {
-    padding: 10px;
     border: 6px solid var(--bg-border-color);
     box-sizing: border-box;
+    padding: 10px;
 }
 
 #visualization-area {
@@ -247,7 +247,7 @@ main {
 }
 
 @media (aspect-ratio < 0.7) {
-    .popup-container {
+    .dialog-container {
         font-size: 3.3vw;
         input, select, label {
             font-size: 3.0vw;
@@ -255,34 +255,34 @@ main {
     }
 }
 
-dialog.popup-container[open] {
+dialog.dialog-container[open] {
     overflow: hidden;
     box-sizing: border-box;
     max-width: 95%;
     padding: 4px;
     color: var(--fg-color);
     background-color: var(--bg-color);
-    border: 2px solid var(--popup-border-color);
-    filter: drop-shadow(5px 5px 8px var(--popup-shadow-color));
+    border: 2px solid var(--dialog-border-color);
+    filter: drop-shadow(5px 5px 8px var(--dialog-shadow-color));
     display: flex;
     flex-direction: column;
 }
 
 ::backdrop {
-    background-color: var(--popup-bg-dim-color);
+    background-color: var(--dialog-bg-dim-color);
     backdrop-filter: blur(2px);
 }
   
-.popup-header {
+.dialog-header {
     width: 100%;
     box-sizing: border-box;
-    background-color: var(--popup-title-bg-color);
+    background-color: var(--dialog-title-bg-color);
     padding: 4px;
     height: 2.2lh;
     line-height: 100%;
     text-align: center;
     margin-bottom: 5px;
-    .popup-title {
+    .dialog-title {
         display: inline-block;
         vertical-align: middle;
         text-align: center;
@@ -290,12 +290,12 @@ dialog.popup-container[open] {
         margin-left: 1.8lh;
         font-size: larger;
         font-weight: bold;
-        color: var(--popup-title-fg-color);
+        color: var(--dialog-title-fg-color);
     }
     .close-button {
         float: inline-end;
-        background-color: var(--popup-title-bg-color);
-        color: var(--popup-title-fg-color);
+        background-color: var(--dialog-title-bg-color);
+        color: var(--dialog-title-fg-color);
         font-size: larger;
         border: none;
         padding: 0.3lh !important;
@@ -308,25 +308,25 @@ dialog.popup-container[open] {
         }
         .svg-icon {
             padding: 0 3px;
-            fill: var(--popup-title-fg-color);
+            fill: var(--dialog-title-fg-color);
             vertical-align: 0;
         }
     }
 }
 
-.popup-main {
+.dialog-main {
     overflow: auto;
     box-sizing: border-box;
     width: 100%;
     padding: 6px;
 }
 
-#popup-about .popup-main {
+#dialog-about .dialog-main {
     padding: 25px;
     line-height: 150%;
 }
 
-#popup-set-selector {
+#dialog-set-selector {
     width: 85%;
     min-width: min(70ch, 95%);
     max-width: 95%;
@@ -353,7 +353,7 @@ dialog.popup-container[open] {
     }
 }
 
-#popup-config {
+#dialog-config {
     width: 80%;
     min-width: min(90ch, 95%);
     max-width: 95%;
@@ -382,10 +382,10 @@ dialog.popup-container[open] {
 }
 
 @media (aspect-ratio >= 1.2) {
-    #popup-export-image .popup-main {
+    #dialog-export-image .dialog-main {
         flex-direction: row;
     }
-    #popup-export-options {
+    #dialog-export-options {
         margin-left: 8px;
         padding-left: 7px;
         border-left: 3px solid var(--table-alternate-color);
@@ -393,35 +393,35 @@ dialog.popup-container[open] {
 }
 
 @media (aspect-ratio < 1.2) {
-    #popup-export-image .popup-main {
+    #dialog-export-image .dialog-main {
         flex-direction: column-reverse;
     }
-    #popup-export-preview {
+    #dialog-export-preview {
         max-height: 50vh;
     }
-    #popup-export-options {
+    #dialog-export-options {
         margin-bottom: 8px;
         padding-bottom: 7px;
         border-bottom: 3px solid var(--table-alternate-color);
     }
 }
 
-#popup-export-image {
+#dialog-export-image {
     width: 80%;
     min-width: min(110ch, 95%);
     max-width: 95%;
     max-height: 95%;
-    .popup-main {
+    .dialog-main {
         display: flex;
     }
-    #popup-export-preview {
+    #dialog-export-preview {
         flex: 1 0;
         aspect-ratio: 1;
         margin: 2px;
         padding: 8px;
         box-sizing: border-box;
     }
-    #popup-export-options {
+    #dialog-export-options {
         flex: 2 1;
         max-height: fit-content;
         min-width: 54ch;
