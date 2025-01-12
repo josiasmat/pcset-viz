@@ -35,7 +35,10 @@ const PitchPlayer = {
         23.12, 24.5, 25.96, 27.5, 29.14, 30.87
     ],
 
-    createSingleOscillator(pc) {
+    playing : Array(12).fill(false),
+    timeouts : Array(12).fill(null),
+
+    createOscillator(pc) {
         const real = new Float32Array(257).fill(0.0);
         const imag = new Float32Array(257).fill(0.0);
         for ( let i = 1; i <= 512; i*=2 ) real[i] = 1.0;
@@ -45,7 +48,13 @@ const PitchPlayer = {
         );
         osc.frequency.setValueAtTime(this.base_freqs[pc], this.audio_ctx.currentTime);
         osc.connect(this.gains[pc]);
-        this.oscillators[pc] = [osc];
+        osc.start();
+        this.oscillators[pc] = osc;
+        return osc;
+    },
+
+    isAudioRunning() {
+        return ( this.audio_ctx != null && this.audio_ctx.state == "running" );
     },
 
     initialize() {
@@ -59,6 +68,7 @@ const PitchPlayer = {
             g.gain.value = 0;
             g.connect(hpf);
             this.gains[pc] = g;
+            this.createOscillator(pc);
         }
     },
 
@@ -73,35 +83,39 @@ const PitchPlayer = {
     setGradualGainChange(pc, from, to, ramp = 0, delay = 0) {
         const now = this.audio_ctx.currentTime;
         const end = now + ramp + delay;
+        this.gains[pc].gain.cancelScheduledValues(now);
         this.gains[pc].gain.setValueAtTime(from, now + delay);
         this.gains[pc].gain.linearRampToValueAtTime(to, end);
         return end;
     },
 
     playPitch(pitch, duration = 0, delay = 0) {
-        if ( this.audio_ctx == null )
+        if ( !this.isAudioRunning() ) {
             this.initialize();
-        const pc = pitch%12;
-        if ( !this.oscillators[pc] ) {
-            this.createSingleOscillator(pc);
-            this.setGradualGainChange(pc, 0, this.gain, this.fade_in, delay);
-            for ( const osc of this.oscillators[pc] )
-                osc.start();
+            return;
         }
-        if ( duration > 0 )
-            this.stopPitch(pitch, delay + duration);
+        const pc = pitch%12;
+        if ( !this.playing[pc] ) {
+            this.playing[pc] = true;
+            this.setGradualGainChange(pc, 0, this.gain, this.fade_in, delay);
+        }
+        if ( this.timeouts[pc] ) clearTimeout(this.timeouts[pc]);
+        if ( duration > 0 ) {
+            this.timeouts[pc] = setTimeout((timeouts) => { 
+                    this.stopPitch(pitch); 
+                    timeouts[pc] = null;
+                }, 1000*(delay+duration), this.timeouts
+            );
+        }
     },
 
     stopPitch(pitch, delay = 0) {
+        if ( !this.isAudioRunning() )
+            return;
         const pc = pitch%12;
-        if ( this.oscillators[pc] ) {
-            const end_time = this.setGradualGainChange(pc, this.gain, 0, this.fade_out, delay);
-            for ( const osc of this.oscillators[pc] ) {
-                osc.addEventListener("ended", (e) => { e.target.disconnect(this.gains[pc]); });
-                
-                osc.stop(end_time);
-            }
-            this.oscillators[pc] = null;
+        if ( this.playing[pc] ) {
+            this.setGradualGainChange(pc, this.gain, 0, this.fade_out, delay);
+            this.playing[pc] = false;
         }
     },
 
@@ -110,6 +124,10 @@ const PitchPlayer = {
      * @param {Number} pitch_duration 
      */
     playScale(pitches, pitch_duration) {
+        if ( !this.isAudioRunning() ) {
+            this.initialize();
+            return;
+        }
         for ( let i = 0; i < pitches.length; i++ ) {
             const delay = i * pitch_duration;
             this.playPitch(pitches[i], pitch_duration, delay);
