@@ -23,8 +23,9 @@ const SVGNS = "http://www.w3.org/2000/svg";
 const SvgTools = {
 
     /**
-     * @param {String} type 
-     * @param {Object} attributes 
+     * Creates a SVG element.
+     * @param {String} type - Element type.
+     * @param {Object} attributes - Optional argument to pass attributes.
      * @returns {SVGElement}
      */
     createElement(type, attributes = {}) {
@@ -36,7 +37,7 @@ const SvgTools = {
 
     /**
      * Creates a SVG root element.
-     * @param {Object} attributes 
+     * @param {Object} attributes - Optional argument to pass attributes.
      * @returns {SVGSVGElement}
      */
     createRootElement(attributes = {}) {
@@ -48,10 +49,24 @@ const SvgTools = {
         return svg;
     },
 
+    /**
+     * Creates a SVG group element.
+     * @param {Object} attributes - Optional argument to pass attributes.
+     * @returns {SVGGElement}
+     */
     createGroup(attributes = {}) {
         return this.createElement("g", attributes);
     },
 
+    /**
+     * Creates a SVG line element.
+     * @param {Number} x1 - First point x coordinate.
+     * @param {Number} y1 - First point y coordinate.
+     * @param {Number} x2 - Second point x coordinate.
+     * @param {Number} y2 - Second point y coordinate.
+     * @param {Object} attributes - Optional argument to pass additional attributes.
+     * @returns {SVGLineElement}
+     */
     makeLine(x1, y1, x2, y2, attributes) {
         const line = this.createElement("line", attributes);
         line.setAttribute("x1", x1);
@@ -61,14 +76,28 @@ const SvgTools = {
         return line;
     },
 
-    makeCircle(x, y, r, attributes) {
-        attributes.cx = x;
-        attributes.cy = y;
-        attributes.r = r;
+    /**
+     * Creates a SVG circle element.
+     * @param {Number} x - Horizontal center of the circle.
+     * @param {Number} y - Vertical center of the circle.
+     * @param {Number} r - Radius of the circle.
+     * @param {Object} attributes - Optional argument to pass additional attributes.
+     * @returns {SVGCircleElement}
+     */
+    makeCircle(x, y, r, attributes = {}) {
         const circle = this.createElement("circle", attributes);
+        circle.setAttribute("cx", x);
+        circle.setAttribute("cy", y);
+        circle.setAttribute("r", r);
         return circle;
     },
     
+    /**
+     * Creates a SVG polygon element.
+     * @param {{x: Number, y: Number}[]} points - An array of objects with _x_ and _y_ properties.
+     * @param {Object} attributes - Optional argument to pass additional attributes.
+     * @returns {SVGPolygonElement}
+     */
     makePolygon(points, attributes = {}) {
         const count = points.length;
         const polygon = this.createElement("path", attributes);
@@ -82,6 +111,15 @@ const SvgTools = {
         return polygon;
     },
     
+    /**
+     * Creates a SVG path element.
+     * @param {Array|String} d - The _d_ attribute of the path element, which can be a
+     *      string or an array of numbers and strings containing the data.
+     * @param {Object} attributes - Optional argument to pass additional attributes.
+     * @param {Number} x - Optional horizontal offset.
+     * @param {Number} y - Optional vertical offset.
+     * @returns {SVGPathElement}
+     */
     makePath(d, attributes = {}, x = null, y = null) {
         const path = this.createElement("path", attributes);
         path.setAttribute("d", ( Array.isArray(d) ? d.join(" ") : d ));
@@ -90,6 +128,13 @@ const SvgTools = {
         return path;
     },
     
+    /**
+     * Creates a simple SVG arrow marker element.
+     * @param {String} id - The _id_ attribute of the SVG element.
+     * @param {Number} size - Length of the side of the arrow.
+     * @param {Object} attributes - Optional argument to pass additional attributes.
+     * @returns {SVGElement}
+     */
     makeSimpleArrowMarker(id, size, attributes = {}) {
         const path = this.makePath(
             ['M', 0, 0, 'L', 10, 5, 'L', 0, 10, 'Z'], attributes
