@@ -19,15 +19,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 const viz = {
+    /** @type {SVGSVGElement} */
     svg_root: null,
+    /** @type {SVGGElement} */
     svg_main: null,
     viewport: { w: 0, h: 0, min: 0, cx: 0, cy: 0 },
     pitches: Array(12).fill(null),
     pitch_circle_radius: 0,
     pitch_circle_center_distance: 0,
     pitch_circle_border_distance: 0,
+    /** @type {SVGPolygonElement} */
     polygon: null,
+    /** @type {SVGGElement} */
     intervals_group: null,
+    /** @type {SVGGElement} */
     sym_lines_group: null,
     move_line: null,
     arrow_marker: null,

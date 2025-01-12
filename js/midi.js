@@ -31,7 +31,9 @@ const midi = {
         enabled: false,
         pressed: false,
     },
+    /** @type {(pc: Number)=>Void?} */
     on_pc_on: null,
+    /** @type {(pc: Number)=>Void?} */
     on_pc_off: null,
     keyPressed(key) {
         return ( this.pedal.enabled && this.pedal.pressed )
@@ -62,6 +64,9 @@ const midi = {
         this.pcs = Array(12).fill(0);
         this.notes = Array(128).fill(false);
         this.pedal.pressed = false;
+        if ( this.on_pc_off )
+            for ( let pc = 0; pc < 12; pc++ )
+                this.on_pc_off(pc);
     },
     last_event_timestamp : 0,
     last_event_time_delta : 0,
@@ -277,7 +282,7 @@ function loadMidiConfig() {
     const dev_name = config_midi_storage.readString("last-device-name", "");
     if ( dev_name )
         connectMidiDeviceByName(dev_name);
-    midi.on_pc_on = (pc) => { if ( config.sound_midi ) PitchPlayer.playPitch(pc) };
+    midi.on_pc_on  = (pc) => { if ( config.sound_midi ) PitchPlayer.playPitch(pc) };
     midi.on_pc_off = (pc) => { if ( config.sound_midi ) PitchPlayer.stopPitch(pc) };
 }
 
