@@ -121,10 +121,10 @@ function showPrimeSelector() {
     const table_row_0 = document.getElementById("table-set-row0");
     table_row_0.parentElement.style.display = "table-row";
     table_row_0.innerHTML = [
-        makeSelectorSetLink("", new PcSet().toString(config.set_format, true)),
-        makeSelectorSetLink("0", new PcSet("0").toString(config.set_format, true)),
-        makeSelectorSetLink("0123456789A", new PcSet("0123456789A").toString(config.set_format, true)),
-        makeSelectorSetLink("0123456789AB", new PcSet("0123456789AB").toString(config.set_format, true))
+        makeSelectorSetLink("", new PcSet().toString(config.set_format, config.set_brackets)),
+        makeSelectorSetLink("0", new PcSet("0").toString(config.set_format, config.set_brackets)),
+        makeSelectorSetLink("0123456789A", new PcSet("0123456789A").toString(config.set_format, config.set_brackets)),
+        makeSelectorSetLink("0123456789AB", new PcSet("0123456789AB").toString(config.set_format, config.set_brackets))
     ].join(DIALOG_SET_SEPARATOR);
 
     // remaining sets
@@ -132,7 +132,7 @@ function showPrimeSelector() {
         let links = []
         for ( let entry of Object.entries(PCSET_CATALOG[i]) ) {
             const set = entry[0].slice(1,-1);
-            const text = new PcSet(entry[0]).toString(config.set_format, true);
+            const text = new PcSet(entry[0]).toString(config.set_format, config.set_brackets);
             links.push(makeSelectorSetLink(set, text));
         }
         const id = `table-set-row${( i>1 && i<11 ) ? i : 0}`;
@@ -236,8 +236,8 @@ function showDescriptionSelector() {
         for ( let entry of Object.entries(string_data["sets"]) ) {
             const set = new PcSet(entry[0]);
             const len = set.size; //entry[0].length-2;
-            const str_short = set.toString("short-ab", false);// entry[0].substring(1,len+1);
-            const str_full = set.toString(config.set_format, true);
+            const str_short = set.toString("short-ab", null);// entry[0].substring(1,len+1);
+            const str_full = set.toString(config.set_format, config.set_brackets);
             const hint = `${str_full} (${config.prime_unique ? set.forte_name : set.forte_name_ab})\n${entry[1]["names"].join("\n")}`;
             for ( let name of entry[1]["names"] ) {
                 if ( filterName(name) ) {
@@ -282,7 +282,7 @@ function showDescriptionSelector() {
 function showSubsetSelector() {
     const superset = state.pcset.normal;
     document.getElementById("dialog-set-selector-second-column-header").setHTMLUnsafe( 
-        `Subsets of <span class="setfont">${superset.toString(config.set_format, true)}</span>`);
+        `Subsets of <span class="setfont">${superset.toString(config.set_format, config.set_brackets)}</span>`);
     document.getElementById("table-set-row-filter").hidden = true;
 
     const subsets = superset.getSubsets();
@@ -292,8 +292,8 @@ function showSubsetSelector() {
     for ( let i = 0; i < 13; i++ ) links[i] = [];
 
     for ( let subset of subsets ) {
-        const set = subset.toString("short-ab", false);
-        const text = subset.toString(config.set_format, true);
+        const set = subset.toString("short-ab", null);
+        const text = subset.toString(config.set_format, config.set_brackets);
         links[subset.size].push(makeSelectorSetLink(set, text));
     }
 
@@ -317,7 +317,7 @@ function showSubsetSelector() {
 function showPrimeSubsetSelector() {
     const superset = state.pcset.prime;
     document.getElementById("dialog-set-selector-second-column-header").setHTMLUnsafe( 
-        `Prime subsets of <span class="setfont">${superset.toString(config.set_format, true)}</span>`);
+        `Prime subsets of <span class="setfont">${superset.toString(config.set_format, config.set_brackets)}</span>`);
     document.getElementById("table-set-row-filter").hidden = true;
 
     const subsets = superset.getPrimeSubsets();
@@ -327,8 +327,8 @@ function showPrimeSubsetSelector() {
     for ( let i = 0; i < 13; i++ ) links[i] = [];
 
     for ( let subset of subsets ) {
-        const set = subset.toString("short-ab", false);
-        const text = subset.toString(config.set_format, true);
+        const set = subset.toString("short-ab", null);
+        const text = subset.toString(config.set_format, config.set_brackets);
         links[subset.size].push(makeSelectorSetLink(set, text));
     }
 

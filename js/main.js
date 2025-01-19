@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 "use strict";
 
-const VERSION = "2025-01-16";
+const VERSION = "2025-01-19";
 
 const config_storage = new LocalStorageHandler("pcsetviz");
 const config_visible_data = new LocalStorageHandler("pcsetviz-visible-data");
@@ -26,6 +26,7 @@ const config_export_image = new LocalStorageHandler("pcsetviz-export-image");
 const input_main = document.getElementById("input-main");
 
 const SET_FORMATS = ["short-ab","short-te","numbers","notes-sharps","notes-flats"];
+const SET_BRACKETS = ["[]","{}","()"];
 const VECTOR_FORMATS = ["short", "long"];
 const INVERSION_FORMATS = ["In", "TnI"];
 const STAFF_CLEFS = ["G2", "C3", "C4", "F4"];
@@ -42,6 +43,7 @@ const config = {
     layout: "svg-first",
     staff_clef: STAFF_CLEFS[0],
     set_format: SET_FORMATS[0],
+    set_brackets: SET_BRACKETS[0],
     vector_format: VECTOR_FORMATS[0],
     inversion_format: INVERSION_FORMATS[0],
     sound_midi: false,
@@ -86,6 +88,7 @@ var data_cells = {
     features: document.getElementById("features"),
     rotations: document.getElementById("rotations"),
     symmetries: document.getElementById("symmetries"),
+    combinatorials: document.getElementById("combinatorials"),
     transpositions: document.getElementById("transpositions"),
     ctt: document.getElementById("ctt"),
     inversions: document.getElementById("inversions"),
@@ -146,13 +149,13 @@ function textOrDash(s) {
  */
 function pcsetHyperlink(pcset, options = {}) {
     const tx = options.text ?? htmlEscape(
-        (options.normalize) ? pcset.normal.toString(config.set_format, true) : pcset.toString(config.set_format, true)
+        (options.normalize) ? pcset.normal.toString(config.set_format, config.set_brackets) : pcset.toString(config.set_format, config.set_brackets)
     );
     let anchor;
     if ( pcset.isEqualTo(state.pcset) && !options.enable )
         anchor = `<span class="setfont same-set">${tx}</span>`;
     else {
-        const ss = pcset.toString("short-ab", false);
+        const ss = pcset.toString("short-ab", null);
         const js = (options.op) ? `javascript:goto('${ss}', ['${options.op[0]}',${options.op[1]}])`: `javascript:goto('${ss}')`;
         anchor = makeAnchorStr(js, { text: tx, classes: ["setfont"] });
     }
@@ -173,7 +176,7 @@ function strWithCopyLink(s, cs = null) {
 function pushSetToHistory(timeout = 0) {
     if ( history_update_timer ) clearTimeout(history_update_timer);
     history_update_timer = setTimeout(() => { 
-            const s = state.pcset.toString("short-ab", false);
+            const s = state.pcset.toString("short-ab", null);
             if ( s != window.history.state[0] )
                 window.history.pushState([s,state.last_op,++state.history_index], document.title, 
                     window.location.pathname + (s ? `?set=${s}` : ''));
@@ -197,12 +200,12 @@ function pushSetToHistory(timeout = 0) {
  *      * _keep_input_ : set to true to prevent changing the input control.
  */
 function showPcset(options = {}) {
-    
+
     if ( !options.no_history )
         pushSetToHistory(options.history_delay ?? 0);
 
     if ( !options.keep_input )
-        input_main.value = state.pcset.toString(config.set_format, false);
+        input_main.value = state.pcset.toString(config.set_format, config.set_brackets);
         
     const normal = state.pcset.normal;
     const reduced = normal.reduced;
@@ -306,7 +309,7 @@ function showPcset(options = {}) {
          taggedSetCollectionToLinks(transpositional_symmetries, "Tn")]
             .filter((s) => s != "").join(", ")
     ));
-    
+
     data_cells.multiplications.setHTMLUnsafe(textOrDash(
         taggedSetCollectionToLinks(multiples, "Mn")));
 
@@ -329,6 +332,8 @@ function showPcset(options = {}) {
         getCombinatorialsStr(combs.r, 'R')
     ].filter( (s) => s ).join(' ');
 
+    data_cells.combinatorials.setHTMLUnsafe(textOrDash(combs_str));
+
     // Collect set features
 
     const features = [];
@@ -346,7 +351,7 @@ function showPcset(options = {}) {
     if ( generators.length > 0 ) features.push(htmlNonBreakingSpaces(`Generated (${integerRangesToStr(generators)})`));
     if ( prime.hasMyhillProperty() ) features.push(htmlNonBreakingSpaces("Myhill's property"));
     if ( zcorrespondent ) features.push("Z-set");
-    if ( comb_count > 0 ) features.push(( comb_count >= 3 ? "All&#8209;combinatorial&nbsp;(" : "Combinatorial&nbsp;(" ) + combs_str + ")");
+    if ( comb_count > 0 ) features.push(comb_count >= 3 ? "All&#8209;combinatorial" : "Combinatorial");
 
     data_cells.features.setHTMLUnsafe(textOrDash(features.join(", ")));
 
@@ -458,7 +463,7 @@ function operationUpdate(reset = false) {
 
 function pcsetRotate(amount) {
     state.pcset.shift(amount);
-    input_main.value = state.pcset.toString(config.set_format, false);
+    input_main.value = state.pcset.toString(config.set_format, config.set_brackets);
     showPcset({ no_history: false, keep_polygon: true });
 }
 
@@ -486,7 +491,7 @@ function staffNoteClick(pc) {
 
 function pcsetGetDescriptiveNames(pcset) {
     if ( "sets" in string_data ) {
-        let zero_set = pcset.reduced.toString("short-ab", true);
+        let zero_set = pcset.reduced.toString("short-ab", config.set_brackets);
         if ( zero_set in string_data["sets"] && "names" in string_data["sets"][zero_set] )
             return string_data["sets"][zero_set]["names"];
     }
@@ -545,8 +550,9 @@ function goto(s, op = null, options = {}) {
 }
 
 
-function onChange() {
+function onChange(update_config_dialog = false) {
     updateConfigFromInterface();
+    if ( update_config_dialog ) updateInterfaceFromConfig();
     showPcset();
 }
 
@@ -565,7 +571,7 @@ function togglePcs(pc_array) {
             PitchPlayer.playPitch(pc, 0.3);
     }
     state.last_op = null;
-    input_main.value = state.pcset.normal.toString(config.set_format, false);
+    input_main.value = state.pcset.normal.toString(config.set_format, config.set_brackets);
     showPcset();
 }
 
@@ -630,10 +636,10 @@ function populateConfigDialogVisibleData() {
     for ( let row of data_rows ) {
         let label = row.label;
         label.replaceAll(" ", "&nbsp;");
-        let checkbox_id = "chk-visible-data-" + label.toLowerCase();
-        checkbox_id.replaceAll(" ", "-");
+        const checkbox_id = "chk-visible-data-" + row.id;
+        const label_id = checkbox_id + "-label";
         checkboxes.push(`<span><input id="${checkbox_id}" type="checkbox" target="${row.id}" onchange="toggleVisibleData('${checkbox_id}')">`+
-                        `&nbsp;<label for="${checkbox_id}">${label}</label></span>`)
+                        `&nbsp;<label id="${label_id}" for="${checkbox_id}">${label}</label></span>`)
     }
     document.getElementById("visible-data-checkboxes-area").setHTMLUnsafe(checkboxes.join(" "));
 }
@@ -650,8 +656,15 @@ function toggleVisibleData(id, checked = null) {
 }
 
 function updateInterfaceFromConfig() {
+    document.getElementById("radio-setformat-short-ab-label").innerHTML = config.set_brackets[0] + "012…9AB" + config.set_brackets[1];
+    document.getElementById("radio-setformat-short-te-label").innerHTML = config.set_brackets[0] + "012…9TE" + config.set_brackets[1];
+    document.getElementById("radio-setformat-numbers-label").innerHTML = config.set_brackets[0] + "0,1,2,…,9,10,11" + config.set_brackets[1];
+    document.getElementById("radio-setformat-notes-sharps-label").innerHTML = config.set_brackets[0] + "C,C&#9839;,D,…,A,A&#9839;,B" + config.set_brackets[1];
+    document.getElementById("radio-setformat-notes-flats-label").innerHTML = config.set_brackets[0] + "C,D&#9837;,D,…,A,B&#9837;,B" + config.set_brackets[1];
+    document.getElementById("chk-visible-data-row-cti-label").innerHTML = `Common tones under ${config.inversion_format}`;
     document.querySelector(`input[name="div-layout"][value="${config.layout}"]`).checked = true;
     document.querySelector(`input[name="set-format"][value="${config.set_format}"]`).checked = true;
+    document.querySelector(`input[name="set-brackets"][value="${config.set_brackets}"]`).checked = true;
     document.querySelector(`input[name="prime-form"][value="${config.prime_unique.toString()}"]`).checked = true;
     document.querySelector(`input[name="vector-format"][value="${config.vector_format}"]`).checked = true;
     document.querySelector(`input[name="inversion-format"][value="${config.inversion_format}"]`).checked = true;
@@ -671,6 +684,7 @@ function updateConfigFromInterface() {
     if ( new_set_format != config.set_format )
         input_main.value = state.pcset.toString(new_set_format, false);
     config.set_format = new_set_format;
+    config.set_brackets = document.querySelector(`input[name="set-brackets"]:checked`).value;
     config.prime_unique = document.getElementById("radio-prime-form-unique").checked;
     config.vector_format = document.querySelector(`input[name="vector-format"]:checked`).value;
     config.inversion_format = document.querySelector(`input[name="inversion-format"]:checked`).value;
@@ -693,6 +707,7 @@ function updateConfigFromInterface() {
 function readConfig() {
     config.layout = config_storage.readString("layout", "svg-first");
     config.set_format = config_storage.readString("set-format", SET_FORMATS[0]);
+    config.set_brackets = config_storage.readString("set-brackets", SET_BRACKETS[0]);
     config.prime_unique = config_storage.readBool("prime-unique", true);
     config.vector_format = config_storage.readString("vector-format", VECTOR_FORMATS[0]);
     config.inversion_format = config_storage.readString("inversion-format", INVERSION_FORMATS[0]);
@@ -717,6 +732,7 @@ function readConfig() {
 function saveConfig() {
     config_storage.writeString("layout", config.layout);
     config_storage.writeString("set-format", config.set_format);
+    config_storage.writeString("set-brackets", config.set_brackets);
     config_storage.writeBool("prime-unique", config.prime_unique);
     config_storage.writeString("vector-format", config.vector_format);
     config_storage.writeString("inversion-format", config.inversion_format);
@@ -772,7 +788,7 @@ function onVisualizationConfigChange() {
 function onGeneralConfigChange() {
     saveConfig(); 
     updateInterfaceFromConfig(); 
-    input_main.value = state.pcset.toString(config.set_format, false);
+    input_main.value = state.pcset.toString(config.set_format, null);
     showPcset({ no_history: true, keep_polygon: true });
 }
 

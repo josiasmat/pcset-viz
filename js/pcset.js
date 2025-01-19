@@ -18,8 +18,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 "use strict";
 
 var PCSET_DEFAULT_BRACKETS = "[]";
-var ICVEC_DEFAULT_BRACKETS = "<>";
-var CTVEC_DEFAULT_BRACKETS = "<>";
+var ICVEC_DEFAULT_BRACKETS = "‹›";
+var CTVEC_DEFAULT_BRACKETS = "‹›";
 
 const PCSET_TOKEN_MAP_SHORT_AB = "0123456789AB";
 const PCSET_TOKEN_MAP_SHORT_TE = "0123456789TE";
@@ -230,8 +230,9 @@ class PcSet {
         return PCSET_DEFAULT_BRACKETS.charAt(1);
     }
 
-    #encloseStr(s) {
-        return this.#left_bracket + s + this.#right_bracket;
+    #encloseStr(s, brackets = PCSET_DEFAULT_BRACKETS) {
+        return brackets.charAt(0) + s + brackets.charAt(1);
+        // return this.#left_bracket + s + this.#right_bracket;
     }
 
     /**
@@ -540,42 +541,42 @@ class PcSet {
      * Returns a string representation of the set.
      * @param {String} format Optional. Accepted values are: "short-ab" (default),
      *      "short-te", "numbers", "notes-sharps", "notes-flats".
-     * @param {Boolean} include_brackets Optional; default is _true_.
+     * @param {Boolean} brackets Optional; default is _true_.
      * @returns {String}
      */
-    toString(format = "short-ab", include_brackets = true) {
+    toString(format = "short-ab", brackets = PCSET_DEFAULT_BRACKETS) {
         switch ( format.toLowerCase() ) {
             case "short-ab":
-                return this.#strCompact(include_brackets, PCSET_TOKEN_MAP_SHORT_AB);
+                return this.#strCompact(brackets, PCSET_TOKEN_MAP_SHORT_AB);
             case "short-te":
-                return this.#strCompact(include_brackets, PCSET_TOKEN_MAP_SHORT_TE);
+                return this.#strCompact(brackets, PCSET_TOKEN_MAP_SHORT_TE);
             case "numbers":
-                return this.#strNumbers(include_brackets);
+                return this.#strNumbers(brackets);
             case "notes-sharps":
-                return this.#strFromMap(PCSET_TOKEN_MAP_NOTES_SHARPS, include_brackets);
+                return this.#strFromMap(PCSET_TOKEN_MAP_NOTES_SHARPS, brackets);
             case "notes-flats":
-                return this.#strFromMap(PCSET_TOKEN_MAP_NOTES_FLATS, include_brackets);
+                return this.#strFromMap(PCSET_TOKEN_MAP_NOTES_FLATS, brackets);
             default:
-                return this.#strNumbers(include_brackets);
+                return this.#strNumbers(brackets);
         }
     }
 
     /** @returns {String} */
-    #strCompact(include_brackets = false, char_map = PCSET_CHAR_MAP) {
+    #strCompact(brackets = PCSET_DEFAULT_BRACKETS, char_map = PCSET_CHAR_MAP) {
         const s = this.#data.map((x) => char_map[x]).join("");
-        return (include_brackets) ? this.#encloseStr(s) : s;
+        return (brackets) ? this.#encloseStr(s, brackets) : s;
     }
 
     /** @returns {String} */
-    #strNumbers(include_brackets = false) {
+    #strNumbers(brackets = PCSET_DEFAULT_BRACKETS) {
         const s = this.#data.map((x) => x.toString()).join(",");
-        return (include_brackets) ? this.#encloseStr(s) : s;
+        return (brackets) ? this.#encloseStr(s, brackets) : s;
     }
 
     /** @returns {String} */
-    #strFromMap(map, include_brackets) {
+    #strFromMap(map, brackets = PCSET_DEFAULT_BRACKETS) {
         const s = this.#data.map((x) => map[x]).join(",");
-        return (include_brackets) ? this.#encloseStr(s) : s;
+        return (brackets) ? this.#encloseStr(s, brackets) : s;
     }
 
     // INDIVIDUAL PITCH CLASS OPERATIONS
@@ -846,7 +847,7 @@ class PcSet {
 
     /** @returns {Object} */
     #getCatalogEntry() {
-        return PCSET_CATALOG[this.size][this.prime.#strCompact(true, PCSET_TOKEN_MAP_SHORT_AB)];
+        return PCSET_CATALOG[this.size][this.prime.#strCompact(PCSET_DEFAULT_BRACKETS, PCSET_TOKEN_MAP_SHORT_AB)];
     }
 
     /** @returns {String} */
@@ -1877,6 +1878,6 @@ for ( let i = 3; i < 11; i++ ) {
         const prime = new PcSet(entry[0]);
         const inverse = prime.invert().reduced;
         if ( !prime.isEqualTo(inverse) )
-            entry[1].inv = inverse.toString("short-ab", true);
+            entry[1].inv = inverse.toString("short-ab", PCSET_DEFAULT_BRACKETS);
     }
 }

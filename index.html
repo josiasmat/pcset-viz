@@ -134,6 +134,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                             <td>Symmetries/Equivalences:</td>
                             <td id="symmetries"></td>
                         </tr>
+                        <tr id="row-combinatorials" hidden>
+                            <td>Combinatoriality:</td>
+                            <td id="combinatorials"></td>
+                        </tr>
                         <tr id="row-transposition" hidden>
                             <td>Transpositions:</td>
                             <td id="transpositions"></td>
@@ -281,29 +285,46 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                 </td>
                             </tr>
                             <tr>
-                                <td>Set format</td>
+                                <td>Pitch-class format</td>
                                 <td>
                                     <span>
                                         <input id="radio-setformat-short-ab" type="radio" name="set-format" value="short-ab" onchange="onChange()" checked>
-                                        <label for="radio-setformat-short-ab">[012…9AB]</label>
+                                        <label id="radio-setformat-short-ab-label" for="radio-setformat-short-ab">[012…9AB]</label>
                                     </span>
                                     <span>
                                         <input id="radio-setformat-short-te" type="radio" name="set-format" value="short-te" onchange="onChange()">
-                                        <label for="radio-setformat-short-te">[012…9TE]</label>
+                                        <label id="radio-setformat-short-te-label" for="radio-setformat-short-te">[012…9TE]</label>
                                     </span>
                                     <span>
                                         <input id="radio-setformat-numbers" type="radio" name="set-format" value="numbers" onchange="onChange()">
-                                        <label for="radio-setformat-numbers">[0,1,2,…,9,10,11]</label>
+                                        <label id="radio-setformat-numbers-label" for="radio-setformat-numbers">[0,1,2,…,9,10,11]</label>
                                     </span>
                                     <span>
                                         <input id="radio-setformat-notes-sharps" type="radio" name="set-format" value="notes-sharps" onchange="onChange()">
-                                        <label for="radio-setformat-notes-sharps">[C,C&#9839;,D,…,A,A&#9839;,B]</label>
+                                        <label id="radio-setformat-notes-sharps-label" for="radio-setformat-notes-sharps">[C,C&#9839;,D,…,A,A&#9839;,B]</label>
                                     </span>
                                     <span>
                                         <input id="radio-setformat-notes-flats" type="radio" name="set-format" value="notes-flats" onchange="onChange()">
-                                        <label for="radio-setformat-notes-flats">[C,D&#9837;,D,…,A,B&#9837;,B]</label>
+                                        <label id="radio-setformat-notes-flats-label" for="radio-setformat-notes-flats">[C,D&#9837;,D,…,A,B&#9837;,B]</label>
                                     </span>
                                     <span class="keyboard-shortcut" style="float: inline-end;">(Alt+F)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Set bracketing</td>
+                                <td>
+                                    <span>
+                                        <input id="radio-setbrackets-square" type="radio" name="set-brackets" value="[]" onchange="onChange(true)" checked>
+                                        <label for="radio-setbrackets-square">[…] square brackets</label>
+                                    </span>
+                                    <span>
+                                        <input id="radio-setbrackets-round" type="radio" name="set-brackets" value="()" onchange="onChange(true)">
+                                        <label for="radio-setbrackets-round">(…) parentheses</label>
+                                    </span>
+                                    <span>
+                                        <input id="radio-setbrackets-curly" type="radio" name="set-brackets" value="{}" onchange="onChange(true)">
+                                        <label for="radio-setbrackets-curly">{…} curly braces</label>
+                                    </span>
                                 </td>
                             </tr>
                             <tr>
@@ -311,11 +332,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                 <td>
                                     <span>
                                         <input id="radio-vectorformat-short" type="radio" name="vector-format" value="short" onchange="onChange()" checked>
-                                        <label for="radio-vectorformat-short">&lt;254361&gt;</label>
+                                        <label for="radio-vectorformat-short">‹254361›</label>
                                     </span>
                                     <span>
                                         <input id="radio-vectorformat-long" type="radio" name="vector-format" value="long" onchange="onChange()">
-                                        <label for="radio-vectorformat-long">&lt;2,5,4,3,6,1&gt;</label>
+                                        <label for="radio-vectorformat-long">‹2,5,4,3,6,1›</label>
                                     </span>
                                     <span class="keyboard-shortcut" style="float: inline-end;">(Alt+V)</span>
                                 </td>
@@ -324,11 +345,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                 <td>Inversion format</td>
                                 <td>
                                     <span>
-                                        <input id="radio-inversionformat-in" type="radio" name="inversion-format" value="In" onchange="onChange()" checked>
+                                        <input id="radio-inversionformat-in" type="radio" name="inversion-format" value="In" onchange="onChange(true)" checked>
                                         <label for="radio-inversionformat-in">Simple (I<sub>n</sub>)</label>
                                     </span>
                                     <span>
-                                        <input id="radio-inversionformat-tni" type="radio" name="inversion-format" value="TnI" onchange="onChange()">
+                                        <input id="radio-inversionformat-tni" type="radio" name="inversion-format" value="TnI" onchange="onChange(true)">
                                         <label for="radio-inversionformat-tni">Compound (T<sub>n</sub>I)</label>
                                     </span>
                                     <span class="keyboard-shortcut" style="float: inline-end;">(Alt+I)</span>
