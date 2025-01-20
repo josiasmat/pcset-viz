@@ -114,7 +114,8 @@ function showAboutDialog() {
 }
 
 function showPrimeSelector() {
-    document.getElementById("dialog-set-selector-second-column-header").textContent = "Prime forms";
+    document.getElementById("dialog-set-selector-second-column-header").textContent = 
+        ( config.prime_unique ? "Prime forms" : "Prime forms and their inverses" );
     document.getElementById("table-set-row-filter").hidden = true;
 
     // set of cardinality 0, 1, 11 & 12
@@ -132,8 +133,13 @@ function showPrimeSelector() {
         let links = []
         for ( let entry of Object.entries(PCSET_CATALOG[i]) ) {
             const set = entry[0].slice(1,-1);
-            const text = new PcSet(entry[0]).toString(config.set_format, config.set_brackets);
+            const text = new PcSet(set).toString(config.set_format, config.set_brackets);
             links.push(makeSelectorSetLink(set, text));
+            if ( !config.prime_unique && entry[1].inv ) {
+                const inv_set = entry[1].inv.slice(1,-1);
+                const inv_text = new PcSet(inv_set).toString(config.set_format, config.set_brackets);
+                links.push(makeSelectorSetLink(inv_set, inv_text));
+            }
         }
         const id = `table-set-row${( i>1 && i<11 ) ? i : 0}`;
         const elm = document.getElementById(id);
