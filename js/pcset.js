@@ -97,23 +97,32 @@ class PcSet {
     /**
      * Constructs a new PcSet object.
      * @param {Number[]|String} [arg] An optional source for the set, which
-     *      can be an array of pitches or pitch-classes, or a string containing
-     *      a list of pitch-classes.
+     *      can be (1) an array of pitches or pitch-classes, (2) a string 
+     *      containing a list of pitch-classes, or (3) an integer number
+     *      representing the binary value of a set.
      */
-    constructor(arg = []) {
+    constructor(arg = null) {
         if ( typeof(arg) == "string" ) {
             if ( substrFoundInStr(arg, [" ",",",";"]) )
                 this.#parseStringLong(arg);
             else
                 this.#parseStringCompact(arg);
+            this.#removeDuplicates();
+            this.#sortFromFirst();
         } else if ( Array.isArray(arg) ) {
             for ( const n of arg ) {
                 if ( typeof(n) == "number" )
                     this.#data.push(mod12(Math.trunc(n)));
             }
+            this.#removeDuplicates();
+            this.#sortFromFirst();
+        } else if ( Number.isInteger(arg) ) {
+            for ( let i = 0; i < 12; i++ ) {
+                if ( arg % 2 ) this.#data.push(i);
+                arg >>= 1;
+            }
+            this.#data = this.normal.#data;
         }
-        this.#removeDuplicates();
-        this.#sortFromFirst();
     }
 
     static generate(count, interval, first = 0) {
