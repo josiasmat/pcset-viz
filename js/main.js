@@ -177,9 +177,9 @@ function pushSetToHistory(timeout = 0) {
     if ( history_update_timer ) clearTimeout(history_update_timer);
     history_update_timer = setTimeout(() => { 
             const s = state.pcset.toString("short-ab", null);
-            if ( s != window.history.state[0] )
+            if ( s !== window.history.state[0] )
                 window.history.pushState([s,state.last_op,++state.history_index], document.title, 
-                    window.location.pathname + (s ? `?set=${s}` : ''));
+                    `${window.location.pathname}?set=${s}`);
             config.last_set = s;
             config_storage.writeString("last-set", s);
             history_update_timer = null;
@@ -491,7 +491,7 @@ function staffNoteClick(pc) {
 
 function pcsetGetDescriptiveNames(pcset) {
     if ( "sets" in string_data ) {
-        let zero_set = pcset.reduced.toString("short-ab", config.set_brackets);
+        let zero_set = pcset.reduced.toString("short-ab", PCSET_DEFAULT_BRACKETS);
         if ( zero_set in string_data["sets"] && "names" in string_data["sets"][zero_set] )
             return string_data["sets"][zero_set]["names"];
     }
@@ -540,13 +540,11 @@ function taggedSetCollectionToLinks(sets, op = null, options = {}) { //} op = nu
 }
 
 
-function goto(s, op = null, options = {}) {
-    state.pcset = new PcSet(s);
+function goto(set, op = null, options = {}) {
+    state.pcset = new PcSet(set);
     state.last_op = op;
-    //input_main.value = state.pcset.toString(config.set_format, false);
     typeof(hideAllDialogs) === typeof(Function) && hideAllDialogs();
     showPcset(options);
-    //showPcset({ no_history: !push_to_history });
 }
 
 
@@ -862,11 +860,19 @@ createMainClockfaceSvg(document.getElementById("visualization-svg"));
 enableKeyboardShortcuts();
 
 {
-    const url_param_set = getUrlQueryValue("set");
-    if ( url_param_set ) {
-        goto(url_param_set, null, {no_history: true});
-        window.history.replaceState([url_param_set,'',state.history_index], document.title, 
-            `${window.location.pathname}?set=${url_param_set}`);
+    const url_params = new URLSearchParams(window.parent.location.search);
+    if ( url_params.has("set") ) {
+        const param_set = url_params.get("set");
+        goto(param_set, null, {no_history: true});
+        window.history.replaceState([param_set,'',state.history_index], document.title, 
+            `${window.location.pathname}?set=${param_set}`);
+    } else if ( url_params.has("b") ) {
+        const param_b = url_params.get("b");
+        let bv = param_b ? parseInt(param_b) : 0;
+        if ( !bv ) bv = 0;
+        goto(bv, null, {no_history: true});
+        window.history.replaceState([bv,'',state.history_index], document.title, 
+            `${window.location.pathname}?b=${bv}`);
     } else {
         goto(config.last_set, null, {no_history: true});
         window.history.replaceState([config.last_set,'',state.history_index], document.title, 
