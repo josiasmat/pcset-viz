@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 "use strict";
 
-const VERSION = "2025-01-20";
+const VERSION = "2025-01-21";
 
 const config_storage = new LocalStorageHandler("pcsetviz");
 const config_visible_data = new LocalStorageHandler("pcsetviz-visible-data");
@@ -83,6 +83,7 @@ var data_cells = {
     descriptive_name: document.getElementById("descriptive-name"),
     ic_vector: document.getElementById("ic-vector"),
     ct_vector: document.getElementById("ct-vector"),
+    spectra: document.getElementById("spectra"),
     complement: document.getElementById("complement"),
     zcorrespondent: document.getElementById("zcorrespondent"),
     features: document.getElementById("features"),
@@ -315,6 +316,19 @@ function showPcset(options = {}) {
 
     data_cells.descriptive_name.setHTMLUnsafe(textOrDash(
         pcsetGetDescriptiveNames(reduced).join(", ")));
+
+    // Spectra
+
+    const spectra = PcSetSpectra.fromPcset(prime);
+    let spectra_str = [];
+    if ( prime.size > 1 ) {
+        for ( let i = 1; i < prime.size; i++ ) {
+            spectra_str.push( `‹${i}›&nbsp;=&nbsp;${spectra.toString(i, true)}`);
+        }
+        const rounded_var = Math.round(spectra.variation*100)/100;
+        spectra_str.push(`Variation&nbsp;${(rounded_var == spectra.variation ? '=' : '≈')}&nbsp;${rounded_var.toFixed(2)}`);
+    }
+    data_cells.spectra.setHTMLUnsafe(textOrDash(spectra_str.join('; ')));
 
     // Hexacordal combinatorials
 

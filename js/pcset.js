@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 var PCSET_DEFAULT_BRACKETS = "[]";
 var ICVEC_DEFAULT_BRACKETS = "‹›";
 var CTVEC_DEFAULT_BRACKETS = "‹›";
+var SPECTRA_DEFAULT_BRACKETS = "{}";
 
 const PCSET_TOKEN_MAP_SHORT_AB = "0123456789AB";
 const PCSET_TOKEN_MAP_SHORT_TE = "0123456789TE";
@@ -278,22 +279,32 @@ class PcSet {
         return ( len == 0 ) ? null : this.#data[len-1];
     }
 
+    /**
+     * Returns the interval spectrum of given generic interval.
+     * @param {Number} generic_interval
+     * @returns {Number[]}
+     */
+    genericIntervalSpectrum(generic_interval) {
+        const spectrum = [];
+        if ( this.size < 2 ) return spectrum;
+        for ( let i = 0; i < this.size; i++ ) {
+            const j = (i+generic_interval) % this.size;
+            const interval = computeInterval(this.#data[i], this.#data[j]);
+            if ( !spectrum.includes(interval) ) spectrum.push(interval);
+        }
+        return spectrum;
+    }
+
     /** @returns {Boolean} */
     isMaximallyEven() {
-        if ( [0,1].includes(this.size) )   return false;
-        if ( [11,12].includes(this.size) ) return true;
+        if ( this.size < 2  ) return false;
+        if ( this.size > 10 ) return true;
         const cache_key = "maximally_even";
         const cached = PcSet.#cacheRead(this.binary_value, cache_key);
         if ( cached ) return cached;
+        const spectra = PcSetSpectra.fromPcset(this);
         for ( let d = 1; d < this.size; d++ ) {
-            const first_interval = computeInterval(this.#data[0], this.#data[d]);
-            let [min,max] = [first_interval,first_interval];
-            for ( let i = 1; i < this.size; i++ ) {
-                const j = (i+d) % this.size;
-                const interval = computeInterval(this.#data[i], this.#data[j]);
-                [min,max] = [Math.min(min,interval), Math.max(max,interval)];
-            }
-            if ( max-min > 1 ) 
+            if ( spectra.width(d) > 1 ) 
                 return PcSet.#cacheWrite(this.binary_value, cache_key, false);
         }
         return PcSet.#cacheWrite(this.binary_value, cache_key, true);
@@ -318,11 +329,9 @@ class PcSet {
         const cache_key = "myhill";
         const cached = PcSet.#cacheRead(this.binary_value, cache_key);
         if ( cached ) return cached;
+        const spectra = PcSetSpectra.fromPcset(this);
         for ( let d = 1; d < this.size; d++ ) {
-            let c = new Set();
-            for ( let i = 0; i < this.size; i++ )
-                c.add(computeInterval(this.at(i), this.at(i+d)));
-            if ( c.size != 2 ) 
+            if ( spectra.of(d).length != 2 ) 
                 return PcSet.#cacheWrite(this.binary_value, cache_key, false);
         }
         return PcSet.#cacheWrite(this.binary_value, cache_key, true);
@@ -1477,6 +1486,93 @@ class CommonToneVector {
     /** @returns {Number} */
     sum() {
         return this.data.reduce((sum, x) => sum + x, 0);
+    }
+
+}
+
+
+class PcSetSpectra {
+
+    #spectra = new Map();
+    #widths = new Map();
+    #variation = null;
+
+    /**
+     * Creates a new PcSetSpectra object from a PcSet object.
+     * @param {PcSet} pcset 
+     * @returns {PcSetSpectra}
+     */
+    static fromPcset(pcset) {
+        const obj = new PcSetSpectra();
+        const n = pcset.size;
+        if ( n < 2 ) return obj;
+        const widths = [];
+        for ( let d = 1; d < n; d++ ) {
+            const spectrum = pcset.genericIntervalSpectrum(d);
+            obj.#spectra.set(d, spectrum);
+            const [min,max] = [Math.min.apply(null,spectrum), Math.max.apply(null,spectrum)];
+            const width = max-min;
+            obj.#widths.set(d, width);
+            widths.push(width);
+        }
+        obj.#variation = widths.reduce((sum,x)=>sum+x) / n;
+        return obj;
+    }
+
+    /**
+     * @param {Number} interval
+     * @returns {Number[]}
+     */
+    of(interval) {
+        return this.#spectra.get(interval);
+    }
+
+    /**
+     * @param {Number} interval
+     * @returns {Number}
+     */
+    minOf(interval) {
+        return Math.min(this.of(interval));
+    }
+
+    /**
+     * @param {Number} interval
+     * @returns {Number}
+     */
+    maxOf(interval) {
+        return Math.max(this.of(interval));
+    }
+
+    /**
+     * @param {Number} interval
+     * @returns {[Number,Number]}
+     */
+    minMaxOf(interval) {
+        return [this.minOf(interval), this.maxOf(interval)];
+    }
+
+    /**
+     * @param {Number} interval
+     * @returns {Number}
+     */
+    width(interval) {
+        return this.#widths.get(interval);
+    }
+
+    /** @returns {Number} */
+    get variation() {
+        return this.#variation;
+    }
+
+    /** @returns {String} */
+    toString(index, include_brackets = false) {
+        const s = this.#spectra.get(index).map((x) => x.toString()).join(',');
+        return (include_brackets) ? this.#enclose_str(s) : s;
+    }
+
+    /** @returns {String} */
+    #enclose_str(s) {
+        return SPECTRA_DEFAULT_BRACKETS[0] + s + SPECTRA_DEFAULT_BRACKETS[1];
     }
 
 }
