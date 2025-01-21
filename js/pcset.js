@@ -292,7 +292,7 @@ class PcSet {
             const interval = computeInterval(this.#data[i], this.#data[j]);
             if ( !spectrum.includes(interval) ) spectrum.push(interval);
         }
-        return spectrum;
+        return spectrum.sort((a,b)=>a-b);
     }
 
     /** @returns {Boolean} */
