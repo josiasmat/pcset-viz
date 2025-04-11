@@ -2,6 +2,8 @@
 
 A tool for visualizing pitch-class sets.
 
+![Screenshot](/assets/screenshot.png)
+
 ## Online usage
 
 Visit https://josiasmat.github.io/pcset-viz/
