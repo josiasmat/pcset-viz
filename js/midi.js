@@ -253,8 +253,8 @@ function updatePlayedNotes(key = null, note_on = false) {
             break;
         case "scale":
             if ( key != null ) {
-                const sum = midi.notes.reduce( (sum,k) => sum += (k ? 1 : 0), 0 );
-                if ( sum == 1 && first_on && midi.last_event_time_delta >= 300 )
+                const count = midi.notes.reduce( (sum,k) => sum += (k ? 1 : 0), 0 );
+                if ( count == 1 && first_on && midi.last_event_time_delta >= 300 )
                     state.pcset = new PcSet([pc]);
                 else if ( midi.pcs[pc] > 0 )
                     state.pcset.add(pc);
@@ -262,8 +262,8 @@ function updatePlayedNotes(key = null, note_on = false) {
             break;
         case "accumulate":
             if ( key != null ) {
-                const sum = midi.notes.reduce( (sum,k) => sum += (k ? 1 : 0), 0 );
-                if ( sum == 1 && first_on )
+                const count = midi.notes.reduce( (sum,k) => sum += (k ? 1 : 0), 0 );
+                if ( count == 1 && first_on )
                     state.pcset = new PcSet([pc]);
                 else if ( midi.pcs[pc] > 0 )
                     state.pcset.add(pc);
