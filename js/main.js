@@ -86,6 +86,7 @@ var data_cells = {
     spectra: document.getElementById("spectra"),
     complement: document.getElementById("complement"),
     zcorrespondent: document.getElementById("zcorrespondent"),
+    sumclass: document.getElementById("sumclass"),
     features: document.getElementById("features"),
     rotations: document.getElementById("rotations"),
     symmetries: document.getElementById("symmetries"),
@@ -286,6 +287,8 @@ function showPcset(options = {}) {
 
     data_cells.carter_name.setHTMLUnsafe(
         strWithCopyLink(prime.carter_number.toString()));
+
+    data_cells.sumclass.setHTMLUnsafe(`${state.pcset.sum} ≡ ${state.pcset.sum_class} <small>(mod12)</small>`);
 
     data_cells.rotations.setHTMLUnsafe(textOrDash(
         setCollectionToLinks(rotations, {normalize: false})));

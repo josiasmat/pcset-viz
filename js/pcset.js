@@ -904,6 +904,14 @@ class PcSet {
         return (zc) ? new PcSet(zc) : null;
     }
 
+    get sum() {
+        return this.#data.reduce((sum,x) => sum + x, 0);
+    }
+
+    get sum_class() {
+        return this.sum % 12;
+    }
+
     // SYMMETRIES
 
     /**
