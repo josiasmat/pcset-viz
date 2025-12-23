@@ -283,18 +283,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                     <table id="dialog-config-table">
                         <tbody>
                             <tr>
-                                <td>Load/save</td>
+                                <td>Import/export</td>
                                 <td>
-                                    <a href="javascript:loadFavoritesFromFile()" autofocus>Load favorites from file</a> ·
-                                    <a href="javascript:saveFavoritesToFile()" autofocus>Save favorites to file</a> ·
-                                    <a href="javascript:loadConfigFromFile()" autofocus>Load config from file</a> ·
-                                    <a href="javascript:saveConfigToFile()" autofocus>Save config to file</a>
+                                    <span style="margin-right: 4rem;">Favorites:
+                                    <a href="javascript:loadFavoritesFromFile()" autofocus>Import from file</a> |
+                                    <a href="javascript:saveFavoritesToFile()">Export to file</a></span>
+                                    <span>Configuration:
+                                    <a href="javascript:loadConfigFromFile()">Import from file</a> |
+                                    <a href="javascript:saveConfigToFile()">Export to file</a></span>
                                 </td>
                             </tr>
                             <tr>
                                 <td>Visible data<br />
-                                    (<a href="javascript:resetVisibleDataRows()" autofocus>Reset</a> · 
-                                     <a href="javascript:setAllDataRowsVisible()" autofocus>All</a>)
+                                    (<a href="javascript:resetVisibleDataRows()">Reset</a> · 
+                                     <a href="javascript:setAllDataRowsVisible()">All</a>)
                                 </td>
                                 <td id="visible-data-checkboxes-area"></td>
                             </tr>
