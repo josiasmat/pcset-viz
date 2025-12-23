@@ -54,7 +54,7 @@ const PitchPlayer = {
     },
 
     isAudioRunning() {
-        return ( this.audio_ctx != null && this.audio_ctx.state == "running" );
+        return ( this.audio_ctx?.state == "running" );
     },
 
     initialize() {
@@ -70,6 +70,12 @@ const PitchPlayer = {
             this.gains[pc] = g;
             this.createOscillator(pc);
         }
+    },
+
+    resume() {
+        if ( !this.audio_ctx ) 
+            this.initialize();
+        return this.audio_ctx.resume();
     },
 
     /**
@@ -91,7 +97,11 @@ const PitchPlayer = {
 
     playPitch(pitch, duration = 0, delay = 0) {
         if ( !this.isAudioRunning() ) {
-            this.initialize();
+            document.body.style.setProperty("cursor", "progress", "important");
+            this.resume().then(() => {
+                this.playPitch(pitch, duration, delay);
+                document.body.style.removeProperty("cursor");
+            });
             return;
         }
         const pc = pitch%12;
@@ -125,7 +135,11 @@ const PitchPlayer = {
      */
     playScale(pitches, pitch_duration) {
         if ( !this.isAudioRunning() ) {
-            this.initialize();
+            document.body.style.setProperty("cursor", "progress", "important");
+            this.resume().then(() => {
+                this.playScale(pitches, pitch_duration);
+                document.body.style.removeProperty("cursor");
+            });
             return;
         }
         for ( let i = 0; i < pitches.length; i++ ) {
