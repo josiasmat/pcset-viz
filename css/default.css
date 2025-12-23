@@ -477,8 +477,22 @@ a, span.same-set {
     }
 }
 
-.icon-search {
-    padding: 0 3px;
+.icon-search, .icon-star {
+    float: right;
+}
+
+.icon-star {
+    font-size: 130%;
+    vertical-align: middle;
+}
+
+#staff-up-btn {
+    float: left; 
+    padding-top: 0.5lh;
+}
+
+#staff-down-btn {
+    float: right;
 }
 
 .svg-icon {

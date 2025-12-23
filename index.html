@@ -50,6 +50,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                 <input id="input-main" class="setfont" type="text" spellcheck="false" oninput="onInput()">
                             </td>
                         </tr>
+                        <tr id="row-favorites">
+                            <td i18n="row-favorites">Favorite sets: 
+                                <a id="favorites-toggle" class="icon-star" href="javascript:toggleFavorite()">☆</a></td>
+                            <td id="favorites"></td>
+                        </tr>
                         <tr id="row-ruler-view" hidden>
                             <td i18n="row-ruler-view"><span>Ruler view:</span>
                             <span style="float: inline-end;">
@@ -61,8 +66,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                         </tr>
                         <tr id="row-staff-view">
                             <td i18n="row-staff-view">
-                                <span style="float: left; padding-top: 0.5lh">Staff view:</span>
-                                <span style="float: right">
+                                <span id="staff-up-btn">Staff view:</span>
+                                <span id="staff-down-btn">
                                     <a href="javascript:pcsetRotate(1)">▲</a><br /><a href="javascript:pcsetRotate(-1)">▼</a>
                                 </span>
                             </td>

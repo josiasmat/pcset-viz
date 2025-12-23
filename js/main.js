@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 "use strict";
 
-const VERSION = "2025-01-21";
+const VERSION = "2025-12-23";
 
 const config_storage = new LocalStorageHandler("pcsetviz");
 const config_visible_data = new LocalStorageHandler("pcsetviz-visible-data");
@@ -47,7 +47,9 @@ const config = {
     vector_format: VECTOR_FORMATS[0],
     inversion_format: INVERSION_FORMATS[0],
     sound_midi: false,
-    sound_toggle: false
+    sound_toggle: false,
+    /** @type {PcSet[]} */
+    favorites: []
 }
 
 class DataRow {
@@ -73,6 +75,8 @@ class DataRow {
 var data_rows = [];
 
 var data_cells = {
+    favorites: document.getElementById("favorites"),
+    favorites_toggle: document.getElementById("favorites-toggle"),
     ruler_view: document.getElementById("ruler-view"),
     staff_view: document.getElementById("staff-view"),
     binary_value: document.getElementById("binary-value"),
@@ -240,6 +244,14 @@ function showPcset(options = {}) {
     function addEquivIf(cond, s) {
         return (cond) ? "&nbsp;=&nbsp;" + s : "";
     }
+
+    data_cells.favorites.setHTMLUnsafe(
+        ( config.favorites.length === 0 ) ? '-' : getFavoritesLinks()
+    );
+
+    data_cells.favorites_toggle.setHTMLUnsafe(
+        isFavorite(state.pcset) ? '★' : '☆'
+    );
 
     data_cells.binary_value.setHTMLUnsafe(
         `${strWithCopyLink(toBinary(state.pcset.binary_value, 12))} = ${strWithCopyLink(state.pcset.binary_value.toString())}`
@@ -433,6 +445,49 @@ function showPcset(options = {}) {
 
     drawVisualization(options);
 
+}
+
+
+/** @param {PcSet} pcset */
+function findFavorite(pcset) {
+    return config.favorites.findIndex((item) => item.isEqualTo(pcset.normal));
+}
+
+
+/** @param {PcSet} pcset */
+function isFavorite(pcset) {
+    return findFavorite(pcset) != -1;
+}
+
+
+function getFavoritesLinks() {
+    return setCollectionToLinks(config.favorites);
+}
+
+
+function toggleFavorite() {
+    const fav_index = findFavorite(state.pcset);
+    if ( fav_index != -1 )
+        config.favorites.splice(fav_index, 1);
+    else
+        config.favorites.push(state.pcset.normal);
+    saveConfig();
+    showPcset({no_history: true, keep_polygon: true, keep_input: true});
+}
+
+
+/** @param {PcSet[]} arr */
+function pcsetArrayToStr(arr) {
+    return arr.map((pcset) => pcset.toString("short-ab",false))
+              .sort((a,b) => (a.length - b.length) || a.localeCompare(b))
+              .join(',');
+}
+
+
+/** @param {String} s */
+function strToPcsetArray(s) {
+    const ss = s.split(',');
+    return ( ss == "" ) ? [] : ss.map((item) => new PcSet(item));
 }
 
 
@@ -741,6 +796,7 @@ function readConfig() {
     config.sound_toggle = config_storage.readBool("sound-toggle", false);
     for ( let row of data_rows )
         row.visible = config_visible_data.readBool(row.id, row.visible);
+    config.favorites = strToPcsetArray(config_storage.readString("favorites", ""));
     updateInterfaceFromConfig();
 }
 
@@ -761,6 +817,7 @@ function saveConfig() {
     config_storage.writeBool("sound-toggle", config.sound_toggle);
     for ( let row of data_rows )
         config_visible_data.writeBool(row.id, row.visible);
+    config_storage.writeString("favorites", pcsetArrayToStr(config.favorites));
 }
 
 
