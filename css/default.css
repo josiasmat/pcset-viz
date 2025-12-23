@@ -36,7 +36,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         --table-alternate-color: var(--bg-alternate-light);
         --hyperlink-fg-color: #0000dd;
         --hyperlink-hover-bg-color: rgba(0,0,0,0.05);
-        --hyperlink-hover-border-color: rgba(0,0,0,0.2);
+        --hyperlink-hover-border-color: rgba(0,0,0,0.6);
+        --same-set-border-color: rgba(0,0,0,0.4);
         --button-bg-color: lightgray;
         --input-bg-color: #fff;
         --input-fg-color: var(--fg-light);
@@ -66,7 +67,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         --table-alternate-color: var(--bg-alternate-dark);
         --hyperlink-fg-color: #ddffaa;
         --hyperlink-hover-bg-color: rgba(255,255,255,0.1);
-        --hyperlink-hover-border-color: rgba(255,255,255,0.2);
+        --hyperlink-hover-border-color: rgba(255,255,255,0.6);
+        --same-set-border-color: rgba(255,255,255,0.4);
         --button-bg-color: gray;
         --input-bg-color: #111;
         --input-fg-color: var(--fg-dark);
@@ -466,11 +468,16 @@ table {
 a, span.same-set {
     text-decoration: none;
     border: 1px solid transparent;
-    padding: 1px 1px;
+    padding: 1px 1px 0.5px;
     text-wrap: nowrap;
     user-select: none;
     &:not(.same-set):not(.close-button) { color: var(--hyperlink-fg-color); }
-    &.same-set { color: var(--fg-same-set); }
+    &.same-set { 
+        color: var(--fg-same-set); 
+    }
+    &.same-set, &.similar-set {
+        border: 1px solid var(--same-set-border-color);
+    }
     &:hover {
         background-color: var(--hyperlink-hover-bg-color);
         border: 1px solid var(--hyperlink-hover-border-color);

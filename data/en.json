@@ -1,4 +1,6 @@
 {
+    "language": "en-US",
+    
     "strings": {
         "main-title": "Pitch-Class Set Visualizer",
         "input-main": "Type a set:",

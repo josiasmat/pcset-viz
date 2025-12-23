@@ -35,6 +35,10 @@ function showConfigDialog() {
     showDialog("dialog-config");
 }
 
+function hideConfigDialog() {
+    hideDialog("dialog-config");
+}
+
 
 /**
  * @param {String} text 
@@ -97,13 +101,13 @@ function selectMidiMode() {
 
 
 function resetVisibleDataRows() {
-    data_rows.forEach( (row) => { row.visible = row.default } );
+    Table.rows.forEach( (row) => { row.visible = row.default } );
     updateConfigDialog();
     saveConfig();
 }
 
 function setAllDataRowsVisible() {
-    data_rows.forEach( (row) => { row.show() } );
+    Table.rows.forEach( (row) => { row.show() } );
     updateConfigDialog();
     saveConfig();
 }

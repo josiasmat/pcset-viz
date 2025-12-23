@@ -446,3 +446,17 @@ function romanize(n) {
 function toBinary(n, min_digits = 0) {
     return n.toString(2).padStart(min_digits, '0');
 }
+
+
+/**
+ * Makes a shallow copy of an object
+ * @param {Object} obj - Source object
+ * @param {String[]?} props - Names of properties to be excluded from copy
+ * @returns {Object}
+ */
+function cloneObjectExcept(obj, props = []) {
+    const clone = { ...obj };
+    for (const p of props)
+        delete clone[p];
+    return clone;
+}

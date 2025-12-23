@@ -21,6 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         <title i18n="main-title">Pitch-Class Set Visualizer</title>
         <link rel="stylesheet" href="css/default.css">
         <link rel="stylesheet" href="css/clockface.css">
+        <script type="text/javascript" src="js/globals.js" defer></script>
         <script type="text/javascript" src="js/pcset.js"></script>
         <script type="text/javascript" src="js/musicnote.js"></script>
         <script type="text/javascript" src="js/storage-handler.js"></script>
@@ -32,7 +33,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         <script type="text/javascript" src="js/colors.js" defer></script>
         <script type="text/javascript" src="js/graphics.js" defer></script>
         <script type="text/javascript" src="js/utils.js"></script>
+        <script type="text/javascript" src="js/fileutils.js"></script>
         <script type="text/javascript" src="js/i18n.js" defer></script>
+        <script type="text/javascript" src="js/config.js" defer></script>
+        <script type="text/javascript" src="js/favorites.js" defer></script>
+        <script type="text/javascript" src="js/table.js" defer></script>
         <script type="text/javascript" src="js/main.js" defer></script>
         <link rel="icon" type="image/png" href="favicon.png">
     </head>
@@ -111,6 +116,18 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                             <td i18n="row-descriptive-name">Descriptive name(s): <a class="icon-search" href="javascript:showDescriptionSelector()" hidden>&#128269;</a></td>
                             <td id="descriptive-name"></td>
                         </tr>
+                        <tr id="row-features" hidden>
+                            <td i18n="row-features">Set features: <a href="javascript:showFeaturesSelector()" hidden>&#128269;</a></td>
+                            <td id="features"></td>
+                        </tr>
+                        <tr id="row-complement">
+                            <td>Complement:</td>
+                            <td id="complement"></td>
+                        </tr>
+                        <tr id="row-zcorrespondent" hidden>
+                            <td>Z-correspondent:</td>
+                            <td id="zcorrespondent"></td>
+                        </tr>
                         <tr id="row-ic-vector">
                             <td i18n="row-ic-vector">Interval-class vector:</td>
                             <td id="ic-vector"></td>
@@ -123,21 +140,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                             <td i18n="row-spectra">Interval spectra:</td>
                             <td id="spectra"></td>
                         </tr>
-                        <tr id="row-complement">
-                            <td>Complement:</td>
-                            <td id="complement"></td>
-                        </tr>
-                        <tr id="row-zcorrespondent" hidden>
-                            <td>Z-correspondent:</td>
-                            <td id="zcorrespondent"></td>
-                        </tr>
                         <tr id="row-sumclass" hidden>
                             <td>Sum & sum class:</a></td>
                             <td id="sumclass"></td>
-                        </tr>
-                        <tr id="row-features" hidden>
-                            <td i18n="row-features">Set features: <a href="javascript:showFeaturesSelector()" hidden>&#128269;</a></td>
-                            <td id="features"></td>
                         </tr>
                         <tr id="row-rotations" hidden>
                             <td i18n="row-rotations">Modes:</td>
@@ -277,6 +282,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                 <div class="dialog-main">
                     <table id="dialog-config-table">
                         <tbody>
+                            <tr>
+                                <td>Load/save</td>
+                                <td>
+                                    <a href="javascript:loadFavoritesFromFile()" autofocus>Load favorites from file</a> ·
+                                    <a href="javascript:saveFavoritesToFile()" autofocus>Save favorites to file</a> ·
+                                    <a href="javascript:loadConfigFromFile()" autofocus>Load config from file</a> ·
+                                    <a href="javascript:saveConfigToFile()" autofocus>Save config to file</a>
+                                </td>
+                            </tr>
                             <tr>
                                 <td>Visible data<br />
                                     (<a href="javascript:resetVisibleDataRows()" autofocus>Reset</a> · 

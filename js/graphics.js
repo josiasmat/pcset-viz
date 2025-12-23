@@ -54,7 +54,7 @@ class PcSetBaseView {
     }
 
     getStandardFilename(ext, postfix = "") {
-        return `set-${new PcSet(input_main.value).toString("short-ab", false)}${postfix}.${ext}`;
+        return `set-${new PcSet(Table.input_value).toString("short-ab", false)}${postfix}.${ext}`;
     }
 
     #triggerDownload(url, filename) {
