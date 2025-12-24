@@ -241,7 +241,7 @@ function pcsetGetDescriptiveNames(pcset) {
 function setCollectionToLinks(sets, options = {}) {
     return sets.map( 
         (item) => pcsetHyperlink(item, options) 
-    ).join(options.sep ?? ", ");
+    ).join(options.sep ?? " ");
 }
 
 
@@ -369,9 +369,10 @@ function updateInterfaceFromConfig() {
     document.getElementById("chk-polygon").checked = config.polygon;
     document.getElementById("chk-sym-axes").checked = config.symmetry_axes;
     document.querySelector(`input[name="theme"][value="${config.theme}"]`).checked = true;
+    document.querySelector(`input[name="font"][value="${config.font}"]`).checked = true;
     document.getElementById("chk-sound-midi").checked = config.sound_midi;
     document.getElementById("chk-sound-toggle").checked = config.sound_toggle;
-    updateColorTheme();
+    updateAppearance();
     updateLayout();
 }
 
@@ -394,16 +395,17 @@ function updateConfigFromInterface() {
         createMainClockfaceSvg(document.getElementById("visualization-svg"));
     }
     config.theme = document.querySelector('input[name="theme"]:checked').value;
+    config.font = document.querySelector('input[name="font"]:checked').value;
     config.sound_midi = document.getElementById("chk-sound-midi").checked;
     config.sound_toggle = document.getElementById("chk-sound-toggle").checked;
-    updateColorTheme();
+    updateAppearance();
     updateLayout();
     saveConfig();
 }
 
 
 function on_system_theme_change_event_handler(event) {
-    updateColorTheme();
+    updateAppearance();
 }
 
 function getCurrentTheme() {
@@ -416,8 +418,17 @@ function getCurrentTheme() {
     return config.theme;
 }
 
-function updateColorTheme() {
-    document.documentElement.setAttribute("theme", getCurrentTheme());
+function updateAppearance() {
+    const theme = getCurrentTheme();
+    document.documentElement.setAttribute("theme", theme);
+    document.getElementById("color-scheme").setAttribute("content", theme);
+    if ( config.font == "serif" ) {
+        document.body.classList.remove("font-sans");
+        document.body.classList.add("font-serif");
+    } else {
+        document.body.classList.remove("font-serif");
+        document.body.classList.add("font-sans");
+    }
 }
 
 function updateLayout() {

@@ -16,10 +16,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 
 :root {
+    --sans-font: "Inter Tight", sans-serif;
     --serif-font: "Frank Ruhl Libre", serif;
     --bg-light: #fbfbfb;
     --bg-dark: #111;
@@ -86,7 +88,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         --dialog-shadow-color: black;
         --dialog-title-bg-color: #444;
         --dialog-title-fg-color: var(--fg-color);
+        --close-btn-bg-color: var(--dialog-title-bg-color);
+        --close-btn-fg-color: var(--dialog-title-fg-color);
     }
+}
+
+body.font-sans {
+    font-family: var(--sans-font);
+    font-weight: 300;
+}
+
+body.font-serif {
+    font-family: var(--serif-font);
+    font-weight: 300;
 }
 
 body {
@@ -95,8 +109,6 @@ body {
     background-color: var(--bg-border-color); 
     box-sizing: border-box;
     margin: 0;
-    font-family: var(--serif-font);
-    font-weight: 300;
     font-style: normal;
 }
 
@@ -185,6 +197,9 @@ main {
             width: 98%;
             padding: 0 0.5ch;
         }
+        select, input[type="number"] {
+            vertical-align: bottom;
+        }
     }
     .graphics-view {
         line-height: 0px;
@@ -214,25 +229,32 @@ main {
         height: 100%;
         th, td {
             &:first-child {
-                width: 21ch;
+                width: 20ch;
             }
         }
     }
 }
+
 @media (aspect-ratio < 1.2) {
     #data-area {
         width: 100%;
         height: auto;
+        th, td {
+            &:first-child {
+                width: 20ch;
+            }
+        }
     }
 }
-@media (aspect-ratio < 0.7) {
+
+@media (aspect-ratio < 0.8) {
     #data-area {
         th, td {
             &:first-child {
                 width: 30%;
             }
         }
-        /* font-size: 3.7vw; */
+        /* font-size: 3.0vw; */
         &, label, input, select {
             font-size: 3.7vw;
         }
@@ -265,14 +287,13 @@ dialog.dialog-container[open] {
     color: var(--fg-color);
     background-color: var(--bg-color);
     border: 2px solid var(--dialog-border-color);
-    filter: drop-shadow(5px 5px 8px var(--dialog-shadow-color));
+    filter: drop-shadow(1px 1px 10px var(--dialog-shadow-color));
     display: flex;
     flex-direction: column;
 }
 
 ::backdrop {
     background-color: var(--dialog-bg-dim-color);
-    backdrop-filter: blur(2px);
 }
   
 .dialog-header {
@@ -338,7 +359,7 @@ dialog.dialog-container[open] {
         user-select: none;
         th, td {
             &:first-child {
-                width: 13ch;
+                width: 12ch;
                 text-align: center;
             }
         }
@@ -349,9 +370,9 @@ dialog.dialog-container[open] {
         background-color: var(--input-bg-color);
         border-color: var(--input-border-color);
         border-style: solid;
-        font-family: var(--serif-font);
         width: 99%;
         padding: 2px 0.5ch;
+        font-family: var(--serif-font);
     }
 }
 
@@ -378,6 +399,7 @@ dialog.dialog-container[open] {
         }
         .keyboard-shortcut {
             font-size: smaller;
+            font-weight: 300;
             color: var(--fg-dim-color);
         }
     }
@@ -430,7 +452,7 @@ dialog.dialog-container[open] {
         table {
             th, td {
                 &:first-child {
-                    width: 9ch;
+                    width: 8ch;
                     text-align: center;
                     font-weight: 500;
                 }
@@ -463,6 +485,24 @@ table {
     :nth-child(odd of tr:not([hidden])) {
         background-color: var(--table-alternate-color);
     }
+}
+
+select, input[type="number"] {
+    box-sizing: border-box;
+    height: 1.5lh;
+    border-radius: 0%;
+    border: 1px solid var(--same-set-border-color);
+    color: var(--fg-color);
+}
+
+select {
+    padding: 0 1ch;
+}
+
+input[type="number"] {
+    padding-left: 1.5ch;
+    margin-right: 0.5ch;
+    width: 8ch;
 }
 
 a, span.same-set {
@@ -538,6 +578,7 @@ a, span.same-set {
     &[status="3"] {
         background-color: #f003;
     }
+    font-size: 90%;
 }
 
 input[type="checkbox"], input[type="radio"] {
@@ -549,6 +590,32 @@ input[type="checkbox"], input[type="radio"] {
     &:not([disabled]) {
         &, + label {
             cursor: pointer;
+        }
+    }
+    margin-right: 2px;
+}
+
+body.font-sans {
+    input[type="checkbox"], input[type="radio"] {
+        vertical-align: -10%;
+    }
+}
+body.font-serif {
+    input[type="checkbox"], input[type="radio"] {
+        vertical-align: -15%;
+    }
+}
+
+/* Hack for Firefox */
+@-moz-document url-prefix() {
+    body.font-sans {
+        input[type="checkbox"], input[type="radio"] {
+            vertical-align: -6% !important;
+        }
+    }
+    body.font-serif {
+        input[type="checkbox"], input[type="radio"] {
+            vertical-align: -12% !important;
         }
     }
 }

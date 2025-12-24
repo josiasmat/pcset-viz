@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 <html>
     <head>
         <title i18n="main-title">Pitch-Class Set Visualizer</title>
+        <meta id="color-scheme" name="color-scheme" content="light" />
         <link rel="stylesheet" href="css/default.css">
         <link rel="stylesheet" href="css/clockface.css">
         <script type="text/javascript" src="js/globals.js" defer></script>
@@ -88,7 +89,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                     <option value="Rn">Shift</option>
                                 </select>
                                 <input type="number" id="operation-index" name="operation-index" 
-                                    min="-12" max="12" value="1" previous="1" oninput="operationUpdate()"/>
+                                    min="-12" max="12" value="1" previous="1" size="2" oninput="operationUpdate()"/>
                                 =&nbsp;<span id="operation-result"></span>
                             </td>
                         </tr>
@@ -186,7 +187,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                             <td>Misc.:</td>
                             <td id="misc-area">
                                 <span>
-                                    <a href="javascript:playScale()">Play</a>
+                                    <a href="javascript:playScale()">Listen</a>
                                 </span> | 
                                 <span>
                                     <a href="javascript:showExportImageDialog()">Export&nbsp;image</a>
@@ -389,15 +390,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                 <td>
                                     <span>
                                         <input id="chk-note-names" type="checkbox" onchange="onChange()">
-                                        <label for="chk-note-names">Note names instead of numbers <span class="keyboard-shortcut">(Alt+N)<span></label>
+                                        <label for="chk-note-names">Note names <span class="keyboard-shortcut">(Alt+N)<span></label>
                                     </span>
                                     <span>
                                         <input id="chk-polygon" type="checkbox" onchange="onChange()">
-                                        <label for="chk-polygon">Show set geometry <span class="keyboard-shortcut">(Alt+G)</span></label>
+                                        <label for="chk-polygon">Set geometry <span class="keyboard-shortcut">(Alt+G)</span></label>
                                     </span>
                                     <span>
                                         <input id="chk-sym-axes" type="checkbox" onchange="onChange()">
-                                        <label for="chk-sym-axes">Show axes of symmetry <span class="keyboard-shortcut">(Alt+S)</span></label>
+                                        <label for="chk-sym-axes">Axes of symmetry <span class="keyboard-shortcut">(Alt+S)</span></label>
                                     </span>
                                     <span>
                                         <input id="chk-fifths" type="checkbox" onchange="onChange()">
@@ -458,19 +459,33 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                 </td>
                             </tr>
                             <tr>
-                                <td>Theme</td>
+                                <td>Appearance</td>
                                 <td>
-                                    <span>
-                                        <input id="radio-theme-auto" type="radio" name="theme" value="auto" onchange="onChange()" checked>
-                                        <label for="radio-theme-auto">Follow browser setting</label>
+                                    <span style="margin-right: 4ch;">
+                                        <span>Theme:</span>
+                                        <span>
+                                            <input id="radio-theme-auto" type="radio" name="theme" value="auto" onchange="onChange()" checked>
+                                            <label for="radio-theme-auto">Follow browser setting</label>
+                                        </span>
+                                        <span>
+                                            <input id="radio-theme-light" type="radio" name="theme" value="light" onchange="onChange()">
+                                            <label for="radio-theme-light">Light</label>
+                                        </span>
+                                        <span>
+                                            <input id="radio-theme-dark" type="radio" name="theme" value="dark" onchange="onChange()">
+                                            <label for="radio-theme-dark">Dark</label>
+                                        </span>
                                     </span>
                                     <span>
-                                        <input id="radio-theme-light" type="radio" name="theme" value="light" onchange="onChange()">
-                                        <label for="radio-theme-light">Light theme</label>
-                                    </span>
-                                    <span>
-                                        <input id="radio-theme-dark" type="radio" name="theme" value="dark" onchange="onChange()">
-                                        <label for="radio-theme-dark">Dark theme</label>
+                                        <span>Font style:</span>
+                                        <span>
+                                            <input id="radio-font-sans" type="radio" name="font" value="sans" onchange="onChange()" checked>
+                                            <label for="radio-font-sans">Sans-serif</label>
+                                        </span>
+                                        <span>
+                                            <input id="radio-font-serif" type="radio" name="font" value="serif" onchange="onChange()">
+                                            <label for="radio-font-serif">Serif</label>
+                                        </span>
                                     </span>
                                 </td>
                             </tr>

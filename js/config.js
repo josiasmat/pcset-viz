@@ -27,6 +27,7 @@ const config = {
     symmetry_axes: false,
     fifths: false,
     theme: "auto",
+    font: "sans",
     layout: "svg-first",
     staff_clef: STAFF_CLEFS[0],
     set_format: SET_FORMATS[0],
@@ -66,6 +67,7 @@ function readConfig() {
         createMainClockfaceSvg(document.getElementById("visualization-svg"));
     }
     config.theme = config_storage.readString("theme", "auto");
+    config.font = config_storage.readString("font", "sans");
     config.sound_midi = config_storage.readBool("sound-midi", false);
     config.sound_toggle = config_storage.readBool("sound-toggle", false);
     for ( let row of Table.rows )
@@ -87,6 +89,7 @@ function saveConfig() {
     config_storage.writeBool("symmetry-axes", config.symmetry_axes);
     config_storage.writeBool("fifths", config.fifths);
     config_storage.writeString("theme", config.theme);
+    config_storage.writeString("font", config.font);
     config_storage.writeString("staff-clef", config.staff_clef);
     config_storage.writeBool("sound-midi", config.sound_midi);
     config_storage.writeBool("sound-toggle", config.sound_toggle);

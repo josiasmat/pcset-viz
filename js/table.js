@@ -57,12 +57,13 @@ const table_cells = {
 class TableRow {
     element; id; label; default;
 
-    constructor(element) {
-        this.element = element;
-        this.id = element.id;
-        const text = element.firstElementChild.textContent;
-        this.label = text.substring(0, text.indexOf(":"));
-        this.default = !element.hasAttribute("hidden");
+    /** @param {HTMLElement} elm */
+    constructor(elm) {
+        this.element = elm;
+        this.id = elm.id;
+        const text = elm.firstElementChild.textContent;
+        this.label = text.trim().substring(0, text.indexOf(":"));
+        this.default = !elm.hasAttribute("hidden");
     }
 
     get visible() { return !(this.hidden); }
@@ -110,8 +111,8 @@ const Table = {
     },
 
     updateFavorites() {
-        table_cells.favorites.setHTMLUnsafe(
-            ( favorites.length === 0 ) ? '-' : getFavoritesLinks()
+        table_cells.favorites.setHTMLUnsafe(( favorites.length === 0 ) 
+            ? '-' : setCollectionToLinks(favorites, {sep: " "})
         );
 
         table_cells.favorites_toggle.setHTMLUnsafe(
@@ -333,6 +334,7 @@ const Table = {
     },
 
     updateStaffView() {
+        /** @param {HTMLElement} elm @param {String} type @param {Number} index */
         const adaptStaffView = (elm, type, index) => {
             switch ( type ) {
                 case "clef":
@@ -408,3 +410,6 @@ function populateConfigDialogTableRows() {
     }
     document.getElementById("visible-data-checkboxes-area").setHTMLUnsafe(checkboxes.join(" "));
 }
+
+
+Table.input_main.addEventListener("focus", () => Table.input_main.select());
