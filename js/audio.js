@@ -111,11 +111,10 @@ const PitchPlayer = {
         }
         if ( this.timeouts[pc] ) clearTimeout(this.timeouts[pc]);
         if ( duration > 0 ) {
-            this.timeouts[pc] = setTimeout((timeouts) => { 
-                    this.stopPitch(pitch); 
-                    timeouts[pc] = null;
-                }, 1000*(delay+duration), this.timeouts
-            );
+            this.timeouts[pc] = setTimeout(() => { 
+                this.timeouts[pc] = null;
+                this.stopPitch(pitch); 
+            }, 1000*(delay+duration));
         }
     },
 
@@ -125,6 +124,19 @@ const PitchPlayer = {
         const pc = pitch%12;
         if ( this.playing[pc] ) {
             this.setGradualGainChange(pc, this.gain, 0, this.fade_out, delay);
+            this.playing[pc] = false;
+        }
+    },
+
+    stopAll() {
+        for ( let pc = 0; pc < 12; pc++ ) {
+            if ( this.timeouts[pc] ) {
+                clearTimeout(this.timeouts[pc]);
+                this.timeouts[pc] = null;
+            }
+            this.gains[pc].gain.cancelScheduledValues(this.audio_ctx.currentTime);
+            this.gains[pc].gain.value = 0;
+            // this.setGradualGainChange(pc, this.gain, 0, this.fade_out);
             this.playing[pc] = false;
         }
     },
@@ -142,10 +154,13 @@ const PitchPlayer = {
             });
             return;
         }
-        for ( let i = 0; i < pitches.length; i++ ) {
-            const delay = i * pitch_duration;
-            this.playPitch(pitches[i], pitch_duration, delay);
-        }
+        this.stopAll();
+        setTimeout(() => {
+            for ( let i = 0; i < pitches.length; i++ ) {
+                const delay = i * pitch_duration;
+                this.playPitch(pitches[i], pitch_duration, delay);
+            }
+        }, 50);
     },
 
 }
