@@ -229,7 +229,7 @@ main {
         height: 100%;
         th, td {
             &:first-child {
-                width: 20ch;
+                width: 21ch;
             }
         }
     }
@@ -599,10 +599,16 @@ body.font-sans {
     input[type="checkbox"], input[type="radio"] {
         vertical-align: -10%;
     }
+    td sub {
+        font-size: 0.75em;
+    }
 }
 body.font-serif {
     input[type="checkbox"], input[type="radio"] {
         vertical-align: -15%;
+    }
+    td sub {
+        font-size: 0.8em;
     }
 }
 
@@ -629,7 +635,8 @@ span.range-label {
     /* padding-bottom: 0.5lh; */
 }
 
-@keyframes pulse_animation {
-    0%   { transform: scale(100%); }
-    100% { transform: scale(105%); }
+td sub {
+    vertical-align: baseline;
+    position: relative;
+    bottom: -0.2em;
 }

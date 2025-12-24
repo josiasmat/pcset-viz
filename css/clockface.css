@@ -9,10 +9,12 @@
 }
 
 #visualization-svg {
-    g.pc {
-        cursor: pointer;
+    * {
         transform-origin: center;
         transform-box: border-box;
+    }
+    g.pc {
+        cursor: pointer;
         text {
             font-family: serif;
             font-size: 2.5em;
@@ -32,7 +34,7 @@
             transition: stroke 0.2s ease-in-out;
         }
         &:hover {
-            animation: 0.2s ease-in-out alternate infinite pulse_animation;
+            animation: 0.2s ease-in-out alternate infinite pc-pulse-animation;
             circle {
                 transition: none;
                 fill: var(--pc-hover-color);
@@ -52,10 +54,8 @@
         }
         &.pc-moving-from {
             cursor: move;
-            animation: 0.2s ease-in-out alternate infinite pulse_animation;
+            animation: 0.2s ease-in-out alternate infinite pc-pulse-animation;
             circle {
-                /* fill: #ffc1c1 !important; */
-                /* stroke: transparent; */
                 stroke-dasharray: 10,5;
                 transition: none;
             }
@@ -77,24 +77,40 @@
         stroke-width: 2px;
         fill: var(--polygon-fill-color);
         transition: all 0.3s ease-in-out;
+        animation: 0.9s ease-in-out 0s infinite alternate polygon-rotate-animation;
     }
     #move-line {
         fill: none;
         stroke: var(--pc-moving-to-stroke);
         stroke-width: 4px;
-        /* stroke-dasharray: 10,5; */
         transition: all 0.1s ease-out;
         marker-end: url(#marker-arrow);
     }
     .symmetry-axis {
         fill: none;
         stroke: var(--axis-color);
-        stroke-width: 2px;
-        stroke-dasharray: 5,10;
-        stroke-dashoffset: 1;
+        stroke-width: 1.7px;
+        stroke-dasharray: 3.5,7;
+        stroke-dashoffset: 2.5;
+        animation: 4s ease-in-out 0s infinite alternate symline-opacity-animation;
     }
     .interval-line {
         stroke: var(--axis-color);
         stroke-width: 2px;
     }
+}
+
+@keyframes pc-pulse-animation {
+    0%   { transform: scale(100%); }
+    100% { transform: scale(105%); }
+}
+
+@keyframes polygon-rotate-animation {
+    0%   { transform: rotate(-0.5deg); }
+    100% { transform: rotate(+0.5deg); }
+}
+
+@keyframes symline-opacity-animation {
+    0%   { stroke-opacity: 60%; }
+    100% { stroke-opacity: 70%; }
 }
