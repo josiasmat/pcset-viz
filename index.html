@@ -22,23 +22,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         <meta id="color-scheme" name="color-scheme" content="light" />
         <link rel="stylesheet" href="css/default.css">
         <link rel="stylesheet" href="css/clockface.css">
+        <script type="text/javascript" src="js/utils.js" defer></script>
+        <script type="text/javascript" src="js/storage-handler.js" defer></script>
         <script type="text/javascript" src="js/globals.js" defer></script>
-        <script type="text/javascript" src="js/pcset.js"></script>
-        <script type="text/javascript" src="js/musicnote.js"></script>
-        <script type="text/javascript" src="js/storage-handler.js"></script>
-        <script type="text/javascript" src="js/clockface.js"></script>
-        <script type="text/javascript" src="js/dialogs.js" async></script>
-        <script type="text/javascript" src="js/midi.js" async></script>
-        <script type="text/javascript" src="js/audio.js" async></script>
+        <script type="text/javascript" src="js/fileutils.js" defer></script>
+        <script type="text/javascript" src="js/i18n.js" defer></script>
+        <script type="text/javascript" src="js/favorites.js" defer></script>
+        <script type="text/javascript" src="js/config.js" defer></script>
+        <script type="text/javascript" src="js/pcset.js" defer></script>
+        <script type="text/javascript" src="js/table.js" defer></script>
         <script type="text/javascript" src="js/svgtools.js" defer></script>
+        <script type="text/javascript" src="js/musicnote.js"defer ></script>
         <script type="text/javascript" src="js/colors.js" defer></script>
         <script type="text/javascript" src="js/graphics.js" defer></script>
-        <script type="text/javascript" src="js/utils.js"></script>
-        <script type="text/javascript" src="js/fileutils.js"></script>
-        <script type="text/javascript" src="js/i18n.js" defer></script>
-        <script type="text/javascript" src="js/config.js" defer></script>
-        <script type="text/javascript" src="js/favorites.js" defer></script>
-        <script type="text/javascript" src="js/table.js" defer></script>
+        <script type="text/javascript" src="js/clockface.js" defer></script>
+        <script type="text/javascript" src="js/midi.js" defer></script>
+        <script type="text/javascript" src="js/dialogs.js"></script>
+        <script type="text/javascript" src="js/audio.js"></script>
         <script type="text/javascript" src="js/main.js" defer></script>
         <link rel="icon" type="image/png" href="favicon.png">
     </head>
@@ -648,6 +648,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                         <span includetype="tonnetz-set">
                                             <input id="chk-tonnetz-show-all-connections" type="checkbox" onchange="updateImageExportDialog()">
                                             <label for="chk-tonnetz-show-all-connections">All connections</label>
+                                        </span>
+                                        <span includetype="tonnetz-set">
+                                            <input id="chk-tonnetz-fill-triangles" type="checkbox" onchange="updateImageExportDialog()">
+                                            <label for="chk-tonnetz-fill-triangles">Fill triangles</label>
                                         </span>
                                         <span includetype="clockface-set clockface-intervals clockface-inversion clockface-transposition">
                                             <input id="chk-export-fifths" type="checkbox" onchange="updateImageExportDialog()">

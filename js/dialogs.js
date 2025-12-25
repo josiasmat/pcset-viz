@@ -498,6 +498,7 @@ function loadImageExportDialogSettings() {
     document.getElementById("expimg-tonnetz-centerpc").value = config_export_image.readNumber("tonnetz-centerpc", 0);
     document.getElementById("chk-tonnetz-show-all-pcs").checked = config_export_image.readBool("tonnetz-all-pcs", true);
     document.getElementById("chk-tonnetz-show-all-connections").checked = config_export_image.readBool("tonnetz-all-connections", true);
+    document.getElementById("chk-tonnetz-fill-triangles").checked = config_export_image.readBool("tonnetz-fill-triangles", true);
     document.getElementById("expimg-select-theme").value = config_export_image.readString("theme", "basic");
     document.getElementById("expimg-select-theme-color").value = config_export_image.readString("theme-color", "");
     document.getElementById("expimg-select-theme-bg").value = config_export_image.readString("theme-bg", "light");
@@ -529,7 +530,7 @@ function saveImageExportDialogSettings() {
     config_export_image.writeBool("inv-transp-all-paths", document.getElementById("chk-all-paths").checked);
     config_export_image.writeNumber("tonnetz-centerpc", parseInt(document.getElementById("expimg-tonnetz-centerpc").value));
     config_export_image.writeBool("tonnetz-all-pcs", document.getElementById("chk-tonnetz-show-all-pcs").checked);
-    config_export_image.writeBool("tonnetz-all-connections", document.getElementById("chk-tonnetz-show-all-connections").checked);
+    config_export_image.writeBool("tonnetz-fill-triangles", document.getElementById("chk-tonnetz-fill-triangles").checked);
     config_export_image.writeString("theme", document.getElementById("expimg-select-theme").value);
     config_export_image.writeString("theme-color", document.getElementById("expimg-select-theme-color").value);
     config_export_image.writeString("theme-bg", document.getElementById("expimg-select-theme-bg").value);
@@ -658,6 +659,7 @@ function makeTonnetzSvgFromParams(theme) {
             show_text: document.querySelector('input[name="expimg-show-text"]:checked').value,
             show_all_pcs: document.getElementById("chk-tonnetz-show-all-pcs").checked,
             show_all_connections: document.getElementById("chk-tonnetz-show-all-connections").checked,
+            fill_triangles: document.getElementById("chk-tonnetz-fill-triangles").checked,
             scale: parseFloat(document.getElementById("expimg-scale").value),
             stroke_width: parseFloat(document.getElementById("expimg-stroke").value),
         },
