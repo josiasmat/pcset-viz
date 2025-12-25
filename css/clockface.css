@@ -34,7 +34,6 @@
             transition: stroke 0.2s ease-in-out;
         }
         &:hover {
-            animation: 0.2s ease-in-out alternate infinite pc-pulse-animation;
             circle {
                 transition: none;
                 fill: var(--pc-hover-color);
@@ -54,7 +53,6 @@
         }
         &.pc-moving-from {
             cursor: move;
-            animation: 0.2s ease-in-out alternate infinite pc-pulse-animation;
             circle {
                 stroke-dasharray: 10,5;
                 transition: none;
@@ -70,6 +68,11 @@
                 stroke: var(--pc-moving-to-stroke);
                 transition: none;
             };
+        }
+        &:hover, &.pc-moving-from {
+            circle {
+                animation: 0.3s ease-in alternate infinite pc-pulse-animation;
+            }
         }
     }
     #polygon {
@@ -102,7 +105,7 @@
 
 @keyframes pc-pulse-animation {
     0%   { transform: scale(100%); }
-    100% { transform: scale(105%); }
+    100% { transform: scale(103%);  }
 }
 
 @keyframes polygon-rotate-animation {
