@@ -1,6 +1,6 @@
 "use strict";
 
-const VERSION = "2025-12-24";
+const VERSION = "2025-12-25";
 
 const SET_FORMATS = ["short-ab","short-te","numbers","notes-sharps","notes-flats"];
 const SET_BRACKETS = ["[]","{}","()"];
