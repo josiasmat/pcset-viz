@@ -446,7 +446,7 @@ dialog.dialog-container[open] {
         box-sizing: border-box;
     }
     #dialog-export-options {
-        flex: 2 1;
+        flex: 1.7 1;
         max-height: fit-content;
         min-width: 54ch;
         table {
@@ -503,6 +503,10 @@ input[type="number"] {
     padding-left: 1.5ch;
     margin-right: 0.5ch;
     width: 8ch;
+}
+
+#input-export-file-png-size {
+    width: 11ch;
 }
 
 a, span.same-set {
