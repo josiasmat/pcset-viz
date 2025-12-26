@@ -17,802 +17,803 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <!DOCTYPE html>
 <html>
-    <head>
-        <title i18n="main-title">Pitch-Class Set Visualizer</title>
-        <meta id="color-scheme" name="color-scheme" content="light" />
-        <link rel="stylesheet" href="css/default.css">
-        <link rel="stylesheet" href="css/clockface.css">
-        <script type="text/javascript" src="js/utils.js" defer></script>
-        <script type="text/javascript" src="js/storage-handler.js" defer></script>
-        <script type="text/javascript" src="js/globals.js" defer></script>
-        <script type="text/javascript" src="js/fileutils.js" defer></script>
-        <script type="text/javascript" src="js/i18n.js" defer></script>
-        <script type="text/javascript" src="js/favorites.js" defer></script>
-        <script type="text/javascript" src="js/config.js" defer></script>
-        <script type="text/javascript" src="js/pcset.js" defer></script>
-        <script type="text/javascript" src="js/table.js" defer></script>
-        <script type="text/javascript" src="js/svgtools.js" defer></script>
-        <script type="text/javascript" src="js/musicnote.js"defer ></script>
-        <script type="text/javascript" src="js/colors.js" defer></script>
-        <script type="text/javascript" src="js/graphics.js" defer></script>
-        <script type="text/javascript" src="js/clockface.js" defer></script>
-        <script type="text/javascript" src="js/midi.js" defer></script>
-        <script type="text/javascript" src="js/dialogs.js"></script>
-        <script type="text/javascript" src="js/audio.js"></script>
-        <script type="text/javascript" src="js/main.js" defer></script>
-        <link rel="icon" type="image/png" href="favicon.png">
-    </head>
-    <body>
-        <main id="main-area">
-            <div id="visualization-area">
-                <svg id="visualization-svg" width="500" height="500" viewbox="0 0 500 500"></svg>
-            </div>
-            <div id="data-area" tabindex="-1">
-                <table id="data-table">
-                    <tbody id="data-table-body">
-                        <tr id="row-input" always-visible>
-                            <td><label for="input-main" i18n="input-main">Type a set:</label></td>
-                            <td>
-                                <input id="input-main" class="setfont" type="text" spellcheck="false" oninput="onInput()">
-                            </td>
-                        </tr>
-                        <tr id="row-favorites">
-                            <td i18n="row-favorites">Favorite sets: 
-                                <a id="favorites-toggle" class="icon-star" href="javascript:toggleFavorite()">☆</a></td>
-                            <td id="favorites"></td>
-                        </tr>
-                        <tr id="row-ruler-view" hidden>
-                            <td i18n="row-ruler-view"><span>Ruler view:</span>
-                            <span style="float: inline-end;">
-                                <a href="javascript:rulerShift(1)">◀</a>
-                                <a href="javascript:rulerShift(-1)">▶</a>
-                            </span>
-                            </td>
-                            <td id="ruler-view" class="graphics-view"></td>
-                        </tr>
-                        <tr id="row-staff-view">
-                            <td i18n="row-staff-view">
-                                <span id="staff-up-btn">Staff view:</span>
-                                <span id="staff-down-btn">
-                                    <a href="javascript:pcsetRotate(1)">▲</a><br /><a href="javascript:pcsetRotate(-1)">▼</a>
-                                </span>
-                            </td>
-                            <td id="staff-view" style="display: inline-flex"></td>
-                        </tr>
-                        <tr id="row-operations">
-                            <td i18n="row-operations">Operation:</td>
-                            <td id="operations">
-                                <select name="operation-selector" id="operation-selector" onchange="operationUpdate(true)">
-                                    <option value="Tn">Transpose</option>
-                                    <option value="In">Invert</option>
-                                    <option value="Mn">Multiply</option>
-                                    <option value="Rn">Shift</option>
-                                </select>
-                                <input type="number" id="operation-index" name="operation-index" 
-                                    min="-12" max="12" value="1" previous="1" size="2" oninput="operationUpdate()"/>
-                                ⇒&nbsp;<span id="operation-result"></span>
-                            </td>
-                        </tr>
-                        <tr id="row-binv" hidden>
-                            <td i18n="row-binv">Binary representation:</td>
-                            <td id="binary-value"></td>
-                        </tr>
-                        <tr id="row-normal">
-                            <td i18n="row-normal">Normal order:</td>
-                            <td id="normal-form"></td>
-                        </tr>
-                        <tr id="row-prime">
-                            <td i18n="row-prime">Prime form: <a class="icon-search" href="javascript:showPrimeSelector()">&#128269;</a></td>
-                            <td id="prime-form"></td>
-                        </tr>
-                        <tr id="row-forte">
-                            <td i18n="row-forte">Forte/Morris name: <a class="icon-search" href="javascript:showForteSelector()">&#128269;</a></td>
-                            <td id="forte-name"></td>
-                        </tr>
-                        <tr id="row-carter" hidden>
-                            <td i18n="row-carter">Carter number: <a class="icon-search" href="javascript:showCarterSelector()">&#128269;</a></td>
-                            <td id="carter-name"></td>
-                        </tr>
-                        <tr id="row-descriptive-name">
-                            <td i18n="row-descriptive-name">Descriptive name(s): <a class="icon-search" href="javascript:showDescriptionSelector()" hidden>&#128269;</a></td>
-                            <td id="descriptive-name"></td>
-                        </tr>
-                        <tr id="row-features">
-                            <td i18n="row-features">Set features: <a href="javascript:showFeaturesSelector()" hidden>&#128269;</a></td>
-                            <td id="features"></td>
-                        </tr>
-                        <tr id="row-complement">
-                            <td>Complement:</td>
-                            <td id="complement"></td>
-                        </tr>
-                        <tr id="row-zcorrespondent" hidden>
-                            <td>Z-correspondent:</td>
-                            <td id="zcorrespondent"></td>
-                        </tr>
-                        <tr id="row-ic-vector">
-                            <td i18n="row-ic-vector">Interval-class vector:</td>
-                            <td id="ic-vector"></td>
-                        </tr>
-                        <tr id="row-ct-vector" hidden>
-                            <td i18n="row-ct-vector">Common-tone vector:</td>
-                            <td id="ct-vector"></td>
-                        </tr>
-                        <tr id="row-spectra" hidden>
-                            <td i18n="row-spectra">Interval spectra:</td>
-                            <td id="spectra"></td>
-                        </tr>
-                        <tr id="row-sumclass" hidden>
-                            <td>Sum & sum class:</a></td>
-                            <td id="sumclass"></td>
-                        </tr>
-                        <tr id="row-rotations" hidden>
-                            <td i18n="row-rotations">Modes:</td>
-                            <td id="rotations"></td>
-                        </tr>
-                        <tr id="row-symmetries" hidden>
-                            <td>Symmetries/Equivalences:</td>
-                            <td id="symmetries"></td>
-                        </tr>
-                        <tr id="row-combinatorials" hidden>
-                            <td>Combinatoriality:</td>
-                            <td id="combinatorials"></td>
-                        </tr>
-                        <tr id="row-transposition" hidden>
-                            <td>Transpositions:</td>
-                            <td id="transpositions"></td>
-                        </tr>
-                        <tr id="row-ctt" hidden>
-                            <td i18n="row-ctt">Common tones under T<sub>n</sub>:</td>
-                            <td id="ctt"></td>
-                        </tr>
-                        <tr id="row-inversions" hidden>
-                            <td>Inversions:</td>
-                            <td id="inversions"></td>
-                        </tr>
-                        <tr id="row-cti" hidden>
-                            <td i18n="row-cti">Common tones under <span id="cti-inversion-label">I<sub>n</sub></span>:</td>
-                            <td id="cti"></td>
-                        </tr>
-                        <tr id="row-multiples" hidden>
-                            <td>Multiplications:</td>
-                            <td id="multiples"></td>
-                        </tr>
-                        <tr id="row-subsets" hidden>
-                            <td>Subsets:</td>
-                            <td id="subsets">
-                                <a href="javascript:showSubsetSelector()">All subsets</a> | <a href="javascript:showPrimeSubsetSelector()">Prime subsets</a>
-                            </td>
-                        </tr>
-                        <tr id="row-misc" always-visible>
-                            <td>Misc.:</td>
-                            <td id="misc-area">
-                                <span>
-                                    <a href="javascript:playScale()">Listen</a>
-                                </span> | 
-                                <span>
-                                    <a href="javascript:showExportImageDialog()">Export&nbsp;image</a>
-                                </span> | 
-                                <span>
-                                    <a href="javascript:showConfigDialog()">Options</a>
-                                </span> | 
-                                <span>
-                                    <a href="javascript:showAboutDialog()">About</a>
-                                </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <dialog id="dialog-about" class="dialog-container">
-                <div class="dialog-header">
-                    <span class="dialog-title">ABOUT</span>
-                    <a class="close-button" href="javascript:hideDialog('dialog-about')" autofocus>&#128473;</a>
-                </div>
-                <div class="dialog-main">
-                    <b>Pitch-Class Set Visualizer, version <span id="version-number"></span></b>.
-                    <br />
-                    Licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">GNU Affero General Public License version 3</a>.<br />
-                    &#169;&nbsp;2024 Josias Matschulat.
-                    <br /><br />
-                    Descriptive names adapted from Larry Solomon, &#169;&nbsp;1997, 2005,<br />with additions from Straus, 2016.
-                    <br /><br />
-                    Get the <a href="https://github.com/josiasmat/pcset-viz" target="_blank">source code</a> at GitHub.
-                </div>
-            </dialog>
-            <dialog id="dialog-set-selector" class="dialog-container">
-                <div class="dialog-header">
-                    <span class="dialog-title">SET SELECTOR</span>
-                    <a class="close-button" href="javascript:hideDialog('dialog-set-selector')">&#128473;</a>
-                </div>
-                <div class="dialog-main">
-                    <table id="table-set-selector">
-                        <tbody>
-                            <tr>
-                                <th>Type</th>
-                                <th id="dialog-set-selector-second-column-header">Sets</th>
-                            </tr>
-                            <tr id="table-set-row-filter">
-                                <td><label for="input-set-filter" i18n="input-set-filter">Filter:</label></td>
-                                <td><input id="input-set-filter" type="text" spellcheck="false" autofocus></td>
-                            </tr>
-                            <tr>
-                                <td>Dyads:</td>
-                                <td id="table-set-row2"></td>
-                            </tr>
-                            <tr>
-                                <td>Trichords:</td>
-                                <td id="table-set-row3"></td>
-                            </tr>
-                            <tr>
-                                <td>Tetrachords:</td>
-                                <td id="table-set-row4"></td>
-                            </tr>
-                            <tr>
-                                <td>Pentachords:</td>
-                                <td id="table-set-row5"></td>
-                            </tr>
-                            <tr>
-                                <td>Hexachords:</td>
-                                <td id="table-set-row6"></td>
-                            </tr>
-                            <tr>
-                                <td>Heptachords:</td>
-                                <td id="table-set-row7"></td>
-                            </tr>
-                            <tr>
-                                <td>Octachords:</td>
-                                <td id="table-set-row8"></td>
-                            </tr>
-                            <tr>
-                                <td>Nonachords:</td>
-                                <td id="table-set-row9"></td>
-                            </tr>
-                            <tr>
-                                <td>Decachords:</td>
-                                <td id="table-set-row10"></td>
-                            </tr>
-                            <tr>
-                                <td>Others:</td>
-                                <td id="table-set-row0"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </dialog>
-            <dialog id="dialog-config" class="dialog-container">
-                <div class="dialog-header">
-                    <span class="dialog-title">OPTIONS</span>
-                    <a class="close-button" href="javascript:hideDialog('dialog-config')">&#128473;</a>
-                </div>
-                <div class="dialog-main">
-                    <table id="dialog-config-table">
-                        <tbody>
-                            <tr>
-                                <td>Import/export</td>
-                                <td>
-                                    <span style="margin-right: 4rem;">Favorites:
-                                    <a href="javascript:loadFavoritesFromFile()" autofocus>Import from file</a> |
-                                    <a href="javascript:saveFavoritesToFile()">Export to file</a></span>
-                                    <span>Configuration:
-                                    <a href="javascript:loadConfigFromFile()">Import from file</a> |
-                                    <a href="javascript:saveConfigToFile()">Export to file</a></span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Visible data<br />
-                                    (<a href="javascript:resetVisibleDataRows()">Reset</a> · 
-                                     <a href="javascript:setAllDataRowsVisible()">All</a>)
-                                </td>
-                                <td id="visible-data-checkboxes-area"></td>
-                            </tr>
-                            <tr>
-                                <td>Forte/Morris name</td>
-                                <td>
-                                    <span>
-                                        <input id="radio-prime-form-unique" type="radio" name="prime-form" value="true" onchange="onChange()" checked>
-                                        <label for="radio-prime-form-unique">Prime and its inverse are the same (Forte)</label>
-                                    </span>
-                                    <span>
-                                        <input id="radio-prime-form-distinct" type="radio" name="prime-form" value="false" onchange="onChange()">
-                                        <label for="radio-prime-form-distinct">Differentiate prime and its inverse</label>
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Pitch-class format</td>
-                                <td>
-                                    <span>
-                                        <input id="radio-setformat-short-ab" type="radio" name="set-format" value="short-ab" onchange="onChange()" checked>
-                                        <label id="radio-setformat-short-ab-label" for="radio-setformat-short-ab">[012…9AB]</label>
-                                    </span>
-                                    <span>
-                                        <input id="radio-setformat-short-te" type="radio" name="set-format" value="short-te" onchange="onChange()">
-                                        <label id="radio-setformat-short-te-label" for="radio-setformat-short-te">[012…9TE]</label>
-                                    </span>
-                                    <span>
-                                        <input id="radio-setformat-numbers" type="radio" name="set-format" value="numbers" onchange="onChange()">
-                                        <label id="radio-setformat-numbers-label" for="radio-setformat-numbers">[0,1,2,…,9,10,11]</label>
-                                    </span>
-                                    <span>
-                                        <input id="radio-setformat-notes-sharps" type="radio" name="set-format" value="notes-sharps" onchange="onChange()">
-                                        <label id="radio-setformat-notes-sharps-label" for="radio-setformat-notes-sharps">[C,C&#9839;,D,…,A,A&#9839;,B]</label>
-                                    </span>
-                                    <span>
-                                        <input id="radio-setformat-notes-flats" type="radio" name="set-format" value="notes-flats" onchange="onChange()">
-                                        <label id="radio-setformat-notes-flats-label" for="radio-setformat-notes-flats">[C,D&#9837;,D,…,A,B&#9837;,B]</label>
-                                    </span>
-                                    <span class="keyboard-shortcut" style="float: inline-end;">(Alt+F)</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Set bracketing</td>
-                                <td>
-                                    <span>
-                                        <input id="radio-setbrackets-square" type="radio" name="set-brackets" value="[]" onchange="onChange(true)" checked>
-                                        <label for="radio-setbrackets-square">[…] square brackets</label>
-                                    </span>
-                                    <span>
-                                        <input id="radio-setbrackets-round" type="radio" name="set-brackets" value="()" onchange="onChange(true)">
-                                        <label for="radio-setbrackets-round">(…) parentheses</label>
-                                    </span>
-                                    <span>
-                                        <input id="radio-setbrackets-curly" type="radio" name="set-brackets" value="{}" onchange="onChange(true)">
-                                        <label for="radio-setbrackets-curly">{…} curly braces</label>
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Vector format</td>
-                                <td>
-                                    <span>
-                                        <input id="radio-vectorformat-short" type="radio" name="vector-format" value="short" onchange="onChange()" checked>
-                                        <label for="radio-vectorformat-short">‹254361›</label>
-                                    </span>
-                                    <span>
-                                        <input id="radio-vectorformat-long" type="radio" name="vector-format" value="long" onchange="onChange()">
-                                        <label for="radio-vectorformat-long">‹2,5,4,3,6,1›</label>
-                                    </span>
-                                    <span class="keyboard-shortcut" style="float: inline-end;">(Alt+V)</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Inversion format</td>
-                                <td>
-                                    <span>
-                                        <input id="radio-inversionformat-in" type="radio" name="inversion-format" value="In" onchange="onChange(true)" checked>
-                                        <label for="radio-inversionformat-in">Simple (I<sub>n</sub>)</label>
-                                    </span>
-                                    <span>
-                                        <input id="radio-inversionformat-tni" type="radio" name="inversion-format" value="TnI" onchange="onChange(true)">
-                                        <label for="radio-inversionformat-tni">Compound (T<sub>n</sub>I)</label>
-                                    </span>
-                                    <span class="keyboard-shortcut" style="float: inline-end;">(Alt+I)</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Clockface visualization</td>
-                                <td>
-                                    <span>
-                                        <input id="chk-note-names" type="checkbox" onchange="onChange()">
-                                        <label for="chk-note-names">Note names <span class="keyboard-shortcut">(Alt+N)<span></label>
-                                    </span>
-                                    <span>
-                                        <input id="chk-polygon" type="checkbox" onchange="onChange()">
-                                        <label for="chk-polygon">Set geometry <span class="keyboard-shortcut">(Alt+G)</span></label>
-                                    </span>
-                                    <span>
-                                        <input id="chk-sym-axes" type="checkbox" onchange="onChange()">
-                                        <label for="chk-sym-axes">Axes of symmetry <span class="keyboard-shortcut">(Alt+S)</span></label>
-                                    </span>
-                                    <span>
-                                        <input id="chk-fifths" type="checkbox" onchange="onChange()">
-                                        <label for="chk-fifths">Circle of fifths <span class="keyboard-shortcut">(Alt+5)</span></label>
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>MIDI input</td>
-                                <td>
-                                    <span>
-                                        <label for="select-midi-device">Device:</label>
-                                        <select name="select-midi-device" id="select-midi-device" onchange="selectMidiDevice()">
-                                            <option value="">No device selected</option>
-                                        </select>
-                                        →
-                                        <span id="midi-connection-status" status="0">Disconnected</span>
-                                    </span>
-                                    <span>
-                                        <label for="">Mode:</label>
-                                        <select name="select-midi-mode" id="select-midi-mode" onchange="selectMidiMode()">
-                                            <option value="scale">Scale</option>
-                                            <option value="chord">Chord</option>
-                                            <option value="direct">Direct</option>
-                                            <option value="toggle">Toggle</option>
-                                        </select>
-                                    </span>
-                                    <span>
-                                        <input id="chk-midi-pedal" type="checkbox" onchange="selectMidiMode()">
-                                        <label for="chk-midi-pedal">Hold with sustain pedal</label>
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Sound</td>
-                                <td>
-                                    <span>
-                                        <input id="chk-sound-toggle" type="checkbox" onchange="updateConfigFromInterface()">
-                                        <label for="chk-sound-toggle">Play sound on pitch-class toggle</label>
-                                    </span>
-                                    <span>
-                                        <input id="chk-sound-midi" type="checkbox" onchange="updateConfigFromInterface()">
-                                        <label for="chk-sound-midi">Play sound on MIDI input</label>
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>App layout</td>
-                                <td>
-                                    <span>
-                                        <input id="radio-svg-first" type="radio" name="div-layout" value="svg-first" onchange="onChange()" checked>
-                                        <label for="radio-svg-first">Clockface visualization first</label>
-                                    </span>
-                                    <span>
-                                        <input id="radio-data-first" type="radio" name="div-layout" value="data-first" onchange="onChange()">
-                                        <label for="radio-data-first">Data table first</label>
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Appearance</td>
-                                <td>
-                                    <span style="margin-right: 4ch;">
-                                        <span>Theme:</span>
-                                        <span>
-                                            <input id="radio-theme-auto" type="radio" name="theme" value="auto" onchange="onChange()" checked>
-                                            <label for="radio-theme-auto">Follow browser setting</label>
-                                        </span>
-                                        <span>
-                                            <input id="radio-theme-light" type="radio" name="theme" value="light" onchange="onChange()">
-                                            <label for="radio-theme-light">Light</label>
-                                        </span>
-                                        <span>
-                                            <input id="radio-theme-dark" type="radio" name="theme" value="dark" onchange="onChange()">
-                                            <label for="radio-theme-dark">Dark</label>
-                                        </span>
-                                    </span>
-                                    <span>
-                                        <span>Font style:</span>
-                                        <span>
-                                            <input id="radio-font-sans" type="radio" name="font" value="sans" onchange="onChange()" checked>
-                                            <label for="radio-font-sans">Sans-serif</label>
-                                        </span>
-                                        <span>
-                                            <input id="radio-font-serif" type="radio" name="font" value="serif" onchange="onChange()">
-                                            <label for="radio-font-serif">Serif</label>
-                                        </span>
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </dialog>
-            <dialog id="dialog-export-image" class="dialog-container">
-                <div class="dialog-header">
-                    <span class="dialog-title">EXPORT IMAGE</span>
-                    <a class="close-button" href="javascript:hideDialog('dialog-export-image')">&#128473;</a>
-                </div>
-                <div class="dialog-main">
-                    <div id="dialog-export-preview">
-                        <span></span>
-                    </div>
-                    <div id="dialog-export-options">
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <td><label for="expimg-select-type">Type</label></td>
-                                    <td><select name="expimg-type" id="expimg-select-type" onchange="updateImageExportDialog()" autofocus>
-                                        <option value="clockface-set">Clockface (set)</option>
-                                        <option value="clockface-intervals">Clockface (intervals)</option>
-                                        <option value="clockface-inversion">Clockface (inversion)</option>
-                                        <option value="clockface-transposition">Clockface (transposition)</option>
-                                        <option value="ruler-set">Ruler (set)</option>
-                                        <option value="staff-set">Staff (set)</option>
-                                        <option value="tonnetz-set">Tonnetz (set)</option>
-                                    </select></td>
-                                </tr>
-                                <tr includetype="clockface-inversion">
-                                    <td>Invert</td>
-                                    <td>
-                                        <label for="expimg-inversion-index">Index:</label>
-                                        <input type="number" id="expimg-inversion-index" name="expimg-inversion-index" oninput="updateImageExportDialog()" 
-                                            value="0" min="-1" max="12" step="1" list="expimg-inversion-index-list"/>
-                                    </td>
-                                    <datalist id="expimg-inversion-index-list">
-                                        <option value="0"></option><option value="1"></option>
-                                        <option value="2"></option><option value="3"></option>
-                                        <option value="4"></option><option value="5"></option>
-                                        <option value="6"></option><option value="7"></option>
-                                        <option value="8"></option><option value="9"></option>
-                                        <option value="10"></option><option value="11"></option>
-                                    </datalist>
-                                </tr>
-                                <tr includetype="clockface-transposition">
-                                    <td>Transpose</td>
-                                    <td>
-                                        <label for="expimg-transposition-index">Index:</label>
-                                        <input type="number" id="expimg-transposition-index" name="expimg-transposition-index" oninput="updateImageExportDialog()" 
-                                            value="1" min="-12" max="12" step="1" previous="1" list="expimg-transposition-index-list"/>
-                                    </td>
-                                    <!-- <datalist id="expimg-transposition-index-list">
-                                        <option value="0"></option><option value="1"></option>
-                                        <option value="2"></option><option value="3"></option>
-                                        <option value="4"></option><option value="5"></option>
-                                        <option value="6"></option><option value="7"></option>
-                                        <option value="8"></option><option value="9"></option>
-                                        <option value="10"></option><option value="11"></option>
-                                    </datalist> -->
-                                </tr>
-                                <tr includetype="ruler-set">
-                                    <td><label for="expimg-first-pc">Start at</label></td>
-                                    <td>
-                                        <span class="range-label">0</span>
-                                        <input type="range" id="expimg-first-pc" name="expimg-first-pc" oninput="updateImageExportDialog()" 
-                                        value="0" min="0" max="11" step="1" list="expimg-first-pc-list"/>
-                                        <span class="range-label">11</span>
-                                    </td>
-                                    <datalist id="expimg-first-pc-list">
-                                        <option value="0"></option><option value="1"></option>
-                                        <option value="2"></option><option value="3"></option>
-                                        <option value="4"></option><option value="5"></option>
-                                        <option value="6"></option><option value="7"></option>
-                                        <option value="8"></option><option value="9"></option>
-                                        <option value="10"></option><option value="11"></option>
-                                    </datalist>
-                                </tr>
-                                <tr includetype="tonnetz-set">
-                                    <td>Tonnetz</td>
-                                    <td>
-                                        <span>
-                                            <label for="expimg-tonnetz-width">Width:</label>
-                                            <input type="number" id="expimg-tonnetz-width" name="expimg-tonnetz-width" oninput="updateImageExportDialog()" 
-                                                value="6" min="2" max="20" step="1" />
-                                        </span>
-                                        <span>
-                                            <label for="expimg-tonnetz-height">Height:</label>
-                                            <input type="number" id="expimg-tonnetz-height" name="expimg-tonnetz-height" oninput="updateImageExportDialog()" 
-                                                value="5" min="2" max="20" step="1" />
-                                        </span>
-                                        <span>
-                                            <label for="expimg-tonnetz-centerpc">PC at center:</label>
-                                            <input type="number" id="expimg-tonnetz-centerpc" name="expimg-tonnetz-centerpc" oninput="updateImageExportDialog()" 
-                                                value="4" min="-1" max="12" step="1" />
-                                        </span>
-                                    </td>
-                                    <datalist id="expimg-tonnetz-size-list">
-                                        <option value="2"></option><option value="3"></option>
-                                        <option value="4"></option><option value="5"></option>
-                                        <option value="6"></option><option value="7"></option>
-                                        <option value="8"></option><option value="9"></option>
-                                        <option value="10"></option><option value="11"></option>
-                                        <option value="12"></option>
-                                    </datalist>
-                                </tr>
-                                <tr>
-                                    <td>Elements</td>
-                                    <td id="expimg-elements-area">
-                                        <span includetype="clockface-intervals">
-                                            <input id="chk-export-ic1" type="checkbox" onchange="updateImageExportDialog()">
-                                            <label for="chk-export-ic1">IC1</label>
-                                        </span>
-                                        <span includetype="clockface-intervals">
-                                            <input id="chk-export-ic2" type="checkbox" onchange="updateImageExportDialog()">
-                                            <label for="chk-export-ic2">IC2</label>
-                                        </span>
-                                        <span includetype="clockface-intervals">
-                                            <input id="chk-export-ic3" type="checkbox" onchange="updateImageExportDialog()">
-                                            <label for="chk-export-ic3">IC3</label>
-                                        </span>
-                                        <span includetype="clockface-intervals">
-                                            <input id="chk-export-ic4" type="checkbox" onchange="updateImageExportDialog()">
-                                            <label for="chk-export-ic4">IC4</label>
-                                        </span>
-                                        <span includetype="clockface-intervals">
-                                            <input id="chk-export-ic5" type="checkbox" onchange="updateImageExportDialog()">
-                                            <label for="chk-export-ic5">IC5</label>
-                                        </span>
-                                        <span includetype="clockface-intervals">
-                                            <input id="chk-export-ic6" type="checkbox" onchange="updateImageExportDialog()">
-                                            <label for="chk-export-ic6">IC6</label>
-                                        </span>
-                                        <span includetype="clockface-set">
-                                            <input id="chk-export-polygon" type="checkbox" onchange="updateImageExportDialog()">
-                                            <label for="chk-export-polygon">Set geometry</label>
-                                        </span>
-                                        <span includetype="clockface-set">
-                                            <input id="chk-export-sym-axes" type="checkbox" onchange="updateImageExportDialog()">
-                                            <label for="chk-export-sym-axes">Axes of symmetry</label>
-                                        </span>
-                                        <span includetype="clockface-inversion">
-                                            <input id="chk-export-inversion-axis" type="checkbox" onchange="updateImageExportDialog()">
-                                            <label for="chk-export-inversion-axis">Inversion axis</label>
-                                        </span>
-                                        <span includetype="clockface-inversion clockface-transposition">
-                                            <input id="chk-all-paths" type="checkbox" onchange="updateImageExportDialog()">
-                                            <label for="chk-all-paths">All paths</label>
-                                        </span>
-                                        <span includetype="tonnetz-set">
-                                            <input id="chk-tonnetz-show-all-pcs" type="checkbox" onchange="updateImageExportDialog()">
-                                            <label for="chk-tonnetz-show-all-pcs">All pitch classes</label>
-                                        </span>
-                                        <span includetype="tonnetz-set">
-                                            <input id="chk-tonnetz-show-all-connections" type="checkbox" onchange="updateImageExportDialog()">
-                                            <label for="chk-tonnetz-show-all-connections">All connections</label>
-                                        </span>
-                                        <span includetype="tonnetz-set">
-                                            <input id="chk-tonnetz-fill-triangles" type="checkbox" onchange="updateImageExportDialog()">
-                                            <label for="chk-tonnetz-fill-triangles">Fill triangles</label>
-                                        </span>
-                                        <span includetype="clockface-set clockface-intervals clockface-inversion clockface-transposition">
-                                            <input id="chk-export-fifths" type="checkbox" onchange="updateImageExportDialog()">
-                                            <label for="chk-export-fifths">Circle of fifths</label>
-                                        </span>
-                                        <span includetype="ruler-set">
-                                            <input id="chk-export-double-row" type="checkbox" onchange="updateImageExportDialog()">
-                                            <label for="chk-export-double-row">Double row (as in a keyboard)</label>
-                                        </span>
-                                        <span includetype="staff-set" style="padding-right: 0.5ch;">
-                                            <label for="expimg-select-staff-clef">Clef:</label>
-                                            <select name="expimg-staff-clef" id="expimg-select-staff-clef" onchange="updateImageExportDialog()">
-                                                <option value="G2">Treble</option>
-                                                <option value="C3">Alto</option>
-                                                <option value="C4">Tenor</option>
-                                                <option value="F4">Bass</option>
-                                            </select> 
-                                        </span>
-                                        <span includetype="staff-set" style="padding-right: 0.5ch;">
-                                            <label for="expimg-select-staff-notehead">Notehead:</label>
-                                            <select name="expimg-staff-notehead" id="expimg-select-staff-notehead" onchange="updateImageExportDialog()">
-                                                <option value="q">Quarter</option>
-                                                <option value="h">Half</option>
-                                                <option value="w">Whole</option>
-                                            </select> 
-                                        </span>
-                                        <span includetype="staff-set">
-                                            <label for="expimg-select-staff-barline">Barline:</label>
-                                            <select name="expimg-staff-barline" id="expimg-select-staff-barline" onchange="updateImageExportDialog()">
-                                                <option value="">None</option>
-                                                <option value="single">Single</option>
-                                                <option value="double">Double</option>
-                                                <option value="final">Final</option>
-                                            </select> 
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr excludetype="staff-set">
-                                    <td>Text</td>
-                                    <td id="expimg-text-options-area">
-                                        <span>
-                                            <input id="rad-expimg-text-always" name="expimg-show-text" type="radio" 
-                                                value="always" checked onchange="updateImageExportDialog()">
-                                            <label for="rad-expimg-text-always">Show all</label>
-                                        </span>
-                                        <span>
-                                            <input id="rad-expimg-text-enabled" name="expimg-show-text" type="radio" 
-                                                value="enabled" onchange="updateImageExportDialog()">
-                                            <label for="rad-expimg-text-enabled">Only enabled</label>
-                                        </span>
-                                        <span>
-                                            <input id="rad-expimg-text-never" name="expimg-show-text" type="radio"
-                                                value="never" onchange="updateImageExportDialog()">
-                                            <label for="rad-expimg-text-never">Hide all</label>
-                                        </span>
-                                        <span>
-                                            <input id="chk-export-note-names" type="checkbox" onchange="updateImageExportDialog()">
-                                            <label for="chk-export-note-names">Note names instead of numbers</label>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr includetype="staff-set">
-                                    <td><label for="expimg-select-staff-clef">Shift</label></td>
-                                    <td>
-                                        <a id="expimg-staff-shiftup-link" href="javascript:exportStaffShiftNotes(-1)">▼ Down</a> • 
-                                        <a id="expimg-staff-shiftdown-link" href="javascript:exportStaffShiftNotes(1)">Up ▲</a>
-                                    </td>
-                                </tr>                                    
-                                <tr>
-                                    <td><label for="expimg-select-theme">Theme</label></td>
-                                    <td>
-                                        <span excludetype="staff-set" style="padding-right: 0.5ch;">
-                                            <select name="expimg-theme" id="expimg-select-theme" onchange="updateImageExportDialog()">
-                                                <option value="basic">Simple</option>
-                                                <option value="hard">Strong</option>
-                                                <option value="solid">Solid</option>
-                                                <option value="soft">Subtle</option>
-                                            </select> 
-                                        </span>
-                                        <span style="padding-right: 0.5ch;">
-                                            <label for="expimg-select-theme-color">Color:</label>
-                                            <select name="expimg-theme-color" id="expimg-select-theme-color" onchange="updateImageExportDialog()">
-                                                <option value="">None</option>
-                                                <option value="red">Red</option>
-                                                <option value="green">Green</option>
-                                                <option value="blue">Blue</option>
-                                                <option value="colorful">Colorful</option>
-                                            </select>
-                                        </span>
-                                        <span>
-                                            <label for="expimg-select-theme-bg">Background:</label>
-                                            <select name="expimg-theme-bg" id="expimg-select-theme-bg" onchange="updateImageExportDialog()">
-                                                <option value="light">Light</option>
-                                                <option value="dark">Dark</option>
-                                            </select>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr excludetype="ruler-set staff-set">
-                                    <td><label for="expimg-scale">Scaling</label></td>
-                                    <td>
-                                        <span class="range-label">Small</span>
-                                        <input type="range" id="expimg-scale" name="expimg-scale" oninput="updateImageExportDialog()" 
-                                        value="1.15" min="1.0" max="1.3" step="0.075" list="expimg-scale-list"/>
-                                        <span class="range-label">Large</span>
-                                    </td>
-                                    <datalist id="expimg-scale-list">
-                                        <option value="1.0" ></option>
-                                        <option value="1.075" ></option>
-                                        <option value="1.15"></option>
-                                        <option value="1.225"></option>
-                                        <option value="1.3" ></option>
-                                    </datalist>
-                                </tr>
-                                <tr excludetype="staff-set">
-                                    <td><label for="expimg-stroke">Strokes</label></td>
-                                    <td>
-                                        <span class="range-label">Thin</span>
-                                        <input type="range" id="expimg-stroke" name="expimg-stroke" oninput="updateImageExportDialog()" 
-                                        value="2.0" min="1.25" max="4.25" step="0.75" list="expimg-stroke-list"/>
-                                        <span class="range-label">Thick</span>
-                                    </td>
-                                    <datalist id="expimg-stroke-list">
-                                        <option value="1.25"></option>
-                                        <option value="2.0" ></option>
-                                        <option value="2.75"></option>
-                                        <option value="3.5" ></option>
-                                        <option value="4.25"></option>
-                                    </datalist>
-                                </tr>
-                                <tr>
-                                    <td>Format</td>
-                                    <td>
-                                        <span>
-                                            <input id="radio-export-file-svg" type="radio" name="export-file-type" value="svg" onchange="updateImageExportDialog()" checked>
-                                            <label for="radio-export-file-svg">SVG image</label>
-                                        </span>
-                                        <span>
-                                            <input id="radio-export-file-png" type="radio" name="export-file-type" value="png" onchange="updateImageExportDialog()">
-                                            <label for="radio-export-file-png">PNG image</label>
-                                        </span>
-                                        <span id="span-input-export-file-png-size" hidden>
-                                            <label for="input-export-file-png-size">Height:</label>
-                                            <input id="input-export-file-png-size" type="number" value="1000" step="100" min="100" max="10000" onchange="updateImageExportDialog()"/>
-                                            <label for="input-export-file-png-size"> pixels</label>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Export</td>
-                                    <td>
-                                        <a id="export-image-download-svg-link" href="javascript:downloadImage('svg')">Save SVG file</a>
-                                        <a id="export-image-download-png-link" href="javascript:downloadImage('png')" hidden>Save PNG file</a>
-                                        <span id="export-image-copy-link"> | <a href="javascript:copyImageToClipboard()">Copy image to clipboard</a></span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </dialog>
-        </main>
-    </body>
+  <head>
+    <title i18n="main-title">Pitch-Class Set Visualizer</title>
+    <meta id="color-scheme" name="color-scheme" content="light" />
+    <link rel="stylesheet" href="css/default.css">
+    <link rel="stylesheet" href="css/clockface.css">
+    <script type="text/javascript" src="js/utils.js" defer></script>
+    <script type="text/javascript" src="js/storage-handler.js" defer></script>
+    <script type="text/javascript" src="js/globals.js" defer></script>
+    <script type="text/javascript" src="js/fileutils.js" defer></script>
+    <script type="text/javascript" src="js/i18n.js" defer></script>
+    <script type="text/javascript" src="js/favorites.js" defer></script>
+    <script type="text/javascript" src="js/config.js" defer></script>
+    <script type="text/javascript" src="js/pcset.js" defer></script>
+    <script type="text/javascript" src="js/table.js" defer></script>
+    <script type="text/javascript" src="js/svgtools.js" defer></script>
+    <script type="text/javascript" src="js/musicnote.js"defer ></script>
+    <script type="text/javascript" src="js/colors.js" defer></script>
+    <script type="text/javascript" src="js/graphics.js" defer></script>
+    <script type="text/javascript" src="js/clockface.js" defer></script>
+    <script type="text/javascript" src="js/midi.js" defer></script>
+    <script type="text/javascript" src="js/dialogs.js"></script>
+    <script type="text/javascript" src="js/audio.js"></script>
+    <script type="text/javascript" src="js/main.js" defer></script>
+    <link rel="icon" type="image/png" href="favicon.png">
+  </head>
+  <body>
+    <main id="main-area">
+      <div id="visualization-area">
+        <svg id="visualization-svg" width="500" height="500" viewbox="0 0 500 500"></svg>
+      </div>
+      <div id="data-area" tabindex="-1">
+        <table id="data-table">
+          <tbody id="data-table-body">
+            <tr id="row-input" always-visible>
+              <td><label for="input-main" i18n="input-main">Type a set:</label></td>
+              <td>
+                <input id="input-main" class="setfont" type="text" spellcheck="false" oninput="onInput()">
+              </td>
+            </tr>
+            <tr id="row-favorites">
+              <td i18n="row-favorites">Favorite sets: 
+                <a id="favorites-toggle" class="icon-star" href="javascript:toggleFavorite()">☆</a></td>
+              <td id="favorites"></td>
+            </tr>
+            <tr id="row-ruler-view" hidden>
+              <td i18n="row-ruler-view"><span>Ruler view:</span>
+              <span style="float: inline-end;">
+                <a href="javascript:rulerShift(1)">◀</a>
+                <a href="javascript:rulerShift(-1)">▶</a>
+              </span>
+              </td>
+              <td id="ruler-view" class="graphics-view"></td>
+            </tr>
+            <tr id="row-staff-view">
+              <td i18n="row-staff-view">
+                <span id="staff-up-btn">Staff view:</span>
+                <span id="staff-down-btn">
+                  <a href="javascript:pcsetRotate(1)">▲</a><br /><a href="javascript:pcsetRotate(-1)">▼</a>
+                </span>
+              </td>
+              <td id="staff-view" style="display: inline-flex"></td>
+            </tr>
+            <tr id="row-operations">
+              <td i18n="row-operations">Operation:</td>
+              <td id="operations">
+                <select name="operation-selector" id="operation-selector" onchange="operationUpdate(true)">
+                  <option value="Tn">Transpose</option>
+                  <option value="In">Invert</option>
+                  <option value="Mn">Multiply</option>
+                  <option value="Rn">Shift</option>
+                </select>
+                <input type="number" id="operation-index" name="operation-index" 
+                  min="-12" max="12" value="1" previous="1" size="2" oninput="operationUpdate()"/>
+                ⇒&nbsp;<span id="operation-result"></span>
+              </td>
+            </tr>
+            <tr id="row-binv" hidden>
+              <td i18n="row-binv">Binary representation:</td>
+              <td id="binary-value"></td>
+            </tr>
+            <tr id="row-normal">
+              <td i18n="row-normal">Normal order:</td>
+              <td id="normal-form"></td>
+            </tr>
+            <tr id="row-prime">
+              <td i18n="row-prime">Prime form: <a class="icon-search" href="javascript:showPrimeSelector()">&#128269;</a></td>
+              <td id="prime-form"></td>
+            </tr>
+            <tr id="row-forte">
+              <td i18n="row-forte">Forte/Morris name: <a class="icon-search" href="javascript:showForteSelector()">&#128269;</a></td>
+              <td id="forte-name"></td>
+            </tr>
+            <tr id="row-carter" hidden>
+              <td i18n="row-carter">Carter number: <a class="icon-search" href="javascript:showCarterSelector()">&#128269;</a></td>
+              <td id="carter-name"></td>
+            </tr>
+            <tr id="row-descriptive-name">
+              <td i18n="row-descriptive-name">Descriptive name(s): <a class="icon-search" href="javascript:showDescriptionSelector()" hidden>&#128269;</a></td>
+              <td id="descriptive-name"></td>
+            </tr>
+            <tr id="row-features">
+              <td i18n="row-features">Set features: <a href="javascript:showFeaturesSelector()" hidden>&#128269;</a></td>
+              <td id="features"></td>
+            </tr>
+            <tr id="row-complement">
+              <td>Complement:</td>
+              <td id="complement"></td>
+            </tr>
+            <tr id="row-zcorrespondent" hidden>
+              <td>Z-correspondent:</td>
+              <td id="zcorrespondent"></td>
+            </tr>
+            <tr id="row-ic-vector">
+              <td i18n="row-ic-vector">Interval-class vector:</td>
+              <td id="ic-vector"></td>
+            </tr>
+            <tr id="row-ct-vector" hidden>
+              <td i18n="row-ct-vector">Common-tone vector:</td>
+              <td id="ct-vector"></td>
+            </tr>
+            <tr id="row-spectra" hidden>
+              <td i18n="row-spectra">Interval spectra:</td>
+              <td id="spectra"></td>
+            </tr>
+            <tr id="row-sumclass" hidden>
+              <td>Sum & sum class:</a></td>
+              <td id="sumclass"></td>
+            </tr>
+            <tr id="row-rotations" hidden>
+              <td i18n="row-rotations">Modes:</td>
+              <td id="rotations"></td>
+            </tr>
+            <tr id="row-symmetries" hidden>
+              <td>Symmetries/Equivalences:</td>
+              <td id="symmetries"></td>
+            </tr>
+            <tr id="row-combinatorials" hidden>
+              <td>Combinatoriality:</td>
+              <td id="combinatorials"></td>
+            </tr>
+            <tr id="row-transposition" hidden>
+              <td>Transpositions:</td>
+              <td id="transpositions"></td>
+            </tr>
+            <tr id="row-ctt" hidden>
+              <td i18n="row-ctt">Common tones under T<sub>n</sub>:</td>
+              <td id="ctt"></td>
+            </tr>
+            <tr id="row-inversions" hidden>
+              <td>Inversions:</td>
+              <td id="inversions"></td>
+            </tr>
+            <tr id="row-cti" hidden>
+              <td i18n="row-cti">Common tones under <span id="cti-inversion-label">I<sub>n</sub></span>:</td>
+              <td id="cti"></td>
+            </tr>
+            <tr id="row-multiples" hidden>
+              <td>Multiplications:</td>
+              <td id="multiples"></td>
+            </tr>
+            <tr id="row-subsets" hidden>
+              <td>Subsets:</td>
+              <td id="subsets">
+                <a href="javascript:showSubsetSelector()">All subsets</a> | <a href="javascript:showPrimeSubsetSelector()">Prime subsets</a>
+              </td>
+            </tr>
+            <tr id="row-misc" always-visible>
+              <td>Misc.:</td>
+              <td id="misc-area">
+                <span>
+                  <a href="javascript:playScale()">Listen</a>
+                </span> | 
+                <span>
+                  <a href="javascript:showExportImageDialog()">Export&nbsp;image</a>
+                </span> | 
+                <span>
+                  <a href="javascript:showConfigDialog()">Options</a>
+                </span> | 
+                <span>
+                  <a href="javascript:showAboutDialog()">About</a>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <dialog id="dialog-about" class="dialog-container">
+        <div class="dialog-header">
+          <span class="dialog-title">ABOUT</span>
+          <a class="close-button" href="javascript:hideDialog('dialog-about')" autofocus>&#128473;</a>
+        </div>
+        <div class="dialog-main">
+          <b>Pitch-Class Set Visualizer, version <span id="version-number"></span></b>.
+          <br />
+          Licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">GNU Affero General Public License version 3</a>.<br />
+          &#169;&nbsp;2024 Josias Matschulat.
+          <br /><br />
+          Descriptive names adapted from Larry Solomon, &#169;&nbsp;1997, 2005,<br />with additions from Straus, 2016.
+          <br /><br />
+          Get the <a href="https://github.com/josiasmat/pcset-viz" target="_blank">source code</a> at GitHub.
+        </div>
+      </dialog>
+      <dialog id="dialog-set-selector" class="dialog-container">
+        <div class="dialog-header">
+          <span class="dialog-title">SET SELECTOR</span>
+          <a class="close-button" href="javascript:hideDialog('dialog-set-selector')">&#128473;</a>
+        </div>
+        <div class="dialog-main">
+          <table id="table-set-selector">
+            <tbody>
+              <tr>
+                <th>Type</th>
+                <th id="dialog-set-selector-second-column-header">Sets</th>
+              </tr>
+              <tr id="table-set-row-filter">
+                <td><label for="input-set-filter" i18n="input-set-filter">Filter:</label></td>
+                <td><input id="input-set-filter" type="text" spellcheck="false" autofocus></td>
+              </tr>
+              <tr>
+                <td>Dyads:</td>
+                <td id="table-set-row2"></td>
+              </tr>
+              <tr>
+                <td>Trichords:</td>
+                <td id="table-set-row3"></td>
+              </tr>
+              <tr>
+                <td>Tetrachords:</td>
+                <td id="table-set-row4"></td>
+              </tr>
+              <tr>
+                <td>Pentachords:</td>
+                <td id="table-set-row5"></td>
+              </tr>
+              <tr>
+                <td>Hexachords:</td>
+                <td id="table-set-row6"></td>
+              </tr>
+              <tr>
+                <td>Heptachords:</td>
+                <td id="table-set-row7"></td>
+              </tr>
+              <tr>
+                <td>Octachords:</td>
+                <td id="table-set-row8"></td>
+              </tr>
+              <tr>
+                <td>Nonachords:</td>
+                <td id="table-set-row9"></td>
+              </tr>
+              <tr>
+                <td>Decachords:</td>
+                <td id="table-set-row10"></td>
+              </tr>
+              <tr>
+                <td>Others:</td>
+                <td id="table-set-row0"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </dialog>
+      <dialog id="dialog-config" class="dialog-container">
+        <div class="dialog-header">
+          <span class="dialog-title">OPTIONS</span>
+          <a class="close-button" href="javascript:hideDialog('dialog-config')">&#128473;</a>
+        </div>
+        <div class="dialog-main">
+          <table id="dialog-config-table">
+            <tbody>
+              <tr>
+                <td>Import/export</td>
+                <td>
+                  <span style="margin-right: 4rem;">Favorites:
+                  <a href="javascript:loadFavoritesFromFile()" autofocus>Import from file</a> |
+                  <a href="javascript:saveFavoritesToFile()">Export to file</a></span>
+                  <span>Configuration:
+                  <a href="javascript:loadConfigFromFile()">Import from file</a> |
+                  <a href="javascript:saveConfigToFile()">Export to file</a></span>
+                </td>
+              </tr>
+              <tr>
+                <td>Visible data<br />
+                  (<a href="javascript:resetVisibleDataRows()">Reset</a> · 
+                   <a href="javascript:setAllDataRowsVisible()">All</a>)
+                </td>
+                <td id="visible-data-checkboxes-area"></td>
+              </tr>
+              <tr>
+                <td>Forte/Morris name</td>
+                <td>
+                  <span>
+                    <input id="radio-prime-form-unique" type="radio" name="prime-form" value="true" onchange="onChange()" checked>
+                    <label for="radio-prime-form-unique">Prime and its inverse are the same (Forte)</label>
+                  </span>
+                  <span>
+                    <input id="radio-prime-form-distinct" type="radio" name="prime-form" value="false" onchange="onChange()">
+                    <label for="radio-prime-form-distinct">Differentiate prime and its inverse</label>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>Pitch-class format</td>
+                <td>
+                  <span>
+                    <input id="radio-setformat-short-ab" type="radio" name="set-format" value="short-ab" onchange="onChange()" checked>
+                    <label id="radio-setformat-short-ab-label" for="radio-setformat-short-ab">[012…9AB]</label>
+                  </span>
+                  <span>
+                    <input id="radio-setformat-short-te" type="radio" name="set-format" value="short-te" onchange="onChange()">
+                    <label id="radio-setformat-short-te-label" for="radio-setformat-short-te">[012…9TE]</label>
+                  </span>
+                  <span>
+                    <input id="radio-setformat-numbers" type="radio" name="set-format" value="numbers" onchange="onChange()">
+                    <label id="radio-setformat-numbers-label" for="radio-setformat-numbers">[0,1,2,…,9,10,11]</label>
+                  </span>
+                  <span>
+                    <input id="radio-setformat-notes-sharps" type="radio" name="set-format" value="notes-sharps" onchange="onChange()">
+                    <label id="radio-setformat-notes-sharps-label" for="radio-setformat-notes-sharps">[C,C&#9839;,D,…,A,A&#9839;,B]</label>
+                  </span>
+                  <span>
+                    <input id="radio-setformat-notes-flats" type="radio" name="set-format" value="notes-flats" onchange="onChange()">
+                    <label id="radio-setformat-notes-flats-label" for="radio-setformat-notes-flats">[C,D&#9837;,D,…,A,B&#9837;,B]</label>
+                  </span>
+                  <span class="keyboard-shortcut" style="float: inline-end;">(Alt+F)</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Set bracketing</td>
+                <td>
+                  <span>
+                    <input id="radio-setbrackets-square" type="radio" name="set-brackets" value="[]" onchange="onChange(true)" checked>
+                    <label for="radio-setbrackets-square">[…] square brackets</label>
+                  </span>
+                  <span>
+                    <input id="radio-setbrackets-round" type="radio" name="set-brackets" value="()" onchange="onChange(true)">
+                    <label for="radio-setbrackets-round">(…) parentheses</label>
+                  </span>
+                  <span>
+                    <input id="radio-setbrackets-curly" type="radio" name="set-brackets" value="{}" onchange="onChange(true)">
+                    <label for="radio-setbrackets-curly">{…} curly braces</label>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>Vector format</td>
+                <td>
+                  <span>
+                    <input id="radio-vectorformat-short" type="radio" name="vector-format" value="short" onchange="onChange()" checked>
+                    <label for="radio-vectorformat-short">‹254361›</label>
+                  </span>
+                  <span>
+                    <input id="radio-vectorformat-long" type="radio" name="vector-format" value="long" onchange="onChange()">
+                    <label for="radio-vectorformat-long">‹2,5,4,3,6,1›</label>
+                  </span>
+                  <span class="keyboard-shortcut" style="float: inline-end;">(Alt+V)</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Inversion format</td>
+                <td>
+                  <span>
+                    <input id="radio-inversionformat-in" type="radio" name="inversion-format" value="In" onchange="onChange(true)" checked>
+                    <label for="radio-inversionformat-in">Simple (I<sub>n</sub>)</label>
+                  </span>
+                  <span>
+                    <input id="radio-inversionformat-tni" type="radio" name="inversion-format" value="TnI" onchange="onChange(true)">
+                    <label for="radio-inversionformat-tni">Compound (T<sub>n</sub>I)</label>
+                  </span>
+                  <span class="keyboard-shortcut" style="float: inline-end;">(Alt+I)</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Clockface visualization</td>
+                <td>
+                  <span>
+                    <input id="chk-note-names" type="checkbox" onchange="onChange()">
+                    <label for="chk-note-names">Note names <span class="keyboard-shortcut">(Alt+N)<span></label>
+                  </span>
+                  <span>
+                    <input id="chk-polygon" type="checkbox" onchange="onChange()">
+                    <label for="chk-polygon">Set geometry <span class="keyboard-shortcut">(Alt+G)</span></label>
+                  </span>
+                  <span>
+                    <input id="chk-sym-axes" type="checkbox" onchange="onChange()">
+                    <label for="chk-sym-axes">Axes of symmetry <span class="keyboard-shortcut">(Alt+S)</span></label>
+                  </span>
+                  <span>
+                    <input id="chk-fifths" type="checkbox" onchange="onChange()">
+                    <label for="chk-fifths">Circle of fifths <span class="keyboard-shortcut">(Alt+5)</span></label>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>MIDI input</td>
+                <td>
+                  <span>
+                    <label for="select-midi-device">Device:</label>
+                    <select name="select-midi-device" id="select-midi-device" onchange="selectMidiDevice()">
+                      <option value="">No device selected</option>
+                    </select>
+                    →
+                    <span id="midi-connection-status" status="0">Disconnected</span>
+                  </span>
+                  <span>
+                    <label for="">Mode:</label>
+                    <select name="select-midi-mode" id="select-midi-mode" onchange="selectMidiMode()">
+                      <option value="scale">Scale</option>
+                      <option value="chord">Chord</option>
+                      <option value="direct">Direct</option>
+                      <option value="toggle">Toggle</option>
+                    </select>
+                  </span>
+                  <span>
+                    <input id="chk-midi-pedal" type="checkbox" onchange="selectMidiMode()">
+                    <label for="chk-midi-pedal">Hold with sustain pedal</label>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>Sound</td>
+                <td>
+                  <span>
+                    <input id="chk-sound-toggle" type="checkbox" onchange="updateConfigFromInterface()">
+                    <label for="chk-sound-toggle">Play sound on pitch-class toggle</label>
+                  </span>
+                  <span>
+                    <input id="chk-sound-midi" type="checkbox" onchange="updateConfigFromInterface()">
+                    <label for="chk-sound-midi">Play sound on MIDI input</label>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>App layout</td>
+                <td>
+                  <span>
+                    <input id="radio-svg-first" type="radio" name="div-layout" value="svg-first" onchange="onChange()" checked>
+                    <label for="radio-svg-first">Clockface visualization first</label>
+                  </span>
+                  <span>
+                    <input id="radio-data-first" type="radio" name="div-layout" value="data-first" onchange="onChange()">
+                    <label for="radio-data-first">Data table first</label>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>Appearance</td>
+                <td>
+                  <span style="margin-right: 4ch;">
+                    <span>Theme:</span>
+                    <span>
+                      <input id="radio-theme-auto" type="radio" name="theme" value="auto" onchange="onChange()" checked>
+                      <label for="radio-theme-auto">Follow browser setting</label>
+                    </span>
+                    <span>
+                      <input id="radio-theme-light" type="radio" name="theme" value="light" onchange="onChange()">
+                      <label for="radio-theme-light">Light</label>
+                    </span>
+                    <span>
+                      <input id="radio-theme-dark" type="radio" name="theme" value="dark" onchange="onChange()">
+                      <label for="radio-theme-dark">Dark</label>
+                    </span>
+                  </span>
+                  <span>
+                    <span>Font style:</span>
+                    <span>
+                      <input id="radio-font-sans" type="radio" name="font" value="sans" onchange="onChange()" checked>
+                      <label for="radio-font-sans">Sans-serif</label>
+                    </span>
+                    <span>
+                      <input id="radio-font-serif" type="radio" name="font" value="serif" onchange="onChange()">
+                      <label for="radio-font-serif">Serif</label>
+                    </span>
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </dialog>
+      <dialog id="dialog-export-image" class="dialog-container">
+        <div class="dialog-header">
+          <span class="dialog-title">EXPORT IMAGE</span>
+          <a class="close-button" href="javascript:hideDialog('dialog-export-image')">&#128473;</a>
+        </div>
+        <div class="dialog-main">
+          <div id="dialog-export-preview">
+            <span></span>
+          </div>
+          <div id="dialog-export-options">
+            <table>
+              <tbody>
+                <tr>
+                  <td><label for="expimg-select-type">Type</label></td>
+                  <td><select name="expimg-type" id="expimg-select-type" onchange="updateImageExportDialog()" autofocus>
+                    <option value="clockface-set">Clockface (set)</option>
+                    <option value="clockface-intervals">Clockface (intervals)</option>
+                    <option value="clockface-inversion">Clockface (inversion)</option>
+                    <option value="clockface-transposition">Clockface (transposition)</option>
+                    <option value="ruler-set">Ruler (set)</option>
+                    <option value="staff-set">Staff (set)</option>
+                    <option value="tonnetz-set">Tonnetz (set)</option>
+                  </select></td>
+                </tr>
+                <tr includetype="clockface-inversion">
+                  <td>Invert</td>
+                  <td>
+                    <label for="expimg-inversion-index">Index:</label>
+                    <input type="number" id="expimg-inversion-index" name="expimg-inversion-index" oninput="updateImageExportDialog()" 
+                      value="0" min="-1" max="12" step="1" list="expimg-inversion-index-list"/>
+                  </td>
+                  <datalist id="expimg-inversion-index-list">
+                    <option value="0"></option><option value="1"></option>
+                    <option value="2"></option><option value="3"></option>
+                    <option value="4"></option><option value="5"></option>
+                    <option value="6"></option><option value="7"></option>
+                    <option value="8"></option><option value="9"></option>
+                    <option value="10"></option><option value="11"></option>
+                  </datalist>
+                </tr>
+                <tr includetype="clockface-transposition">
+                  <td>Transpose</td>
+                  <td>
+                    <label for="expimg-transposition-index">Index:</label>
+                    <input type="number" id="expimg-transposition-index" name="expimg-transposition-index" oninput="updateImageExportDialog()" 
+                      value="1" min="-12" max="12" step="1" previous="1" list="expimg-transposition-index-list"/>
+                  </td>
+                </tr>
+                <tr includetype="ruler-set">
+                  <td><label for="expimg-first-pc">Start at</label></td>
+                  <td>
+                    <span class="range-label">0</span>
+                    <input type="range" id="expimg-first-pc" name="expimg-first-pc" oninput="updateImageExportDialog()" 
+                    value="0" min="0" max="11" step="1" list="expimg-first-pc-list"/>
+                    <span class="range-label">11</span>
+                  </td>
+                  <datalist id="expimg-first-pc-list">
+                    <option value="0"></option><option value="1"></option>
+                    <option value="2"></option><option value="3"></option>
+                    <option value="4"></option><option value="5"></option>
+                    <option value="6"></option><option value="7"></option>
+                    <option value="8"></option><option value="9"></option>
+                    <option value="10"></option><option value="11"></option>
+                  </datalist>
+                </tr>
+                <tr includetype="tonnetz-set">
+                  <td>Tonnetz</td>
+                  <td>
+                    <span>
+                      <label for="expimg-tonnetz-centerpc">PC at center:</label>
+                      <input type="number" id="expimg-tonnetz-centerpc" name="expimg-tonnetz-centerpc" oninput="updateImageExportDialog()" 
+                        value="4" min="-1" max="12" step="1" />
+                    </span>
+                    <span>
+                      <label for="expimg-tonnetz-width">Width:</label>
+                      <input type="number" id="expimg-tonnetz-width" name="expimg-tonnetz-width" oninput="updateImageExportDialog()" 
+                        value="6" min="2" max="20" step="1" />
+                    </span>
+                    <span>
+                      <label for="expimg-tonnetz-height">Height:</label>
+                      <input type="number" id="expimg-tonnetz-height" name="expimg-tonnetz-height" oninput="updateImageExportDialog()" 
+                        value="5" min="2" max="20" step="1" />
+                    </span>
+                    <span>
+                      <label for="expimg-tonnetz-h-cut">H-cut:</label>
+                      <input type="number" id="expimg-tonnetz-h-cut" name="expimg-tonnetz-h-cut" oninput="updateImageExportDialog()" 
+                        value="0" min="0" max="10" step="1" />
+                    </span>
+                  </td>
+                  <datalist id="expimg-tonnetz-size-list">
+                    <option value="2"></option><option value="3"></option>
+                    <option value="4"></option><option value="5"></option>
+                    <option value="6"></option><option value="7"></option>
+                    <option value="8"></option><option value="9"></option>
+                    <option value="10"></option><option value="11"></option>
+                    <option value="12"></option>
+                  </datalist>
+                </tr>
+                <tr>
+                  <td>Elements</td>
+                  <td id="expimg-elements-area">
+                    <span includetype="clockface-intervals">
+                      <input id="chk-export-ic1" type="checkbox" onchange="updateImageExportDialog()">
+                      <label for="chk-export-ic1">IC1</label>
+                    </span>
+                    <span includetype="clockface-intervals">
+                      <input id="chk-export-ic2" type="checkbox" onchange="updateImageExportDialog()">
+                      <label for="chk-export-ic2">IC2</label>
+                    </span>
+                    <span includetype="clockface-intervals">
+                      <input id="chk-export-ic3" type="checkbox" onchange="updateImageExportDialog()">
+                      <label for="chk-export-ic3">IC3</label>
+                    </span>
+                    <span includetype="clockface-intervals">
+                      <input id="chk-export-ic4" type="checkbox" onchange="updateImageExportDialog()">
+                      <label for="chk-export-ic4">IC4</label>
+                    </span>
+                    <span includetype="clockface-intervals">
+                      <input id="chk-export-ic5" type="checkbox" onchange="updateImageExportDialog()">
+                      <label for="chk-export-ic5">IC5</label>
+                    </span>
+                    <span includetype="clockface-intervals">
+                      <input id="chk-export-ic6" type="checkbox" onchange="updateImageExportDialog()">
+                      <label for="chk-export-ic6">IC6</label>
+                    </span>
+                    <span includetype="clockface-set">
+                      <input id="chk-export-polygon" type="checkbox" onchange="updateImageExportDialog()">
+                      <label for="chk-export-polygon">Set geometry</label>
+                    </span>
+                    <span includetype="clockface-set">
+                      <input id="chk-export-sym-axes" type="checkbox" onchange="updateImageExportDialog()">
+                      <label for="chk-export-sym-axes">Axes of symmetry</label>
+                    </span>
+                    <span includetype="clockface-inversion">
+                      <input id="chk-export-inversion-axis" type="checkbox" onchange="updateImageExportDialog()">
+                      <label for="chk-export-inversion-axis">Inversion axis</label>
+                    </span>
+                    <span includetype="clockface-inversion clockface-transposition">
+                      <input id="chk-all-paths" type="checkbox" onchange="updateImageExportDialog()">
+                      <label for="chk-all-paths">All paths</label>
+                    </span>
+                    <span includetype="tonnetz-set">
+                      <input id="chk-tonnetz-fill-faces" type="checkbox" onchange="updateImageExportDialog()">
+                      <label for="chk-tonnetz-fill-faces">Fill faces</label>
+                    </span>
+                    <span includetype="tonnetz-set">
+                      <input id="chk-tonnetz-all-vertices" type="checkbox" onchange="updateImageExportDialog()">
+                      <label for="chk-tonnetz-all-vertices">All vertices</label>
+                    </span>
+                    <span includetype="tonnetz-set">
+                      <input id="chk-tonnetz-all-edges" type="checkbox" onchange="updateImageExportDialog()">
+                      <label for="chk-tonnetz-all-edges">All edges</label>
+                    </span>
+                    <span includetype="tonnetz-set">
+                      <input id="chk-tonnetz-extended-edges" type="checkbox" onchange="updateImageExportDialog()">
+                      <label for="chk-tonnetz-extended-edges">Extended edges</label>
+                    </span>
+                    <span includetype="clockface-set clockface-intervals clockface-inversion clockface-transposition">
+                      <input id="chk-export-fifths" type="checkbox" onchange="updateImageExportDialog()">
+                      <label for="chk-export-fifths">Circle of fifths</label>
+                    </span>
+                    <span includetype="ruler-set">
+                      <input id="chk-export-double-row" type="checkbox" onchange="updateImageExportDialog()">
+                      <label for="chk-export-double-row">Double row (as in a keyboard)</label>
+                    </span>
+                    <span includetype="staff-set" style="padding-right: 0.5ch;">
+                      <label for="expimg-select-staff-clef">Clef:</label>
+                      <select name="expimg-staff-clef" id="expimg-select-staff-clef" onchange="updateImageExportDialog()">
+                        <option value="G2">Treble</option>
+                        <option value="C3">Alto</option>
+                        <option value="C4">Tenor</option>
+                        <option value="F4">Bass</option>
+                      </select> 
+                    </span>
+                    <span includetype="staff-set" style="padding-right: 0.5ch;">
+                      <label for="expimg-select-staff-notehead">Notehead:</label>
+                      <select name="expimg-staff-notehead" id="expimg-select-staff-notehead" onchange="updateImageExportDialog()">
+                        <option value="q">Quarter</option>
+                        <option value="h">Half</option>
+                        <option value="w">Whole</option>
+                      </select> 
+                    </span>
+                    <span includetype="staff-set">
+                      <label for="expimg-select-staff-barline">Barline:</label>
+                      <select name="expimg-staff-barline" id="expimg-select-staff-barline" onchange="updateImageExportDialog()">
+                        <option value="">None</option>
+                        <option value="single">Single</option>
+                        <option value="double">Double</option>
+                        <option value="final">Final</option>
+                      </select> 
+                    </span>
+                  </td>
+                </tr>
+                <tr excludetype="staff-set">
+                  <td>Text</td>
+                  <td id="expimg-text-options-area">
+                    <span>
+                      <input id="rad-expimg-text-always" name="expimg-show-text" type="radio" 
+                        value="always" checked onchange="updateImageExportDialog()">
+                      <label for="rad-expimg-text-always">Show all</label>
+                    </span>
+                    <span>
+                      <input id="rad-expimg-text-enabled" name="expimg-show-text" type="radio" 
+                        value="enabled" onchange="updateImageExportDialog()">
+                      <label for="rad-expimg-text-enabled">Only enabled</label>
+                    </span>
+                    <span>
+                      <input id="rad-expimg-text-never" name="expimg-show-text" type="radio"
+                        value="never" onchange="updateImageExportDialog()">
+                      <label for="rad-expimg-text-never">Hide all</label>
+                    </span>
+                    <span>
+                      <input id="chk-export-note-names" type="checkbox" onchange="updateImageExportDialog()">
+                      <label for="chk-export-note-names">Note names</label>
+                    </span>
+                  </td>
+                </tr>
+                <tr includetype="staff-set">
+                  <td><label for="expimg-select-staff-clef">Shift</label></td>
+                  <td>
+                    <a id="expimg-staff-shiftup-link" href="javascript:exportStaffShiftNotes(-1)">▼ Down</a> • 
+                    <a id="expimg-staff-shiftdown-link" href="javascript:exportStaffShiftNotes(1)">Up ▲</a>
+                  </td>
+                </tr>                                    
+                <tr>
+                  <td><label for="expimg-select-theme">Theme</label></td>
+                  <td>
+                    <span excludetype="staff-set" style="padding-right: 0.5ch;">
+                      <select name="expimg-theme" id="expimg-select-theme" onchange="updateImageExportDialog()">
+                        <option value="basic">Simple</option>
+                        <option value="hard">Strong</option>
+                        <option value="solid">Solid</option>
+                        <option value="soft">Subtle</option>
+                      </select> 
+                    </span>
+                    <span style="padding-right: 0.5ch;">
+                      <label for="expimg-select-theme-color">Color:</label>
+                      <select name="expimg-theme-color" id="expimg-select-theme-color" onchange="updateImageExportDialog()">
+                        <option value="">None</option>
+                        <option value="red">Red</option>
+                        <option value="green">Green</option>
+                        <option value="blue">Blue</option>
+                        <option value="colorful">Colorful</option>
+                      </select>
+                    </span>
+                    <span>
+                      <label for="expimg-select-theme-bg">Background:</label>
+                      <select name="expimg-theme-bg" id="expimg-select-theme-bg" onchange="updateImageExportDialog()">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                      </select>
+                    </span>
+                  </td>
+                </tr>
+                <tr excludetype="ruler-set staff-set">
+                  <td><label for="expimg-scale">Scaling</label></td>
+                  <td>
+                    <span class="range-label">Small</span>
+                    <input type="range" id="expimg-scale" name="expimg-scale" oninput="updateImageExportDialog()" 
+                    value="1.15" min="1.0" max="1.3" step="0.075" list="expimg-scale-list"/>
+                    <span class="range-label">Large</span>
+                  </td>
+                  <datalist id="expimg-scale-list">
+                    <option value="1.0" ></option>
+                    <option value="1.075" ></option>
+                    <option value="1.15"></option>
+                    <option value="1.225"></option>
+                    <option value="1.3" ></option>
+                  </datalist>
+                </tr>
+                <tr excludetype="staff-set">
+                  <td><label for="expimg-stroke">Strokes</label></td>
+                  <td>
+                    <span class="range-label">Thin</span>
+                    <input type="range" id="expimg-stroke" name="expimg-stroke" oninput="updateImageExportDialog()" 
+                    value="2.0" min="1.25" max="4.25" step="0.75" list="expimg-stroke-list"/>
+                    <span class="range-label">Thick</span>
+                  </td>
+                  <datalist id="expimg-stroke-list">
+                    <option value="1.25"></option>
+                    <option value="2.0" ></option>
+                    <option value="2.75"></option>
+                    <option value="3.5" ></option>
+                    <option value="4.25"></option>
+                  </datalist>
+                </tr>
+                <tr>
+                  <td>Format</td>
+                  <td>
+                    <span>
+                      <input id="radio-export-file-svg" type="radio" name="export-file-type" value="svg" onchange="updateImageExportDialog()" checked>
+                      <label for="radio-export-file-svg">SVG image</label>
+                    </span>
+                    <span>
+                      <input id="radio-export-file-png" type="radio" name="export-file-type" value="png" onchange="updateImageExportDialog()">
+                      <label for="radio-export-file-png">PNG image</label>
+                    </span>
+                    <span id="span-input-export-file-png-size" hidden>
+                      <label for="input-export-file-png-size">Height:</label>
+                      <input id="input-export-file-png-size" type="number" value="1000" step="100" min="100" max="10000" onchange="updateImageExportDialog()"/>
+                      <label for="input-export-file-png-size"> pixels</label>
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Export</td>
+                  <td>
+                    <a id="export-image-download-svg-link" href="javascript:downloadImage('svg')">Save SVG file</a>
+                    <a id="export-image-download-png-link" href="javascript:downloadImage('png')" hidden>Save PNG file</a>
+                    <span id="export-image-copy-link"> | <a href="javascript:copyImageToClipboard()">Copy image to clipboard</a></span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </dialog>
+    </main>
+  </body>
 </html>

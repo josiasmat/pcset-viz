@@ -852,26 +852,35 @@ class StaticTonnetzPcSetView extends PcSetBaseView {
     /**
      * Creates a static tonnetz-type PcSet representation.
      * @param {PcSet} pcset a pitch-class set object.
-     * @param {Object} options optional; accepts the following properties:
-     *      * _width_ (Number) - Default is _6_;
-     *      * _height_ (Number) - Default is _5_;
-     *      * _centerpc_ (Number) - Default is _0_;
-     *      * _scale_ (Number) - Default is _1.0_;
-     *      * _fn_ (Function) - A function to be called for each component, with
-     *          3 arguments: _element_ (a reference to the SVG element), _type_ 
-     *          (String, "svg" or "pc") and _index_ (Number, for "pc" the pitch-class
-     *          number; for "svg" is zero).
+     * @param {Object?} options
+     * @param {Number?} options.width - Default is _6_
+     * @param {Number?} options.height - Default is _5_
+     * @param {Number?} options.h_cut - Default is _0_
+     * @param {Number?} options.centerpc - Default is _0_
+     * @param {Number?} options.scale - Default is _1.0_
+     * @param {Number?} options.stroke_width - Default is _3.0_
+     * @param {Boolean?} options.show_text
+     * @param {Boolean?} options.fill_faces
+     * @param {Boolean?} options.all_vertices
+     * @param {Boolean?} options.all_edges
+     * @param {Boolean?} options.extended_edges
+     * @param {Function?} options.fn- A function to be called for each component, with
+     *      3 arguments: _element_ (a reference to the SVG element), _type_ 
+     *      (String, "svg" or "pc") and _index_ (Number, for "pc" the pitch-class
+     *      number; for "svg" is zero).
      * @param {String} theme optional; name of a theme.
      */
     constructor(pcset, options = {}, theme = "basic-light") {
         super();
 
         this.pcset_str = pcset.toString("short-ab", false);
-        
+
         const size = options.size ?? 500;
         const scale = (options.scale ?? 1.0)**1.5;
         const h_count = options.width ?? 6;
         const v_count = options.height ?? 5;
+        const bottom_right_edge_sum = h_count + v_count - 2;
+        const h_cut = options.h_cut ?? 0;
         const centerpc = options.centerpc ?? 0;
         const cornerpc = (centerpc + (Math.trunc((h_count-1)/2) * 5) + (Math.ceil((v_count-1)/2) * 8)) % 12;
 
@@ -883,22 +892,19 @@ class StaticTonnetzPcSetView extends PcSetBaseView {
         const circle_unit_diameter = scale/1.8 - (stroke_width/2);
         let r = circle_unit_diameter/2; //circle radius
         const total_unit_height = h*(v_count-1) + circle_unit_diameter + stroke_width*2;
-        const total_unit_width = (h_count-1) + (v_count-1)/2 + circle_unit_diameter + stroke_width*2;
+        const total_unit_width = (h_count-1-h_cut) + (v_count-1)/2 + circle_unit_diameter + stroke_width*2;
         const size_ratio = total_unit_width / total_unit_height;
-        let topleft_center = r + stroke_width;
+        let topleft_center_y = r + stroke_width;
+        let topleft_center_x = topleft_center_y - (h_cut * h / Math.sqrt(3));
         const largest_unit_size = Math.max(total_unit_height, total_unit_width);
         const final_scaling_factor = size / largest_unit_size;
 
-        const [total_width, total_height] = ( size_ratio > 1 ) 
+        let [total_width, total_height] = ( size_ratio > 1 ) 
             ? [size, size/total_unit_width*total_unit_height]
             : [size/total_unit_height*total_unit_width, size];
 
         // create root svg element
-        this.svg = SvgTools.createRootElement({
-            "width": total_width.toString(),
-            "height": total_height.toString(),
-            "viewbox": [0,0,total_width,total_height].join(" ")
-        });
+        this.svg = SvgTools.createRootElement();
 
         if ( options.fn ) options.fn(this.svg, "svg", 0);
 
@@ -913,16 +919,32 @@ class StaticTonnetzPcSetView extends PcSetBaseView {
         stroke_width *= final_scaling_factor;
         h *= final_scaling_factor;
         r *= final_scaling_factor;
-        topleft_center *= final_scaling_factor;
+        topleft_center_y *= final_scaling_factor;
+        topleft_center_x *= final_scaling_factor;
 
-        const X = (x,y) => final_scaling_factor * (x + (y/2)) + topleft_center;
-        const Y = (y) => y*h + topleft_center;
-        const PC = (x,y) => (cornerpc + (x*7) + (y*4)) % 12;
+        const text_scale = scale/110*final_scaling_factor;
 
         const rsin60 = Math.sin(1.0471975512) * r;
         const rcos60 = Math.cos(1.0471975512) * r;
 
-        let text_scale = scale/110*final_scaling_factor;
+        if ( options.extended_edges ) {
+            const h_extend = final_scaling_factor - 2*r;
+            const v_extend = final_scaling_factor - 2*r;
+            total_width += 2 * h_extend;
+            total_height += 2 * v_extend;
+            topleft_center_x += h_extend;
+            topleft_center_y += v_extend;
+        }
+
+        this.svg.setAttribute("width", total_width.toString());
+        this.svg.setAttribute("height", total_height.toString());
+        this.svg.setAttribute("viewbox", [
+            0, 0, total_width, total_height
+        ].join(" "));
+
+        const X = (x,y) => final_scaling_factor * (x + (y/2)) + topleft_center_x;
+        const Y = (y) => y*h + topleft_center_y;
+        const PC = (x,y) => (cornerpc + (x*7) + (y*4)) % 12;
 
         const connector_off_attr = {
             "stroke": theme.off.tnz_connector().css_color, 
@@ -939,22 +961,49 @@ class StaticTonnetzPcSetView extends PcSetBaseView {
             "fill-opacity": theme.triangle_fill().css_opacity
         };
 
+        const isInside = (x,y) => {
+            return (x >= 0) && (y >= 0) && (x < h_count) && (y < v_count)
+                && (x+y >= h_cut) && (x+y <= bottom_right_edge_sum-h_cut);
+        };
+
         // Draw Tonnetz
         for ( let y = 0; y < v_count; y++ ) {
             for ( let x = 0; x < h_count; x++ ) {
+
+                if ( !isInside(x, y) ) continue;
 
                 const pc = PC(x,y);
                 const px = X(x,y);
                 const py = Y(y);
 
-                const has_pcs = [ 
-                    pcset.has(pc), pcset.has((pc+7)%12), 
-                    pcset.has((pc+4)%12), pcset.has((pc+9)%12)
-                ];
+                const pcs = {
+                    me: { has: pcset.has(pc) },
+                    p5: { has: pcset.has((pc+7)%12) },
+                    p4: { has: pcset.has((pc+5)%12) },
+                    maj3: { has: pcset.has((pc+4)%12) },
+                    min6: { has: pcset.has((pc+8)%12) },
+                    min3: { has: pcset.has((pc+3)%12) },
+                    maj6: { has: pcset.has((pc+9)%12) }
+                }
 
-                // draw triangles
-                if ( options.fill_triangles && has_pcs[0] && triangle_attr["fill-opacity"] != '0' ) {
-                    if ( y > 0 && x < h_count-1 && pcset.has((pc+3)%12) && pcset.has((pc+8)%12)) {
+                for ( const item of Object.values(pcs) )
+                    item.visible = item.has || options.all_vertices;
+
+                const edges = {
+                    p5: { strong: pcs.me.has && pcs.p5.has },
+                    p4: { strong: pcs.me.has && pcs.p4.has },
+                    maj3: { strong: pcs.me.has && pcs.maj3.has },
+                    min6: { strong: pcs.me.has && pcs.min6.has },
+                    min3: { strong: pcs.me.has && pcs.min3.has },
+                    maj6: { strong: pcs.me.has && pcs.maj6.has }
+                }
+
+                for ( const item of Object.values(edges) )
+                    item.visible = item.strong || options.all_edges;
+
+                // draw filled faces
+                if ( options.fill_faces && pcs.me.has && triangle_attr["fill-opacity"] != '0' ) {
+                    if ( isInside(x,y-1) && isInside(x+1,y-1) && pcs.min3.has && pcs.min6.has ) {
                         const [ax,ay] = [px + rcos60        , py - rsin60    ];
                         const [bx,by] = [X(x+1,y-1) - rcos60, Y(y-1) + rsin60];
                         const [cx,cy] = [X(x+1,y-1) - r     , Y(y-1)         ];
@@ -971,8 +1020,9 @@ class StaticTonnetzPcSetView extends PcSetBaseView {
                             'Z'
                         ], triangle_attr);
                         g_faces.appendChild(triangle_up);
+                        if ( options.fn ) options.fn(triangle_up, "face", 0);
                     }
-                    if ( y < v_count-1 && x > 0 && pcset.has((pc+4)%12) && pcset.has((pc+9)%12) ) {
+                    if ( isInside(x-1,y+1) && isInside(x,y+1) && pcs.maj3.has && pcs.maj6.has ) {
                         const [ax,ay] = [px + rcos60        , py + rsin60    ];
                         const [bx,by] = [X(x+1,y-1) - rcos60, Y(y+1) - rsin60];
                         const [cx,cy] = [X(x+1,y-1) - r     , Y(y+1)         ];
@@ -989,46 +1039,73 @@ class StaticTonnetzPcSetView extends PcSetBaseView {
                             'Z'
                         ], triangle_attr);
                         g_faces.appendChild(triangle_down);
+                        if ( options.fn ) options.fn(triangle_down, "face", 0);
+                    }
+                }
+                
+                const drawEdge = (x1, y1, x2, y2, strong) => {
+                    const line = SvgTools.makeLine(x1, y1, x2, y2,
+                        ( strong ? connector_on_attr : connector_off_attr ));
+                    g_edges.appendChild(line);
+                    if ( options.fn ) options.fn(line, "edge", 0);
+                };
+                    
+                // draw inner edges
+                if ( edges.p5.visible && isInside(x+1,y) ) {
+                    const [ax,ay] = [px + (pcs.me.visible?r:0), py];
+                    const [bx,by] = [X(x+1,y) - (pcs.p5.visible?r:0), ay];
+                    drawEdge(ax, ay, bx, by, edges.p5.strong);
+                }
+                if ( edges.maj3.visible && isInside(x,y+1) ) {
+                    const [ax,ay] = [px + (pcs.me.visible?rcos60:0), py + (pcs.me.visible?rsin60:0)];
+                    const [bx,by] = [X(x,y+1) - (pcs.maj3.visible?rcos60:0), Y(y+1) - (pcs.maj3.visible?rsin60:0)];
+                    drawEdge(ax, ay, bx, by, edges.maj3.strong);
+                }
+                if ( edges.maj6.visible && isInside(x-1,y+1) ) {
+                    const [ax,ay] = [px - (pcs.me.visible?rcos60:0), py + (pcs.me.visible?rsin60:0)];
+                    const [bx,by] = [X(x-1,y+1) + (pcs.maj6.visible?rcos60:0), Y(y+1) - (pcs.maj6.visible?rsin60:0)];
+                    drawEdge(ax, ay, bx, by, edges.maj6.strong);
+                }
+
+                // draw extended edges
+                if ( options.extended_edges ) {
+                    if ( edges.p4.visible && (x == 0 || (x+y == h_cut)) ) {
+                        const [ax,ay] = [px - (pcs.me.visible?r:0), py];
+                        const [bx,by] = [X(x-1,y) + r, ay];
+                        drawEdge(ax, ay, bx, by, edges.p4.strong);
+                    }
+                    if ( edges.p5.visible && 
+                            (x == h_count-1 || (x+y == bottom_right_edge_sum - h_cut)) ) {
+                        const [ax,ay] = [px + (pcs.me.visible?r:0), py];
+                        const [bx,by] = [X(x+1,y) - r, ay];
+                        drawEdge(ax, ay, bx, by, edges.p5.strong);
+                    }
+                    if ( edges.maj6.visible && ((x == 0 && y < v_count-1) || y == v_count-1) ) {
+                        const [ax,ay] = pcs.me.visible? [px-rcos60, py+rsin60] : [px,py];
+                        const [bx,by] = [X(x-1,y+1) + rcos60, Y(y+1) - rsin60];
+                        drawEdge(ax, ay, bx, by, edges.maj6.strong);
+                    }
+                    if ( edges.min3.visible && ((x == h_count-1 && y > 0) || y == 0) ) {
+                        const [ax,ay] = pcs.me.visible ? [px+rcos60, py-rsin60] : [px,py];
+                        const [bx,by] = [X(x+1,y-1) - rcos60, Y(y-1) + rsin60];
+                        drawEdge(ax, ay, bx, by, edges.min3.strong);
+                    }
+                    if ( edges.min6.visible && (y == 0 || x+y == h_cut) ) {
+                        const [ax,ay] = pcs.me.visible ? [px-rcos60, py-rsin60] : [px,py];
+                        const [bx,by] = [X(x,y-1) + rcos60, Y(y-1) + rsin60];
+                        drawEdge(ax, ay, bx, by, edges.min6.strong);
+                    }
+                    if ( edges.maj3.visible && 
+                            (y == v_count-1 || x+y == bottom_right_edge_sum - h_cut) ) {
+                        const [ax,ay] = pcs.me.visible ? [px+rcos60, py+rsin60] : [px,py];
+                        const [bx,by] = [X(x,y+1) - rcos60, Y(y+1) - rsin60];
+                        drawEdge(ax, ay, bx, by, edges.maj3.strong);
                     }
                 }
 
-                const vpcs = has_pcs.map( (x) => x || options.show_all_pcs );
-
-                const enabled_conn = [
-                    has_pcs[0] && has_pcs[1],
-                    has_pcs[0] && has_pcs[2],
-                    has_pcs[0] && has_pcs[3]
-                ];
-
-                const visible_conn = enabled_conn.map( (x) => x || options.show_all_connections );
-
-                // draw lines
-                const [ax,ay] = [px + (vpcs[0]?r:0)      , py                      ];
-                const [bx,by] = [X(x+1,y) - (vpcs[1]?r:0), ay                      ];
-                const [cx,cy] = [px + (vpcs[0]?rcos60:0) , py + (vpcs[0]?rsin60:0) ];
-                const [dx,dy] = [X(x,y+1) - (vpcs[2]?rcos60:0)  , Y(y+1) - (vpcs[2]?rsin60:0)];
-                const [ex,ey] = [px - (vpcs[0]?rcos60:0)        , py + (vpcs[0]?rsin60:0)    ];
-                const [fx,fy] = [X(x-1,y+1) + (vpcs[3]?rcos60:0), Y(y+1) - (vpcs[3]?rsin60:0)];
-
-                if ( x < h_count-1 && visible_conn[0] ) {
-                    const hline = SvgTools.makeLine(ax,ay,bx,by,
-                        ( enabled_conn[0] ? connector_on_attr : connector_off_attr ));
-                    g_edges.appendChild(hline);
-                }
-                if ( y < v_count-1 && visible_conn[1] ) {
-                    const dline1 = SvgTools.makeLine(cx,cy,dx,dy,
-                        ( enabled_conn[1] ? connector_on_attr : connector_off_attr ));
-                    g_edges.appendChild(dline1);
-                }
-                if ( x > 0 && y < v_count-1 && visible_conn[2] ) {
-                    const dline2 = SvgTools.makeLine(ex,ey,fx,fy,
-                        ( enabled_conn[2] ? connector_on_attr : connector_off_attr ));
-                    g_edges.appendChild(dline2);
-                }
-
-                if ( options.show_all_pcs || has_pcs[0] ) {
-
-                    const actual_theme = ( pcset.has(pc) ? theme.on : theme.off );
+                // draw vertex
+                if ( options.all_vertices || pcs.me.has ) {
+                    const actual_theme = ( pcs.me.has ? theme.on : theme.off );
                     const text_data = ( options.note_names 
                         ? SVG_PATHS_NOTES[pc.toString()] : SVG_PATHS_NUMBERS[pc.toString()] );
         
@@ -1036,13 +1113,11 @@ class StaticTonnetzPcSetView extends PcSetBaseView {
                         actual_theme.circle_stroke(pc), actual_theme.circle_fill(pc),
                         text_data, actual_theme.text(pc), 
                         ( [1,3,6,8,10].includes(pc) && options.note_names ) ? text_scale*0.9 : text_scale,
-                        options.show_text ?? "always", pcset.has(pc)
+                        options.show_text ?? "always", pcs.me.has
                     );
         
                     g_vertices.appendChild(circle_and_text);
-                    
                     if ( options.fn ) options.fn(circle_and_text, "pc", pc);
-
                 }
 
             }

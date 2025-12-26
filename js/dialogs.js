@@ -408,6 +408,16 @@ function imageExportDialogValidateControls() {
         input_tonnetz_centerpc.value = 12 + tonnetz_centerpc;
     else if ( tonnetz_centerpc > 11 )
         input_tonnetz_centerpc.value = tonnetz_centerpc - 12;
+
+    const tonnetz_width = parseInt(document.getElementById("expimg-tonnetz-width").value);
+    const tonnetz_height = parseInt(document.getElementById("expimg-tonnetz-height").value);
+    const input_tonnetz_h_cut = document.getElementById("expimg-tonnetz-h-cut");
+    const tonnetz_h_cut = parseInt(input_tonnetz_h_cut.value);
+    const max_h_cut = Math.min(tonnetz_width, tonnetz_height)-1;
+    input_tonnetz_h_cut.setAttribute("max", max_h_cut);
+    if ( tonnetz_h_cut > max_h_cut )
+        input_tonnetz_h_cut.value = max_h_cut;
+    
 }
 
 
@@ -496,9 +506,13 @@ function loadImageExportDialogSettings() {
     document.getElementById("chk-export-inversion-axis").checked = config_export_image.readBool("inversion-axis", true);
     document.getElementById("chk-all-paths").checked = config_export_image.readBool("inv-transp-all-paths", true);
     document.getElementById("expimg-tonnetz-centerpc").value = config_export_image.readNumber("tonnetz-centerpc", 0);
-    document.getElementById("chk-tonnetz-show-all-pcs").checked = config_export_image.readBool("tonnetz-all-pcs", true);
-    document.getElementById("chk-tonnetz-show-all-connections").checked = config_export_image.readBool("tonnetz-all-connections", true);
-    document.getElementById("chk-tonnetz-fill-triangles").checked = config_export_image.readBool("tonnetz-fill-triangles", true);
+    document.getElementById("expimg-tonnetz-width").value = config_export_image.readNumber("tonnetz-width", 6);
+    document.getElementById("expimg-tonnetz-height").value = config_export_image.readNumber("tonnetz-height", 5);
+    document.getElementById("expimg-tonnetz-h-cut").value = config_export_image.readNumber("tonnetz-h-cut", 0);
+    document.getElementById("chk-tonnetz-fill-faces").checked = config_export_image.readBool("tonnetz-fill-faces", true);
+    document.getElementById("chk-tonnetz-all-vertices").checked = config_export_image.readBool("tonnetz-all-vertices", true);
+    document.getElementById("chk-tonnetz-all-edges").checked = config_export_image.readBool("tonnetz-all-edges", true);
+    document.getElementById("chk-tonnetz-extended-edges").checked = config_export_image.readBool("tonnetz-extended-edges", false);
     document.getElementById("expimg-select-theme").value = config_export_image.readString("theme", "basic");
     document.getElementById("expimg-select-theme-color").value = config_export_image.readString("theme-color", "");
     document.getElementById("expimg-select-theme-bg").value = config_export_image.readString("theme-bg", "light");
@@ -529,8 +543,13 @@ function saveImageExportDialogSettings() {
     config_export_image.writeBool("inversion-axis", document.getElementById("chk-export-inversion-axis").checked);
     config_export_image.writeBool("inv-transp-all-paths", document.getElementById("chk-all-paths").checked);
     config_export_image.writeNumber("tonnetz-centerpc", parseInt(document.getElementById("expimg-tonnetz-centerpc").value));
-    config_export_image.writeBool("tonnetz-all-pcs", document.getElementById("chk-tonnetz-show-all-pcs").checked);
-    config_export_image.writeBool("tonnetz-fill-triangles", document.getElementById("chk-tonnetz-fill-triangles").checked);
+    config_export_image.writeNumber("tonnetz-width", parseInt(document.getElementById("expimg-tonnetz-width").value));
+    config_export_image.writeNumber("tonnetz-height", parseInt(document.getElementById("expimg-tonnetz-height").value));
+    config_export_image.writeNumber("tonnetz-h-cut", parseInt(document.getElementById("expimg-tonnetz-h-cut").value));
+    config_export_image.writeBool("tonnetz-fill-faces", document.getElementById("chk-tonnetz-fill-faces").checked);
+    config_export_image.writeBool("tonnetz-all-vertices", document.getElementById("chk-tonnetz-all-vertices").checked);
+    config_export_image.writeBool("tonnetz-all-edges", document.getElementById("chk-tonnetz-all-edges").checked);
+    config_export_image.writeBool("tonnetz-extended-edges", document.getElementById("chk-tonnetz-extended-edges").checked);
     config_export_image.writeString("theme", document.getElementById("expimg-select-theme").value);
     config_export_image.writeString("theme-color", document.getElementById("expimg-select-theme-color").value);
     config_export_image.writeString("theme-bg", document.getElementById("expimg-select-theme-bg").value);
@@ -652,14 +671,16 @@ function makeTonnetzSvgFromParams(theme) {
     return new StaticTonnetzPcSetView(
         export_data.pcset.normal, 
         {
+            centerpc: parseInt(document.getElementById("expimg-tonnetz-centerpc").value),
             width: parseInt(document.getElementById("expimg-tonnetz-width").value),
             height: parseInt(document.getElementById("expimg-tonnetz-height").value),
-            centerpc: parseInt(document.getElementById("expimg-tonnetz-centerpc").value),
+            h_cut: parseInt(document.getElementById("expimg-tonnetz-h-cut").value),
             note_names: document.getElementById("chk-export-note-names").checked,
             show_text: document.querySelector('input[name="expimg-show-text"]:checked').value,
-            show_all_pcs: document.getElementById("chk-tonnetz-show-all-pcs").checked,
-            show_all_connections: document.getElementById("chk-tonnetz-show-all-connections").checked,
-            fill_triangles: document.getElementById("chk-tonnetz-fill-triangles").checked,
+            fill_faces: document.getElementById("chk-tonnetz-fill-faces").checked,
+            all_vertices: document.getElementById("chk-tonnetz-all-vertices").checked,
+            all_edges: document.getElementById("chk-tonnetz-all-edges").checked,
+            extended_edges: document.getElementById("chk-tonnetz-extended-edges").checked,
             scale: parseFloat(document.getElementById("expimg-scale").value),
             stroke_width: parseFloat(document.getElementById("expimg-stroke").value),
         },
