@@ -49,6 +49,19 @@ const config = {
 }
 
 
+function getRandomStartupPcSet() {
+    const size = getRandomInt(5,8);
+    const pcs = [];
+    for ( let i = 0; i < size; i++ ) {
+        let pc = getRandomInt(0,12);
+        while ( pcs.includes(pc) )
+            pc = getRandomInt(0,12);
+        pcs.push(pc);
+    }
+    return new PcSet(pcs).toString("short-ab", false);
+}
+
+
 function readConfig() {
     config.layout = config_storage.readString("layout", "svg-first");
     config.set_format = config_storage.readString("set-format", SET_FORMATS[0]);
@@ -56,7 +69,7 @@ function readConfig() {
     config.prime_unique = config_storage.readBool("prime-unique", true);
     config.vector_format = config_storage.readString("vector-format", VECTOR_FORMATS[0]);
     config.inversion_format = config_storage.readString("inversion-format", INVERSION_FORMATS[0]);
-    config.last_set = config_storage.readString("last-set", "");
+    config.last_set = config_storage.readString("last-set", getRandomStartupPcSet());
     config.note_names = config_storage.readBool("note_names", false);
     config.polygon = config_storage.readBool("polygon", true);
     config.symmetry_axes = config_storage.readBool("symmetry-axes", false);

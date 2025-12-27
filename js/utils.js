@@ -460,3 +460,15 @@ function cloneObjectExcept(obj, props = []) {
         delete clone[p];
     return clone;
 }
+
+
+/**
+ * @param {Number} min - inclusive
+ * @param {Number} max - exclusive
+ * @returns {Number}
+ */
+function getRandomInt(min, max) {
+    const minCeiled = Math.ceil(min);
+    const maxFloored = Math.floor(max);
+    return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); 
+}
