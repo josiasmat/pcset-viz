@@ -142,7 +142,7 @@ const Table = {
             const prime_inv_op = prime_inv.findTransformFrom(state.pcset);
             table_cells.prime_form.setHTMLUnsafe(
                 pcsetHyperlink(prime, {op: prime_op, copy: true})
-                + " · Inverse: " 
+                + " &#x00b7; Inverse: " 
                 + pcsetHyperlink(prime_inv, {op: prime_inv_op, copy: true}) );
         } else {
             table_cells.prime_form.setHTMLUnsafe( 
@@ -153,7 +153,7 @@ const Table = {
 
     updateSetNames() {
         const fn = config.prime_unique ? state.pcset.forte_name : state.pcset.forte_name_ab;
-        const cn = state.pcset.carter_number.toString();
+        const cn = `${CARDINAL_SET_NAMES[state.pcset.cardinality]}-${state.pcset.carter_number.toString()}`;
         table_cells.forte_name.setHTMLUnsafe(strWithCopyLink(fn));
         table_cells.carter_name.setHTMLUnsafe(strWithCopyLink(cn));
     },
@@ -186,7 +186,7 @@ const Table = {
                 spectra_str.push( `‹${i}›&nbsp;=&nbsp;${spectra.toString(i, true)}`);
             }
             const rounded_var = Math.round(spectra.variation*100)/100;
-            spectra_str.push(`Variation&nbsp;${(rounded_var == spectra.variation ? '=' : '≈')}&nbsp;${rounded_var.toFixed(2)}`);
+            spectra_str.push(`Variation&nbsp;${(rounded_var == spectra.variation ? '=' : '&#x2248;')}&nbsp;${rounded_var.toFixed(2)}`);
         }
         table_cells.spectra.setHTMLUnsafe(textOrDash(spectra_str.join('; ')));
     },
@@ -216,9 +216,7 @@ const Table = {
 
     updateFeatures() {
         const features = [];
-        features.push([
-           "Null set","Singleton","Dyad","Trichord","Tetrachord","Pentachord","Hexachord","Heptachord",
-           "Octachord","Nonachord","Decachord","Undecachord","Dodecachord"][state.pcset.size]);
+        // features.push(CARDINAL_SET_NAMES[state.pcset.size]);
         if ( state.pcset.icvector().count_value(1) == 6 ) 
             features.push(htmlNonBreakingSpaces("All-interval"));
         if ( state.pcset.isMirror() ) 
@@ -240,8 +238,7 @@ const Table = {
             features.push(htmlNonBreakingSpaces("Myhill's property"));
         if ( state.pcset.zcorrespondent ) 
             features.push("Z-set");
-        const comb_count = Object.values(state.pcset.getHexachordalCombinations())
-            .filter((item) => item.length != 0).length;
+        const comb_count = state.pcset.hexachordalCombinatorialityDegree();
         if ( comb_count > 0 ) 
             features.push(comb_count >= 3 ? "All&#8209;combinatorial" : "Combinatorial");
 
@@ -266,7 +263,7 @@ const Table = {
     },
 
     updateHexachordalCombinatoriality() {
-        const all_combs = state.pcset.getHexachordalCombinations();
+        const all_combs = state.pcset.getHexachordalCombinatoriality();
         const getCombinatorialsStr = (combs, type_str) => {
             if ( combs.length == 0) return '';
             return `${type_str}<sub>${combs.join(',')}</sub>`;
@@ -393,7 +390,7 @@ function checkmarkIf(cond) {
 
 /** @param {Boolean} cond @param {String} s @returns {String} */
 function addEquivIf(cond, s) {
-    return (cond) ? "&nbsp;≡&nbsp;" + s : "";
+    return (cond) ? "&nbsp;&#x2261;&nbsp;" + s : "";
 }
 
 

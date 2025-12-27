@@ -46,7 +46,7 @@ class PcSet {
 
     static #max_poly_areas = null;
 
-    static #cache = {};
+    static #cache = new Map();
 
     /**
      * @param {Number} binv 
@@ -54,8 +54,8 @@ class PcSet {
      * @returns {Boolean}
      */
     static #cacheHas(binv, type) {
-        return Object.hasOwn(PcSet.#cache, binv) 
-           && !Object.hasOwn(PcSet.#cache[binv], type);
+        return PcSet.#cache.has(binv)
+            && PcSet.#cache.get(binv).has(type);
     }
 
     /**
@@ -65,9 +65,9 @@ class PcSet {
      * @returns {any}
      */
     static #cacheWrite(binv, type, value) {
-        if ( !Object.hasOwn(PcSet.#cache, binv) )
-            PcSet.#cache[binv] = {};
-        PcSet.#cache[binv][type] = value;
+        if ( !PcSet.#cache.has(binv) )
+            PcSet.#cache.set(binv, new Map());
+        PcSet.#cache.get(binv).set(type, value);
         return value;
     }
 
@@ -78,13 +78,13 @@ class PcSet {
      */
     static #cacheRead(binv, type) {
         if ( PcSet.#cacheHas(binv, type) )
-            return PcSet.#cache[binv][type];
+            return PcSet.#cache.get(binv).get(type);
         return null;
     }
 
     /** @param {Number} binv */
     static #cacheInvalidate(binv) {
-        PcSet.#cache[binv] = {};
+        PcSet.#cache.delete(binv);
     }
 
     static cacheGet() {
@@ -92,7 +92,7 @@ class PcSet {
     }
 
     static cacheClear() {
-        PcSet.#cache = {};
+        PcSet.#cache.clear();
     }
 
     /**
@@ -385,6 +385,9 @@ class PcSet {
 
     computePolygonalArea() {
         if ( this.size < 3 ) return 0;
+        const cache_key = "polygonal_area";
+        const cached = PcSet.#cacheRead(this.binary_value, cache_key);
+        if ( cached ) return cached;
         const points = this.#data.map((x) => {
             const a = degToRad(30*x);
             return { x: Math.sin(a), y: Math.cos(a) };
@@ -395,7 +398,8 @@ class PcSet {
             const h = (a.y + b.y) / 2;
             areas.push(w*h);
         }
-        return areas.reduce((sum,x) => sum += x);
+        const result = areas.reduce((sum,x) => sum += x);
+        return PcSet.#cacheWrite(this.binary_value, cache_key, result);
     }
 
     hasMaximalPolygonalArea() {
@@ -924,6 +928,10 @@ class PcSet {
      *      transpositional symmetry of the set.
      */
     getTranspositionalEquivalents(include_zero = true) {
+        const cache_key = "t_equiv";
+        const cached = PcSet.#cacheRead(this.binary_value, cache_key);
+        if ( cached ) return new PcSet(cached);
+
         const icvec = this.icvector();
         const pcslen = this.size;
         let sym = [];
@@ -938,7 +946,7 @@ class PcSet {
             if ( 2*icvec.at(6) == pcslen && !sym.includes(6)) sym.push(6);
             sym.sort((a,b) => a-b);
         }
-        return sym;
+        return PcSet.#cacheWrite(this.binv, cache_key, sym);
     }
 
     getTranspositionalEquivalenceIndexes(include_zero = true) {
@@ -1266,17 +1274,37 @@ class PcSet {
     /** 
      * @returns {{i: Number[], p: Number[], ri: Number[], r: Number[]}}
      */
-    getHexachordalCombinations() {
+    getHexachordalCombinatoriality() {
         if ( this.size != 6 ) return { i: [], p: [], ri: [], r: [] };
-        const comb = {};
+        const cache_key = "comb";
+        const cached = PcSet.#cacheRead(this.binary_value, cache_key);
+        if ( cached ) return new PcSet(cached);
+        const result = {};
         const complement = this.complement.normal;
         const inversions = this.getInversionsUnique();
         const transpositions = this.getTranspositionsUnique(false);
-        comb.i  = inversions.filter( (item) => item[1].isSameSetClass(complement) ).map( (item) => item[0] );
-        comb.p  = transpositions.filter( (item) => item[1].isSameSetClass(complement) ).map( (item) => item[0] );
-        comb.ri = inversions.filter( (item) => item[1].isSameSetClass(this) ).map( (item) => item[0] );
-        comb.r  = transpositions.filter( (item) => item[1].isSameSetClass(this) ).map( (item) => item[0] );
-        return comb;
+        result.i  = inversions.filter( (item) => item[1].isSameSetClass(complement) ).map( (item) => item[0] );
+        result.p  = transpositions.filter( (item) => item[1].isSameSetClass(complement) ).map( (item) => item[0] );
+        result.ri = inversions.filter( (item) => item[1].isSameSetClass(this) ).map( (item) => item[0] );
+        result.r  = transpositions.filter( (item) => item[1].isSameSetClass(this) ).map( (item) => item[0] );
+        return PcSet.#cacheWrite(this.binv, cache_key, result);
+    }
+
+
+    /** 
+     * Returns how many types of hexachordal combinatoriality the set has. 
+     * If _0_, the set has no combinatoriality. If _3_ or _4_, the set is 
+     * all-combinatorial.
+     * @returns {Number}
+     */
+    hexachordalCombinatorialityDegree() {
+        if ( this.size != 6 ) return 0;
+        const cache_key = "comb_degree";
+        const cached = PcSet.#cacheRead(this.binary_value, cache_key);
+        if ( cached ) return cached;
+        const degree = Object.values(this.getHexachordalCombinatoriality())
+            .reduce((sum,x) => sum += x.length ? 1 : 0, 0);
+        return PcSet.#cacheWrite(this.binary_value, cache_key, degree);
     }
 
 

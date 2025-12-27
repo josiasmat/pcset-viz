@@ -37,8 +37,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <script type="text/javascript" src="js/graphics.js" defer></script>
     <script type="text/javascript" src="js/clockface.js" defer></script>
     <script type="text/javascript" src="js/midi.js" defer></script>
-    <script type="text/javascript" src="js/dialogs.js"></script>
-    <script type="text/javascript" src="js/audio.js"></script>
+    <script type="text/javascript" src="js/dialogs.js" defer></script>
+    <script type="text/javascript" src="js/selector.js" defer></script>
+    <script type="text/javascript" src="js/imgexport.js" defer></script>
+    <script type="text/javascript" src="js/audio.js" defer></script>
     <script type="text/javascript" src="js/main.js" defer></script>
     <link rel="icon" type="image/png" href="favicon.png">
   </head>
@@ -64,8 +66,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
             <tr id="row-ruler-view" hidden>
               <td i18n="row-ruler-view"><span>Ruler view:</span>
               <span style="float: inline-end;">
-                <a href="javascript:rulerShift(1)">◀</a>
-                <a href="javascript:rulerShift(-1)">▶</a>
+                <a href="javascript:rulerShift(1)">&#x25c0;</a>
+                <a href="javascript:rulerShift(-1)">&#x25b6;</a>
               </span>
               </td>
               <td id="ruler-view" class="graphics-view"></td>
@@ -74,7 +76,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
               <td i18n="row-staff-view">
                 <span id="staff-up-btn">Staff view:</span>
                 <span id="staff-down-btn">
-                  <a href="javascript:pcsetRotate(1)">▲</a><br /><a href="javascript:pcsetRotate(-1)">▼</a>
+                  <a href="javascript:pcsetRotate(1)">&#x25b2;</a><br /><a href="javascript:pcsetRotate(-1)">&#x25bc;</a>
                 </span>
               </td>
               <td id="staff-view" style="display: inline-flex"></td>
@@ -90,7 +92,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                 </select>
                 <input type="number" id="operation-index" name="operation-index" 
                   min="-12" max="12" value="1" previous="1" size="2" oninput="operationUpdate()"/>
-                ⇒&nbsp;<span id="operation-result"></span>
+                &#x21d2;&nbsp;<span id="operation-result"></span>
               </td>
             </tr>
             <tr id="row-binv" hidden>
@@ -180,7 +182,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
             <tr id="row-subsets" hidden>
               <td>Subsets:</td>
               <td id="subsets">
-                <a href="javascript:showSubsetSelector()">All subsets</a> | <a href="javascript:showPrimeSubsetSelector()">Prime subsets</a>
+                <a href="javascript:showSubsetSelector()">All subsets</a> | <a href="javascript:showPrimeSubsetSelector()">Subset classes</a>
               </td>
             </tr>
             <tr id="row-misc" always-visible>
@@ -206,7 +208,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       <dialog id="dialog-about" class="dialog-container">
         <div class="dialog-header">
           <span class="dialog-title">ABOUT</span>
-          <a class="close-button" href="javascript:hideDialog('dialog-about')" autofocus>&#128473;</a>
+          <a class="close-button" href="javascript:hideDialog('dialog-about')" autofocus></a>
         </div>
         <div class="dialog-main">
           <b>Pitch-Class Set Visualizer, version <span id="version-number"></span></b>.
@@ -222,7 +224,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       <dialog id="dialog-set-selector" class="dialog-container">
         <div class="dialog-header">
           <span class="dialog-title">SET SELECTOR</span>
-          <a class="close-button" href="javascript:hideDialog('dialog-set-selector')">&#128473;</a>
+          <a class="close-button" href="javascript:hideDialog('dialog-set-selector')"></a>
         </div>
         <div class="dialog-main">
           <table id="table-set-selector">
@@ -231,9 +233,54 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                 <th>Type</th>
                 <th id="dialog-set-selector-second-column-header">Sets</th>
               </tr>
-              <tr id="table-set-row-filter">
-                <td><label for="input-set-filter" i18n="input-set-filter">Filter:</label></td>
-                <td><input id="input-set-filter" type="text" spellcheck="false" autofocus></td>
+              <tr id="table-set-row-filter-features">
+                <td>Feature filter:</td>
+                <td>
+                  <span>
+                    <input id="chk-set-filter-allinterval" type="checkbox" onchange="SetSelector.update()">
+                    <label for="chk-set-filter-allinterval">All interval</label>
+                  </span>
+                  <span>
+                    <input id="chk-set-filter-combinatorial" type="checkbox" onchange="SetSelector.update()">
+                    <label for="chk-set-filter-combinatorial">Combinatorial</label>
+                  </span>
+                  <span>
+                    <input id="chk-set-filter-deepscale" type="checkbox" onchange="SetSelector.update()">
+                    <label for="chk-set-filter-deepscale">Deep scale</label>
+                  </span>
+                  <span>
+                    <input id="chk-set-filter-generated" type="checkbox" onchange="SetSelector.update()">
+                    <label for="chk-set-filter-generated">Generated</label>
+                  </span>
+                  <span>
+                    <input id="chk-set-filter-maxarea" type="checkbox" onchange="SetSelector.update()">
+                    <label for="chk-set-filter-maxarea">Maximal area</label>
+                  </span>
+                  <span>
+                    <input id="chk-set-filter-maxeven" type="checkbox" onchange="SetSelector.update()">
+                    <label for="chk-set-filter-maxeven">Maximally even</label>
+                  </span>
+                  <span>
+                    <input id="chk-set-filter-mirror" type="checkbox" onchange="SetSelector.update()">
+                    <label for="chk-set-filter-mirror">Mirror</label>
+                  </span>
+                  <span>
+                    <input id="chk-set-filter-myhill" type="checkbox" onchange="SetSelector.update()">
+                    <label for="chk-set-filter-myhill">Myhill's property</label>
+                  </span>
+                  <span>
+                    <input id="chk-set-filter-propscale" type="checkbox" onchange="SetSelector.update()">
+                    <label for="chk-set-filter-propscale">Proper scale</label>
+                  </span>
+                  <span>
+                    <input id="chk-set-filter-zset" type="checkbox" onchange="SetSelector.update()">
+                    <label for="chk-set-filter-zset">Z-set</label>
+                  </span>
+                </td>
+              </tr>
+              <tr id="table-set-row-filter-name">
+                <td><label for="input-set-filter-name" i18n="input-set-filter-name">Name filter:</label></td>
+                <td><input id="input-set-filter-name" type="search" spellcheck="false" oninput="SetSelector.update()" autofocus></td>
               </tr>
               <tr>
                 <td>Dyads:</td>
@@ -282,7 +329,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       <dialog id="dialog-config" class="dialog-container">
         <div class="dialog-header">
           <span class="dialog-title">OPTIONS</span>
-          <a class="close-button" href="javascript:hideDialog('dialog-config')">&#128473;</a>
+          <a class="close-button" href="javascript:hideDialog('dialog-config')"></a>
         </div>
         <div class="dialog-main">
           <table id="dialog-config-table">
@@ -300,7 +347,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
               </tr>
               <tr>
                 <td>Visible data<br />
-                  (<a href="javascript:resetVisibleDataRows()">Reset</a> · 
+                  (<a href="javascript:resetVisibleDataRows()">Reset</a> &#x00b7; 
                    <a href="javascript:setAllDataRowsVisible()">All</a>)
                 </td>
                 <td id="visible-data-checkboxes-area"></td>
@@ -418,7 +465,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                     <select name="select-midi-device" id="select-midi-device" onchange="selectMidiDevice()">
                       <option value="">No device selected</option>
                     </select>
-                    →
+                    &#x2192;
                     <span id="midi-connection-status" status="0">Disconnected</span>
                   </span>
                   <span>
@@ -500,7 +547,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       <dialog id="dialog-export-image" class="dialog-container">
         <div class="dialog-header">
           <span class="dialog-title">EXPORT IMAGE</span>
-          <a class="close-button" href="javascript:hideDialog('dialog-export-image')">&#128473;</a>
+          <a class="close-button" href="javascript:hideDialog('dialog-export-image')"></a>
         </div>
         <div class="dialog-main">
           <div id="dialog-export-preview">

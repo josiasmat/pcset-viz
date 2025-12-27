@@ -81,17 +81,21 @@ class PcSetBaseView {
     }
 
     svgToClipboard() {
-        if ( ClipboardItem.supports(SVG_MIME) ) {
-            const blob = this.svg_blob;
-            navigator.clipboard.write([
-                new ClipboardItem({[blob.type]: blob})
-            ]);
-        } else {
-            console.log("SVG images are not supported by the clipboard.");
+        if ( !ClipboardItem?.supports(SVG_MIME) ) {
+            console.error("SVG images not supported by the clipboard.");
+            return;
         }
+        const blob = this.svg_blob;
+        navigator.clipboard.write([
+            new ClipboardItem({[blob.type]: blob})
+        ]);
     }
 
     pngToClipboard(width, height) {
+        if ( !ClipboardItem?.supports(PNG_MIME) ) {
+            console.error("PNG images not supported by the clipboard.");
+            return;
+        }
         this.#makePng(width, height, (blob) => {
             navigator.clipboard.write([
                 new ClipboardItem({[blob.type]: blob})

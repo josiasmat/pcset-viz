@@ -96,11 +96,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 body.font-sans {
     font-family: var(--sans-font);
     font-weight: 300;
+    #input-set-filter-name {
+        font-family: var(--sans-font);
+    }
 }
 
 body.font-serif {
     font-family: var(--serif-font);
     font-weight: 300;
+    #input-set-filter-name {
+        font-family: var(--serif-font);
+    }
 }
 
 body {
@@ -302,6 +308,7 @@ dialog.dialog-container[open] {
     background-color: var(--dialog-title-bg-color);
     padding: 4px;
     height: 2.2lh;
+    min-height: 2.2lh;
     line-height: 100%;
     text-align: center;
     margin-bottom: 5px;
@@ -319,7 +326,6 @@ dialog.dialog-container[open] {
         float: inline-end;
         background-color: var(--dialog-title-bg-color);
         color: var(--dialog-title-fg-color);
-        font-size: larger;
         border: none;
         padding: 0.3lh !important;
         height: 100%;
@@ -330,9 +336,9 @@ dialog.dialog-container[open] {
             border: none;
         }
         .svg-icon {
-            padding: 0 3px;
+            padding: 0 4px;
             fill: var(--dialog-title-fg-color);
-            vertical-align: 0;
+            vertical-align: middle;
         }
     }
 }
@@ -350,10 +356,13 @@ dialog.dialog-container[open] {
 }
 
 #dialog-set-selector {
-    width: 85%;
-    min-width: min(70ch, 95%);
+    min-width: min(50ch, 95%);
     max-width: 95%;
     max-height: 95%;
+    .dialog-main {
+        overflow-y: scroll;
+        height: 100%;
+    }
     table {
         width: 100%;
         user-select: none;
@@ -363,8 +372,11 @@ dialog.dialog-container[open] {
                 text-align: center;
             }
         }
+        span {
+            text-wrap: nowrap;
+        }
     }
-    #input-set-filter {
+    #input-set-filter-name {
         appearance: none;
         color: var(--input-fg-color);
         background-color: var(--input-bg-color);
@@ -372,7 +384,6 @@ dialog.dialog-container[open] {
         border-style: solid;
         width: 99%;
         padding: 2px 0.5ch;
-        font-family: var(--serif-font);
     }
 }
 
