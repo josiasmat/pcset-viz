@@ -532,12 +532,13 @@
         },
         "[02479]": {
             "names": [
+                "Pentatonic scale/collection",
                 "Black-key pentatonic",
-                "Slendro pentamirror",
-                "Raga Bilahari",
                 "Anhemitonic pentatonic",
                 "Quartal pentamirror",
-                "Maximally even pentachord"
+                "Maximally even pentachord",
+                "Slendro pentamirror",
+                "Raga Bilahari"
             ]
         },
         "[01247]": {
@@ -587,9 +588,9 @@
         },
         "[014589]": {
             "names": [
+                "Hexatonic collection",
                 "Augmented scale",
                 "Genus tertium",
-                "Hexatonic collection",
                 "3rd-order all-combinatorial"
             ]
         },
@@ -778,7 +779,9 @@
         },
         "[0134679A]": {
             "names": [
-                "Alternating octatonic or diminished scale (12121212)",
+                "Octatonic scale/collection",
+                "Diminished scale",
+                "Alternating octatonic scale (12121212)",
                 "Messiaen's mode 2 (12121212)",
                 "Maximally even octachord"
             ]
@@ -797,10 +800,10 @@
         },
         "[01245689A]": {
             "names": [
-                "Tsjerepnin",
+                "Enneatonic scale/collection",
                 "Messiaen's mode 3 (112112112)",
                 "Maximally even nonachord",
-                "Enneatonic"
+                "Tsjerepnin"
             ]
         },
         "[0123456789]": {
