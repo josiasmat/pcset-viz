@@ -370,10 +370,15 @@ function copyImageToClipboard() {
     const type = document.querySelector('input[name="export-file-type"]:checked').value;
     const graphics_type = document.getElementById("expimg-select-type").value;
     const svg = makeSetImage(graphics_type);
-    if ( type == "svg" )
-        svg.svgToClipboard();
-    else {
-        const image_size = document.getElementById("input-export-file-png-size").value;
-        svg.pngToClipboard(image_size, image_size);
+    try {
+        if ( type == "svg" )
+            svg.svgToClipboard();
+        else {
+            const image_size = document.getElementById("input-export-file-png-size").value;
+            svg.pngToClipboard(image_size, image_size);
+        }
+        alert("Image copied to the clipboard!");
+    } catch (e) {
+        alert(`Unable to copy image to clipboard: ${e}`);
     }
 }
