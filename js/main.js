@@ -137,7 +137,7 @@ function showPcset(options = {}) {
 
 /** @param {PcSet[]} arr */
 function pcsetArrayToStr(arr) {
-    return arr.map((pcset) => pcset.toString("short-ab",false))
+    return arr.map((pcset) => pcset.toString("short-ab", null))
               .sort((a,b) => (a.length - b.length) || a.localeCompare(b))
               .join(',');
 }
@@ -496,7 +496,15 @@ readConfig();
 
 // Load data files 
 Promise.all(DATA_FILES.map(
-    (datafile) => i18n.fetchDataFile(datafile)
+    (datafile) => i18n.fetchDataFile(datafile, (data) => {
+        // Correct non-compliant reduced forms
+        if ( !data.sets ) return;
+        for ( const old_key of Object.keys(data.sets) ) {
+            const new_key = new PcSet(old_key).reduced.toString("short-ab");
+            if ( old_key != new_key )
+                delete Object.assign(data.sets, {[new_key]: data.sets[old_key] })[old_key];
+        }
+    })
 )).then(() => {
     // Add radio inputs to options dialog
     i18n.getAvailableLanguages()

@@ -134,15 +134,14 @@ const i18n = {
 
     /**
      * @param {String} filepath 
-     * @param {(code, name)} [callback] 
+     * @param {(data)} [callback] 
      */
     async fetchDataFile(filepath, callback = null) {
         const result = await fetchJson(filepath, false);
         const code = result["lang"]["code"];
-        const name = result["lang"]["name"];
         this.data[code] = result;
-        callback?.(code, name);
-        return {code, name};
+        callback?.(result);
+        return result;
     },
 
 }
@@ -177,6 +176,7 @@ function changeLanguage(code) {
     Table.collectRows();
     populateConfigDialogTableRows();
     updateInterfaceFromConfig();
+    updateConfigDialog();
     saveConfig();
     if ( Object.hasOwn(i18n.data[code], "sets") )
         document.querySelector("#row-descriptive-name a").removeAttribute("hidden");
