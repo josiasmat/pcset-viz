@@ -95,6 +95,13 @@ class PcSet {
         PcSet.#cache.clear();
     }
 
+    #cached(key, f) {
+        const cached = PcSet.#cacheRead(this.binary_value, key);
+        return ( cached ) 
+            ? cached
+            : PcSet.#cacheWrite(this.binary_value, key, f());;
+    }
+
     /**
      * Constructs a new PcSet object.
      * @param {Number[]|String} [arg] An optional source for the set, which
@@ -299,42 +306,39 @@ class PcSet {
     isMaximallyEven() {
         if ( this.size < 2  ) return false;
         if ( this.size > 10 ) return true;
-        const cache_key = "maximally_even";
-        const cached = PcSet.#cacheRead(this.binary_value, cache_key);
-        if ( cached ) return cached;
-        const spectra = PcSetSpectra.fromPcset(this);
-        for ( let d = 1; d < this.size; d++ ) {
-            if ( spectra.width(d) > 1 ) 
-                return PcSet.#cacheWrite(this.binary_value, cache_key, false);
-        }
-        return PcSet.#cacheWrite(this.binary_value, cache_key, true);
+        return this.#cached("maximally_even", () => {
+            const spectra = PcSetSpectra.fromPcset(this);
+            for ( let d = 1; d < this.size; d++ ) {
+                if ( spectra.width(d) > 1 ) 
+                    return false;
+            }
+            return true;
+        });
     }
 
     /** @returns {Boolean} */
     isDeepScale() {
-        const cache_key = "deep_scale";
-        const cached = PcSet.#cacheRead(this.binary_value, cache_key);
-        if ( cached ) return cached;
-        const icv = this.icvector();
-        for ( let [a,b] of pairs(icv.data) ) {
-            if ( a == b ) 
-                return PcSet.#cacheWrite(this.binary_value, cache_key, false);
-        }
-        return PcSet.#cacheWrite(this.binary_value, cache_key, true);;
+        return this.#cached("deep_scale", () => {
+            const icv = this.icvector();
+            for ( let [a,b] of pairs(icv.data) ) {
+                if ( a == b ) 
+                    return false;
+            }
+            return true;
+        });
     }
 
     /** @returns {Boolean} */
     hasMyhillProperty() {
         if ( this.size < 3 ) return false;
-        const cache_key = "myhill";
-        const cached = PcSet.#cacheRead(this.binary_value, cache_key);
-        if ( cached ) return cached;
-        const spectra = PcSetSpectra.fromPcset(this);
-        for ( let d = 1; d < this.size; d++ ) {
-            if ( spectra.of(d).length != 2 ) 
-                return PcSet.#cacheWrite(this.binary_value, cache_key, false);
-        }
-        return PcSet.#cacheWrite(this.binary_value, cache_key, true);
+        return this.#cached("myhill", () => {
+            const spectra = PcSetSpectra.fromPcset(this);
+            for ( let d = 1; d < this.size; d++ ) {
+                if ( spectra.of(d).length != 2 ) 
+                    return false;
+            }
+            return true;
+        });
     }
 
     /** 
@@ -343,14 +347,13 @@ class PcSet {
      */
     isGenerated(interval) {
         if ( this.size < 3 ) return false;
-        const cache_key = `generated(${interval})`;
-        const cached = PcSet.#cacheRead(this.binary_value, cache_key);
-        if ( cached ) return cached;
-        for ( let i = 0; i < this.size; i++ ) {
-            if ( this.isSameSetClass(PcSet.generate(this.size, interval, this.at(i))) )
-                return PcSet.#cacheWrite(this.binary_value, cache_key, true);
-        }
-        return PcSet.#cacheWrite(this.binary_value, cache_key, false);
+        return this.#cached(`generated(${interval})`, () => {
+            for ( let i = 0; i < this.size; i++ ) {
+                if ( this.isSameSetClass(PcSet.generate(this.size, interval, this.at(i))) )
+                    return true;
+            }
+            return false;
+        });
     }
 
     /** @returns {Number[]} */
@@ -365,41 +368,37 @@ class PcSet {
     isProperScale() {
         // Don't count sets with less than 5 notes as scales
         if ( this.size < 5 ) return 0;
-        const cache_key = "proper_scale";
-        const cached = PcSet.#cacheRead(this.binary_value, cache_key);
-        if ( cached ) return cached;
-        let strict = true;
-        for ( let d = 1; d < this.size-1; d++ ) {
-            for ( let i = 0; i < this.size; i++ ) {
-                for ( let j = 0; j < this.size; j++ ) {
-                    const int_minor = computeInterval(this.at(i), this.at(i+d));
-                    const int_major = computeInterval(this.at(j), this.at(j+d+1));
-                    if ( int_minor > int_major ) 
-                        return PcSet.#cacheWrite(this.binary_value, cache_key, 0);
-                    if ( int_minor == int_major && strict ) strict = false;
+        return this.#cached("proper_scale", () => {
+            let strict = true;
+            for ( let d = 1; d < this.size-1; d++ ) {
+                for ( let i = 0; i < this.size; i++ ) {
+                    for ( let j = 0; j < this.size; j++ ) {
+                        const int_minor = computeInterval(this.at(i), this.at(i+d));
+                        const int_major = computeInterval(this.at(j), this.at(j+d+1));
+                        if ( int_minor > int_major ) return 0;
+                        if ( int_minor == int_major && strict ) strict = false;
+                    }
                 }
             }
-        }
-        return PcSet.#cacheWrite(this.binary_value, cache_key, ( strict ) ? 2 : 1);
+            return strict ? 2 : 1;
+        });
     }
 
     computePolygonalArea() {
         if ( this.size < 3 ) return 0;
-        const cache_key = "polygonal_area";
-        const cached = PcSet.#cacheRead(this.binary_value, cache_key);
-        if ( cached ) return cached;
-        const points = this.#data.map((x) => {
-            const a = degToRad(30*x);
-            return { x: Math.sin(a), y: Math.cos(a) };
+        return this.#cached("polygonal_area", () => {
+            const points = this.#data.map((x) => {
+                const a = degToRad(30*x);
+                return { x: Math.sin(a), y: Math.cos(a) };
+            });
+            const areas = [];
+            for ( const [a,b] of pairwise(points, true) ) {
+                const w = b.x - a.x;
+                const h = (a.y + b.y) / 2;
+                areas.push(w*h);
+            }
+            return areas.reduce((sum,x) => sum += x);
         });
-        const areas = [];
-        for ( const [a,b] of pairwise(points, true) ) {
-            const w = b.x - a.x;
-            const h = (a.y + b.y) / 2;
-            areas.push(w*h);
-        }
-        const result = areas.reduce((sum,x) => sum += x);
-        return PcSet.#cacheWrite(this.binary_value, cache_key, result);
     }
 
     hasMaximalPolygonalArea() {
@@ -442,8 +441,7 @@ class PcSet {
      * @returns {IntervalClassVector}
      */
     icvector() {
-        const cached = PcSet.#cacheRead(this.binary_value, "icv");
-        return cached ?? PcSet.#cacheWrite(this.binary_value, "icv", IntervalClassVector.from_pcset(this));
+        return this.#cached("icv", () => IntervalClassVector.from_pcset(this));
     }
 
     /**
@@ -451,8 +449,7 @@ class PcSet {
      * @returns {CommonToneVector}
      */
     ctvector() {
-        const cached = PcSet.#cacheRead(this.binary_value, "ctv");
-        return cached ?? PcSet.#cacheWrite(this.binary_value, "ctv", CommonToneVector.from_pcset(this));
+        return this.#cached("ctv", () => CommonToneVector.from_pcset(this));
     }
 
     /** The binary value of the set, which corresponds to the sum of the
@@ -460,12 +457,11 @@ class PcSet {
      *      for all possible unordered pitch-class sets.
      */
     get binary_value() {
-        if ( !this.#binv ) this.#updateBinaryValue();
-        return this.#binv;
+        return this.#binv ?? this.#updateBinaryValue();
     }
 
     #updateBinaryValue() {
-        this.#binv = this.#data.reduce((sum, pc) => sum + (2**pc), 0);
+        return ( this.#binv = this.#data.reduce((sum, pc) => sum + (2**pc), 0) );
     }
 
     /** 
@@ -486,7 +482,7 @@ class PcSet {
      *      i.e. if the set is *not* a mirror.
      */
     hasDistinctInverse() {
-        return ( this.#getCatalogEntry().inv );
+        return Boolean(this.#getCatalogEntry().inv);
     }
 
     /**
@@ -494,7 +490,7 @@ class PcSet {
      *      the set has no distinct inverse.
      */
     isMirror() {
-        return ( !this.isEmpty() && !this.hasDistinctInverse() );
+        return !this.isEmpty() && !this.hasDistinctInverse();
     }
 
     // COMPARISON AND SEGMENTATION
@@ -561,9 +557,9 @@ class PcSet {
 
     /**
      * Returns a string representation of the set.
-     * @param {String} format Optional. Accepted values are: "short-ab" (default),
+     * @param {String} [format] Optional. Accepted values are: "short-ab" (default),
      *      "short-te", "numbers", "notes-sharps", "notes-flats".
-     * @param {Boolean} brackets Optional; default is _true_.
+     * @param {String} [brackets] Optional; default is PCSET_DEFAULT_BRACKETS.
      * @returns {String}
      */
     toString(format = "short-ab", brackets = PCSET_DEFAULT_BRACKETS) {
