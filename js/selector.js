@@ -271,11 +271,17 @@ function showDescriptionSelector() {
     const update = () => {
 
         let filter_str = SetSelector.elms.name_filter.value;
-        const filters = filter_str.trim().toLowerCase().split(" ");
+        const filters = filter_str.trim()
+                                  .normalize("NFD")
+                                  .replace(/\p{Diacritic}/gu, "")
+                                  .toLowerCase()
+                                  .split(" ");
 
         const filterName = (name) => {
             if ( !filter_str ) return true;
-            name = name.toLowerCase();
+            name = name.normalize("NFD")
+                       .replace(/\p{Diacritic}/gu, "")
+                       .toLowerCase();
             for ( const filter of filters ) {
                 if ( !name.includes(filter) )
                     return false;
