@@ -82,7 +82,9 @@ class PcSetBaseView {
 
     svgToClipboard() {
         if ( !ClipboardItem?.supports(SVG_MIME) ) {
-            console.error("SVG images not supported by the clipboard.");
+            console.error(
+                i18n.get("err-clipboard-svg-unsupported", "SVG images not supported by the clipboard.")
+            );
             return;
         }
         const blob = this.svg_blob;
@@ -93,7 +95,7 @@ class PcSetBaseView {
 
     pngToClipboard(width, height) {
         if ( !ClipboardItem?.supports(PNG_MIME) ) {
-            console.error("PNG images not supported by the clipboard.");
+            i18n.get("err-clipboard-png-unsupported", "PNG images not supported by the clipboard.")
             return;
         }
         this.#makePng(width, height, (blob) => {

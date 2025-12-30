@@ -148,10 +148,10 @@ const PitchPlayer = {
     playScale(pitches, pitch_duration) {
         if ( !this.isAudioRunning() ) {
             document.body.style.setProperty("cursor", "progress", "important");
-            this.resume().then(() => {
+            this.resume().then(() => setTimeout(() => {
                 this.playScale(pitches, pitch_duration);
                 document.body.style.removeProperty("cursor");
-            });
+            }, 500));
             return;
         }
         this.stopAll();

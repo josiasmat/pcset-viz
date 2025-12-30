@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 const config = {
+    language: null,
     last_set: "",
     prime_unique: true,
     note_names: false,
@@ -63,6 +64,7 @@ function getRandomStartupPcSet() {
 
 
 function readConfig() {
+    config.language = config_storage.readString("language", null);
     config.layout = config_storage.readString("layout", "svg-first");
     config.set_format = config_storage.readString("set-format", SET_FORMATS[0]);
     config.set_brackets = config_storage.readString("set-brackets", SET_BRACKETS[0]);
@@ -91,6 +93,7 @@ function readConfig() {
 
 
 function saveConfig() {
+    config_storage.writeString("language", config.language);
     config_storage.writeString("layout", config.layout);
     config_storage.writeString("set-format", config.set_format);
     config_storage.writeString("set-brackets", config.set_brackets);
@@ -127,10 +130,12 @@ function loadConfigFromFile() {
         showPcset({no_history: true});
         saveConfig();
         requestAnimationFrame(() => requestAnimationFrame(() => 
-            alert("Configuration loaded!")
+            alert(i18n.get("alert-config-loaded", "Configuration loaded!"))
         ));
     })
-    .catch((err) => alert(`Error loading config file: ${err}`));
+    .catch((err) => alert(i18n.getp(
+        "alert-config-load-error", "Error loading config file: %0", [err]
+    )));
 }
 
 

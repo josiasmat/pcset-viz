@@ -377,8 +377,8 @@ function copyImageToClipboard() {
             const image_size = document.getElementById("input-export-file-png-size").value;
             svg.pngToClipboard(image_size, image_size);
         }
-        alert("Image copied to the clipboard!");
+        alert(i18n.get("alert-image-copy-ok", "Image copied to the clipboard!"));
     } catch (e) {
-        alert(`Unable to copy image to clipboard: ${e}`);
+        alert(i18n.getp("alert-image-copy-err", "Unable to copy image to clipboard: %0", [e]));
     }
 }

@@ -40,10 +40,11 @@ const table_cells = {
     symmetries: document.getElementById("symmetries"),
     combinatorials: document.getElementById("combinatorials"),
     transpositions: document.getElementById("transpositions"),
-    ctt: document.getElementById("ctt"),
     inversions: document.getElementById("inversions"),
+    ctt: document.getElementById("ctt"),
+    ctt_op_label: document.getElementById("ctt-op-label"),
     cti: document.getElementById("cti"),
-    cti_inv_label: document.getElementById("cti-inversion-label"),
+    cti_op_label: document.getElementById("cti-op-label"),
     multiplications: document.getElementById("multiples"),
     subsets: document.getElementById("subsets"),
     operation: {
@@ -61,9 +62,13 @@ class TableRow {
     constructor(elm) {
         this.element = elm;
         this.id = elm.id;
-        const text = elm.firstElementChild.textContent;
-        this.label = text.trim().substring(0, text.indexOf(":"));
         this.default = !elm.hasAttribute("hidden");
+        this.update();
+    }
+
+    update() {
+        const text = this.element.firstElementChild.textContent;
+        this.label = text.trim().substring(0, text.indexOf(":"));
     }
 
     get visible() { return !(this.hidden); }
@@ -95,11 +100,14 @@ const Table = {
     },
 
     collectRows() {
-        this.rows = [];
-        const rows = document.getElementById("data-table-body").children;
-        for ( let row of rows )
-            if ( !(row.hasAttribute("always-visible")) && !(row.hasAttribute("disabled")) )
-                this.rows.push(new TableRow(row));
+        if ( this.rows.length ) {
+            this.rows.forEach((row) => row.update());
+        } else {
+            const row_elements = document.getElementById("data-table-body").children;
+            for ( let elm of row_elements )
+                if ( !(elm.hasAttribute("always-visible")) && !(elm.hasAttribute("disabled")) )
+                    this.rows.push(new TableRow(elm));
+        }
     },
 
     get input_value() {
@@ -142,7 +150,7 @@ const Table = {
             const prime_inv_op = prime_inv.findTransformFrom(state.pcset);
             table_cells.prime_form.setHTMLUnsafe(
                 pcsetHyperlink(prime, {op: prime_op, copy: true})
-                + " &#x00b7; Inverse: " 
+                + ` &#x00b7; ${i18n.get("row-prime-inverse", "Inverse:")} ` 
                 + pcsetHyperlink(prime_inv, {op: prime_inv_op, copy: true}) );
         } else {
             table_cells.prime_form.setHTMLUnsafe( 
@@ -153,7 +161,7 @@ const Table = {
 
     updateSetNames() {
         const fn = config.prime_unique ? state.pcset.forte_name : state.pcset.forte_name_ab;
-        const cn = `${CARDINAL_SET_NAMES[state.pcset.cardinality]}-${state.pcset.carter_number.toString()}`;
+        const cn = `${getCardinalSetName(state.pcset.cardinality)}-${state.pcset.carter_number.toString()}`;
         table_cells.forte_name.setHTMLUnsafe(strWithCopyLink(fn));
         table_cells.carter_name.setHTMLUnsafe(strWithCopyLink(cn));
     },
@@ -186,7 +194,11 @@ const Table = {
                 spectra_str.push( `‹${i}›&nbsp;=&nbsp;${spectra.toString(i, true)}`);
             }
             const rounded_var = Math.round(spectra.variation*100)/100;
-            spectra_str.push(`Variation&nbsp;${(rounded_var == spectra.variation ? '=' : '&#x2248;')}&nbsp;${rounded_var.toFixed(2)}`);
+            spectra_str.push(
+                `${i18n.get("row-spectra_variation", "Variation")}&nbsp;${
+                    (rounded_var == spectra.variation ? '=' : '&#x2248;')}&nbsp;${rounded_var.toFixed(2)
+                }`
+            );
         }
         table_cells.spectra.setHTMLUnsafe(textOrDash(spectra_str.join('; ')));
     },
@@ -216,31 +228,34 @@ const Table = {
 
     updateFeatures() {
         const features = [];
-        // features.push(CARDINAL_SET_NAMES[state.pcset.size]);
         if ( state.pcset.icvector().count_value(1) == 6 ) 
-            features.push(htmlNonBreakingSpaces("All-interval"));
+            features.push(htmlNonBreakingSpaces(i18n.get("all-interval", "All-interval")));
         if ( state.pcset.isMirror() ) 
-            features.push("Mirror");
+            features.push(i18n.get("mirror", "Mirror"));
         if ( state.pcset.isMaximallyEven() ) 
-            features.push(htmlNonBreakingSpaces("Maximally even"));
+            features.push(htmlNonBreakingSpaces(i18n.get("maximally-even", "Maximally even")));
         if ( state.pcset.hasMaximalPolygonalArea() ) 
-            features.push(htmlNonBreakingSpaces("Maximal area"));
+            features.push(htmlNonBreakingSpaces(i18n.get("maximal-area", "Maximal area")));
         switch ( state.pcset.isProperScale() ) {
-            case 1: features.push(htmlNonBreakingSpaces("Proper scale")); break;
-            case 2: features.push(htmlNonBreakingSpaces("Strictly proper scale"));
+            case 1: features.push(htmlNonBreakingSpaces(i18n.get("proper-scale", "Proper scale"))); break;
+            case 2: features.push(htmlNonBreakingSpaces(i18n.get("strictly-proper-scale", "Strictly proper scale")));
         }
         if ( state.pcset.isDeepScale() ) 
-            features.push(htmlNonBreakingSpaces("Deep scale"));
+            features.push(htmlNonBreakingSpaces(i18n.get("deep-scale", "Deep scale")));
         const generators = state.pcset.getGenerators();
         if ( generators.length > 0 ) 
-            features.push(htmlNonBreakingSpaces(`Generated (${integerRangesToStr(generators)})`));
+            features.push(htmlNonBreakingSpaces(
+                i18n.getp("generated-x", "Generated (%0)", [integerRangesToStr(generators)])
+            ));
         if ( state.pcset.hasMyhillProperty() ) 
-            features.push(htmlNonBreakingSpaces("Myhill's property"));
+            features.push(htmlNonBreakingSpaces(i18n.get("myhill-property", "Myhill's property")));
         if ( state.pcset.zcorrespondent ) 
-            features.push("Z-set");
+            features.push(i18n.get("z-set", "Z-set"));
         const comb_count = state.pcset.hexachordalCombinatorialityDegree();
         if ( comb_count > 0 ) 
-            features.push(comb_count >= 3 ? "All&#8209;combinatorial" : "Combinatorial");
+            features.push(comb_count >= 3 
+                ? i18n.get("all-combinatorial", "All-combinatorial") 
+                : i18n.get("combinatorial", "Combinatorial"));
 
         table_cells.features.setHTMLUnsafe(textOrDash(features.join(", ")));
     },
@@ -303,7 +318,7 @@ const Table = {
         table_cells.cti.setHTMLUnsafe(textOrDash(
             taggedSetCollectionToLinks(ctis, config.inversion_format, {eq: ": "})
         ));
-        table_cells.cti_inv_label.setHTMLUnsafe(
+        table_cells.cti_op_label.setHTMLUnsafe(
             ( config.inversion_format == "In" ) ? "I<sub>n</sub>" : "T<sub>n</sub>I"
         );
     },
@@ -403,7 +418,7 @@ function populateConfigDialogTableRows() {
         const label_id = checkbox_id + "-label";
         checkboxes.push(
             `<span><input id="${checkbox_id}" type="checkbox" target="${row.id}" onchange="Table.toggleRow('${checkbox_id}')">`+
-            `&nbsp;<label id="${label_id}" for="${checkbox_id}">${label}</label></span>`)
+            `&nbsp;<label id="${label_id}" for="${checkbox_id}">${label}</label></span>`);
     }
     document.getElementById("visible-data-checkboxes-area").setHTMLUnsafe(checkboxes.join(" "));
 }

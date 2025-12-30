@@ -33,7 +33,6 @@ var state = {
 
 var history_update_timer = null;
 
-var string_data = new Object();
 
 
 function textOrDash(s) {
@@ -82,12 +81,13 @@ function pcsetHyperlink(pcset, options = {}) {
 /** @param {String} s */
 function copyTextToClipboard(s) {
     navigator.clipboard.writeText(s);
-    alert(`"${s}" copied to clipboard!`);
+    alert(i18n.getp("alert-text-copy-ok", '"%0" copied to the clipboard!', [s]));
 }
 
 
 function copyLink(s) {
-    return "<small>(" + makeAnchorStr(`javascript:copyTextToClipboard('${s}')`, {text:"copy"}) + ")</small>";
+    const text = i18n.get("copy", "copy");
+    return "<small>(" + makeAnchorStr(`javascript:copyTextToClipboard('${s}')`, {text}) + ")</small>";
 }
 
 
@@ -220,12 +220,8 @@ function staffNoteClick(pc) {
 
 
 function pcsetGetDescriptiveNames(pcset) {
-    if ( "sets" in string_data ) {
-        let zero_set = pcset.reduced.toString("short-ab", PCSET_DEFAULT_BRACKETS);
-        if ( zero_set in string_data["sets"] && "names" in string_data["sets"][zero_set] )
-            return string_data["sets"][zero_set]["names"];
-    }
-    return [];
+    let zero_set = pcset.reduced.toString("short-ab", PCSET_DEFAULT_BRACKETS);
+    return i18n.getSetNames(zero_set);
 }
 
 
@@ -337,28 +333,18 @@ function historyEventHandler(evt) {
 }
 
 
-async function fetchDataFiles(datafiles) {
-    for ( const datafile of datafiles ) {
-        const data_fetch_response = await fetch(datafile);
-        if ( ! data_fetch_response.ok )
-            throw new Error(`Could not fetch file: '${datafile}'`);
-        const new_data = await data_fetch_response.json();
-        mergeObjects(new_data, string_data);
-        if ( Object.hasOwn(string_data, "sets") )
-            document.querySelector("#row-descriptive-name a").removeAttribute("hidden");
-        updateInterfaceFromConfig();
-        Table.updateAll(["updateInput"]);
-    }
-}
-
-
 function updateInterfaceFromConfig() {
+    const lang_radio = document.querySelector(`input[name="lang"][value="${i18n.language}"]`);
+    if ( lang_radio )
+        lang_radio.checked = true;
     document.getElementById("radio-setformat-short-ab-label").innerHTML = config.set_brackets[0] + "012…9AB" + config.set_brackets[1];
     document.getElementById("radio-setformat-short-te-label").innerHTML = config.set_brackets[0] + "012…9TE" + config.set_brackets[1];
     document.getElementById("radio-setformat-numbers-label").innerHTML = config.set_brackets[0] + "0,1,2,…,9,10,11" + config.set_brackets[1];
     document.getElementById("radio-setformat-notes-sharps-label").innerHTML = config.set_brackets[0] + "C,C&#9839;,D,…,A,A&#9839;,B" + config.set_brackets[1];
     document.getElementById("radio-setformat-notes-flats-label").innerHTML = config.set_brackets[0] + "C,D&#9837;,D,…,A,B&#9837;,B" + config.set_brackets[1];
-    document.getElementById("chk-visible-data-row-cti-label").innerHTML = `Common tones under ${config.inversion_format}`;
+    document.getElementById("chk-visible-data-row-cti-label").innerHTML = 
+        i18n.getp("row-cti", "Common tones under %0", [config.inversion_format])
+        .replace(':', '');
     document.querySelector(`input[name="div-layout"][value="${config.layout}"]`).checked = true;
     document.querySelector(`input[name="set-format"][value="${config.set_format}"]`).checked = true;
     document.querySelector(`input[name="set-brackets"][value="${config.set_brackets}"]`).checked = true;
@@ -377,6 +363,9 @@ function updateInterfaceFromConfig() {
 }
 
 function updateConfigFromInterface() {
+    const lang = document.querySelector('input[name="lang"]:checked')?.value;
+    if ( lang && i18n.language != lang )
+        changeLanguage(lang);
     config.layout = document.querySelector('input[name="div-layout"]:checked').value;
     const new_set_format = document.querySelector(`input[name="set-format"]:checked`).value;
     const set_format_changed = ( new_set_format != config.set_format );
@@ -505,10 +494,27 @@ Table.collectRows();
 populateConfigDialogTableRows();
 readConfig();
 
+// Load data files 
+Promise.all(DATA_FILES.map(
+    (datafile) => i18n.fetchDataFile(datafile)
+)).then(() => {
+    // Add radio inputs to options dialog
+    i18n.getAvailableLanguages()
+    .sort((a,b) => a.name.localeCompare(b.name))
+    .forEach((lang) => addLanguageToConfig(lang.code, lang.name));
+    updateInterfaceFromConfig();
+    // Set default language
+    if ( config.language === null ) {
+        config.language = i18n.getPreferredLanguage();
+        saveConfig();
+    }
+    // Change language if needed
+    changeLanguage(config.language);
+});
+
 addEventListener("popstate", historyEventHandler);
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener("change", on_system_theme_change_event_handler);
 
-fetchDataFiles(["data/en.json"]);
 createMainClockfaceSvg(document.getElementById("visualization-svg"));
 enableKeyboardShortcuts();
 
@@ -546,4 +552,3 @@ for ( const elm of document.querySelectorAll(".icon-search") ) {
     );
     elm.setHTMLUnsafe(svg.outerHTML);
 }
-

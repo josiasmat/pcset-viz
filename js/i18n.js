@@ -1,59 +1,152 @@
-/****************************
- *                          *
- *   Translation routines   *
- *                          *
- ****************************/
+/*
+Pitch-class set visualizer
+Copyright (C) 2024 Josias Matschulat
 
-function getPreferredTranslation(available_translations, default_language = "en") {
-    // check url query
-    var url_param_lang = getUrlQueryValue("lang");
-    if ( url_param_lang != null ) {
-        url_param_lang = url_param_lang.toLowerCase();
-        for ( const translation of available_translations ) {
-            if ( url_param_lang == translation )
-                return translation;
-        }
-    }
-    // check browser languages
-    for ( let lang of navigator.languages ) {
-        lang = lang.toLowerCase();
-        for ( const translation of available_translations ) {
-            if ( lang.startsWith(translation) )
-                return translation;
-        }
-    }
-    // return default
-    return default_language;
-}
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-function getTranslatedStr(key, i18n_data) {
-    if ( i18n_data.hasOwnProperty(key) ) {
-        return i18n_data[key];
-    } else {
-        console.log(`getTranslatedStr():\nKey '${key}' not found for language '${language}'.`);
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+"use strict";
+
+
+// var string_data = new Object();
+
+
+const i18n = {
+
+    data: {},
+    lang: null,
+    fallback_lang: "en",
+
+    get language() {
+        return this.lang ? this.lang : this.fallback_lang;
+    },
+
+    /** 
+     * @param {String} key
+     * @param {String} def - Default string
+     * @returns {?String}
+     */
+    get(key, def) {
+        return this.data[this.language]?.strings[key] 
+            ?? this.data[this.fallback_lang]?.strings[key]
+            ?? def;
+    },
+
+    /** 
+     * @param {String} key
+     * @param {String} def - Default string
+     * @param {Array} params - Parameters to insert
+     * @returns {?String}
+     */
+    getp(key, def, params) {
+        let s = this.get(key, def).replaceAll("%%", '%');
+        for ( let i = 0; i < params.length; i++ )
+            s = s.replaceAll(`%${i}`, `${params[i]}`);
+        return s;
+    },
+
+    /** @returns {String[]} */
+    getAvailableLanguageCodes() {
+        return Object.keys(this.data);
+    },
+
+    getAvailableLanguages() {
+        return this.getAvailableLanguageCodes()
+            .map((key) => ({code: this.data[key].lang.code, name: this.data[key].lang.name}));
+    },
+
+    /** @param {Element} elm */
+    translateElement(elm) {
+        if ( elm.hasAttribute("i18n") ) {
+            const params = Array.from(elm.children).map((elm) => elm.outerHTML);
+            elm.setHTMLUnsafe(this.getp(
+                elm.getAttribute("i18n"), 
+                elm.innerHTML, 
+                params
+            ));
+        }
+    },
+
+    /** @param {Element} elm */
+    translateDOM(elm) {
+        this.translateElement(elm);
+        for ( const c of elm.children )
+            this.translateDOM(c);
+    },
+
+    /** @returns {?String} */
+    getLanguageFromURL() {
+        var param = getUrlQueryValue("lang");
+        if ( param ) {
+            param = param.toLowerCase();
+            return param;
+        }
         return null;
-    }
+    },
+
+    /** @returns {?String} */
+    getBrowserLanguage() {
+        const available = this.getAvailableLanguageCodes();
+        for ( let browser_lang of navigator.languages ) {
+            browser_lang = browser_lang.toLowerCase();
+            for ( const lang of available )
+                if ( browser_lang.startsWith(lang) )
+                    return lang;
+        }
+        return null;
+    },
+
+    /** @returns {String} */
+    getPreferredLanguage() {
+        return this.getLanguageFromURL()
+            ?? this.getBrowserLanguage()
+            ?? this.language
+            ?? this.fallback_lang;
+    },
+
+    setLanguage(lang) {
+        this.lang = lang;
+        return lang;
+    },
+
+    /** @param {String} set @returns {String[]} */
+    getSetNames(set) {
+        return this.data[this.language]?.sets?.[set]?.names
+            ?? this.data[this.fallback_lang]?.sets?.[set]?.names
+            ?? [];
+    },
+
+    getSetNameData() {
+        return this.data[this.language]?.sets
+            ?? this.data[this.fallback_lang]?.sets
+            ?? null;
+    },
+
+    /**
+     * @param {String} filepath 
+     * @param {(code, name)} [callback] 
+     */
+    async fetchDataFile(filepath, callback = null) {
+        const result = await fetchJson(filepath, false);
+        const code = result["lang"]["code"];
+        const name = result["lang"]["name"];
+        this.data[code] = result;
+        callback?.(code, name);
+        return {code, name};
+    },
+
 }
 
-function translate(element, i18n_data) {
-    // translate element if it has i18n attribute
-    if ( element.hasAttribute("i18n") ) {
-        const str = getTranslatedStr(element.getAttribute("i18n"), i18n_data);
-        if ( str ) element.innerHTML = str;
-    }
-    // recurse into child nodes
-    if ( element.hasChildNodes() ) {
-        for ( const child of element.children )
-            translate(child, i18n_data);
-    }
-}
-
-function translateStringsMap(i18n_data, string_map) {
-    for ( const k of string_map.keys() ) {
-        const s = getTranslatedStr(k, i18n_data);
-        if ( s ) string_map.set(k, s);
-    }
-}
 
 async function fetchJson(filepath, try_gz) {
     if ( try_gz ) {
@@ -74,4 +167,18 @@ async function fetchJson(filepath, try_gz) {
             : `Could not fetch file: '${filepath}'`
         );
     return await response.json();
+}
+
+
+function changeLanguage(code) {
+    if ( i18n.setLanguage(code) != code ) return;
+    config.language = code;
+    i18n.translateDOM(document.body);
+    Table.collectRows();
+    populateConfigDialogTableRows();
+    updateInterfaceFromConfig();
+    saveConfig();
+    if ( Object.hasOwn(i18n.data[code], "sets") )
+        document.querySelector("#row-descriptive-name a").removeAttribute("hidden");
+    Table.updateAll(["updateInput"]);
 }

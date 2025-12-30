@@ -138,7 +138,10 @@ const SetSelector = {
 
 
 function showPrimeSelector() {
-    SetSelector.setTableHeader(config.prime_unique ? "Prime forms" : "Prime forms and their inverses" );
+    SetSelector.setTableHeader(config.prime_unique 
+        ? i18n.get("selector-prime-header", "Prime forms") 
+        : i18n.get("selector-prime-inv-header", "Prime forms and their inverses") 
+    );
     SetSelector.clearUpdater();
     SetSelector.clearFilters();
     SetSelector.showFeatureFilters();
@@ -179,7 +182,9 @@ function showPrimeSelector() {
 
 
 function showForteSelector() {
-    SetSelector.setTableHeader("Forte/Morris names");
+    SetSelector.setTableHeader(
+        i18n.get("selector-forte-header", "Forte/Morris names")
+    );
     SetSelector.clearUpdater();
     SetSelector.clearFilters();
     SetSelector.hideNameFilter();
@@ -220,7 +225,9 @@ function showForteSelector() {
 
 
 function showCarterSelector() {
-    SetSelector.setTableHeader("Carter numbers");
+    SetSelector.setTableHeader(
+        i18n.get("selector-carter-header", "Carter numbers")
+    );
     SetSelector.clearUpdater();
     SetSelector.clearFilters();
     SetSelector.hideNameFilter();
@@ -241,7 +248,7 @@ function showCarterSelector() {
             }
             sets.sort((a,b) => a[1] - b[1]);
             const s = sets.map((set) => makeSelectorSetLink(
-                set[0], `${CARDINAL_SET_NAMES[i]}-${parseInt(set[1])}`)
+                set[0], `${getCardinalSetName(i)}-${parseInt(set[1])}`)
             ).join(DIALOG_SET_SEPARATOR);
             SetSelector.setRowContent(i, s);
         }
@@ -253,7 +260,9 @@ function showCarterSelector() {
 
 
 function showDescriptionSelector() {
-    SetSelector.setTableHeader("Descriptive names");
+    SetSelector.setTableHeader(
+        i18n.get("selector-descriptive-names-header", "Descriptive names")
+    );
     SetSelector.clearUpdater();
     SetSelector.clearFilters();
     SetSelector.showNameFilter();
@@ -277,7 +286,7 @@ function showDescriptionSelector() {
         // collect names
         let sets = Array(13);
         for ( let i = 0; i < 13; i++ ) sets[i] = [];
-        for ( let entry of Object.entries(string_data["sets"]) ) {
+        for ( let entry of Object.entries(i18n.getSetNameData()) ) {
             const set = new PcSet(entry[0]);
             const len = set.size; //entry[0].length-2;
             const str_short = set.toString("short-ab", null);// entry[0].substring(1,len+1);
@@ -312,9 +321,12 @@ function showDescriptionSelector() {
 
 function showSubsetSelector() {
     const superset = state.pcset.normal;
-    SetSelector.setTableHeader(
-        `Subsets of <span class="setfont">${superset.toString(config.set_format, config.set_brackets)}</span>`
-    );
+    SetSelector.setTableHeader(i18n.getp(
+        "selector-subsets-header", "Subsets of %0",
+        [`<span class="setfont">${superset.toString(
+            config.set_format, config.set_brackets
+        )}</span>`]
+    ));
     SetSelector.clearUpdater();
     SetSelector.clearFilters();
     SetSelector.hideNameFilter();
@@ -354,9 +366,12 @@ function showSubsetSelector() {
 
 function showPrimeSubsetSelector() {
     const superset = state.pcset.prime;
-    SetSelector.setTableHeader(
-        `Subset classes of <span class="setfont">${superset.toString(config.set_format, config.set_brackets)}</span>`
-    );
+    SetSelector.setTableHeader(i18n.getp(
+        "selector-subsets-classes-header", "Subsets classes of %0",
+        [`<span class="setfont">${superset.toString(
+            config.set_format, config.set_brackets
+        )}</span>`]
+    ));
     SetSelector.clearUpdater();
     SetSelector.clearFilters();
     SetSelector.hideNameFilter();

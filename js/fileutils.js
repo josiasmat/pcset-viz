@@ -37,7 +37,9 @@ function loadStringFromFile() {
         input.onchange = () => {
             const file = input.files[0];
             if (!file) {
-                reject(new Error("No file selected"));
+                reject(new Error(
+                    i18n.get("err-no-file-selected", "No file selected")
+                ));
                 return;
             }
 
@@ -90,7 +92,9 @@ function loadJsonFromFile() {
         input.onchange = () => {
             const file = input.files[0];
             if (!file) {
-                reject(new Error("No file selected"));
+                reject(new Error(
+                    i18n.get("err-no-file-selected", "No file selected")
+                ));
                 return;
             }
 
@@ -101,7 +105,9 @@ function loadJsonFromFile() {
                     const obj = JSON.parse(reader.result);
                     resolve(obj);
                 } catch (e) {
-                    reject(new Error("Invalid JSON file"));
+                    reject(new Error(
+                        i18n.get("err-invalid-json", "Invalid JSON file")
+                    ));
                 }
             };
 

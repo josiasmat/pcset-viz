@@ -27,6 +27,14 @@ function hideConfigDialog() {
     hideDialog("dialog-config");
 }
 
+function addLanguageToConfig(code, name) {
+    const checkboxes_area = document.getElementById("options-language-checkboxes-area");
+    const new_html = `<span><input id="radio-lang-${code}" type="radio" name="lang" value="${code}" onchange="onChange()">`+
+                     `&nbsp;<label for="radio-lang-${code}">${name}</label></span>`;
+    checkboxes_area.setHTMLUnsafe(checkboxes_area.innerHTML + new_html);
+    document.getElementById("options-language-row").hidden = false;
+}
+
 
 /**
  * @param {String} text 
@@ -53,11 +61,13 @@ function updateConfigDialog() {
     const midi_select_elm = document.getElementById("select-midi-device");
     clearSelectOptions(midi_select_elm);
     const options = [addOptionToHtmlSelect(
-        midi_select_elm, "", "No device available"
+        midi_select_elm, "", i18n.get("options-midi-device-none", "No device available")
     )];
     requestMidiInputs( (ports) => {
         if ( ports.length > 0 )
-            options[0].setAttribute("label", "None");
+            options[0].setAttribute(
+                "label", i18n.get("options-midi-device-null", "No device selected")
+            );
         for ( const port of ports ) {
             options.push(addOptionToHtmlSelect(
                 midi_select_elm, port.id, port.name,
@@ -69,12 +79,12 @@ function updateConfigDialog() {
         if ( options.length > 1 )
             midi_select_elm.insertBefore(options[0], options[1]);
         if ( midi.dev )
-            updateConfigMidiStatus("Connected", 1);
+            updateConfigMidiStatus(i18n.get("options-midi-connected", "Connected"), 1);
         else
-            updateConfigMidiStatus("Disconnected", 0);
+            updateConfigMidiStatus(i18n.get("options-midi-disconnected", "Disconnected"), 0);
         //selectMidiDevice();
     }, () => {
-        updateConfigMidiStatus("MIDI access denied", 3);
+        updateConfigMidiStatus(i18n.get("options-midi-denied", "MIDI access denied"), 3);
     });
 }
 

@@ -24,9 +24,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <link rel="stylesheet" href="css/clockface.css">
     <script type="text/javascript" src="js/utils.js" defer></script>
     <script type="text/javascript" src="js/storage-handler.js" defer></script>
-    <script type="text/javascript" src="js/globals.js" defer></script>
     <script type="text/javascript" src="js/fileutils.js" defer></script>
     <script type="text/javascript" src="js/i18n.js" defer></script>
+    <script type="text/javascript" src="js/globals.js" defer></script>
     <script type="text/javascript" src="js/favorites.js" defer></script>
     <script type="text/javascript" src="js/config.js" defer></script>
     <script type="text/javascript" src="js/pcset.js" defer></script>
@@ -42,6 +42,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <script type="text/javascript" src="js/imgexport.js" defer></script>
     <script type="text/javascript" src="js/audio.js" defer></script>
     <script type="text/javascript" src="js/main.js" defer></script>
+    <link rel="preload" href="data/en.json" as="fetch" type="application/json" crossorigin="anonymous">
+    <link rel="preload" href="data/pt.json" as="fetch" type="application/json" crossorigin="anonymous">
     <link rel="icon" type="image/png" href="favicon.png">
   </head>
   <body>
@@ -64,7 +66,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
               <td id="favorites"></td>
             </tr>
             <tr id="row-ruler-view" hidden>
-              <td i18n="row-ruler-view"><span>Ruler view:</span>
+              <td><span i18n="row-ruler-view">Ruler view:</span>
               <span style="float: inline-end;">
                 <a href="javascript:rulerShift(1)">&#x25c0;</a>
                 <a href="javascript:rulerShift(-1)">&#x25b6;</a>
@@ -73,8 +75,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
               <td id="ruler-view" class="graphics-view"></td>
             </tr>
             <tr id="row-staff-view">
-              <td i18n="row-staff-view">
-                <span id="staff-up-btn">Staff view:</span>
+              <td>
+                <span i18n="row-staff-view" id="staff-up-btn">Staff view:</span>
                 <span id="staff-down-btn">
                   <a href="javascript:pcsetRotate(1)">&#x25b2;</a><br /><a href="javascript:pcsetRotate(-1)">&#x25bc;</a>
                 </span>
@@ -85,10 +87,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
               <td i18n="row-operations">Operation:</td>
               <td id="operations">
                 <select name="operation-selector" id="operation-selector" onchange="operationUpdate(true)">
-                  <option value="Tn">Transpose</option>
-                  <option value="In">Invert</option>
-                  <option value="Mn">Multiply</option>
-                  <option value="Rn">Shift</option>
+                  <option i18n="op-transpose" value="Tn">Transpose</option>
+                  <option i18n="op-invert" value="In">Invert</option>
+                  <option i18n="op-multiply" value="Mn">Multiply</option>
+                  <option i18n="op-shift" value="Rn">Shift</option>
                 </select>
                 <input type="number" id="operation-index" name="operation-index" 
                   min="-12" max="12" value="1" previous="1" size="2" oninput="operationUpdate()"/>
@@ -104,31 +106,31 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
               <td id="normal-form"></td>
             </tr>
             <tr id="row-prime">
-              <td i18n="row-prime">Prime form: <a class="icon-search" href="javascript:showPrimeSelector()">&#128269;</a></td>
+              <td><span i18n="row-prime">Prime form:</span> <a class="icon-search" href="javascript:showPrimeSelector()">&#128269;</a></td>
               <td id="prime-form"></td>
             </tr>
             <tr id="row-forte">
-              <td i18n="row-forte">Forte/Morris name: <a class="icon-search" href="javascript:showForteSelector()">&#128269;</a></td>
+              <td><span i18n="row-forte">Forte/Morris name:</span> <a class="icon-search" href="javascript:showForteSelector()">&#128269;</a></td>
               <td id="forte-name"></td>
             </tr>
             <tr id="row-carter" hidden>
-              <td i18n="row-carter">Carter number: <a class="icon-search" href="javascript:showCarterSelector()">&#128269;</a></td>
+              <td><span i18n="row-carter">Carter number:</span> <a class="icon-search" href="javascript:showCarterSelector()">&#128269;</a></td>
               <td id="carter-name"></td>
             </tr>
             <tr id="row-descriptive-name">
-              <td i18n="row-descriptive-name">Descriptive name(s): <a class="icon-search" href="javascript:showDescriptionSelector()" hidden>&#128269;</a></td>
+              <td><span i18n="row-descriptive-name">Descriptive name(s):</span> <a class="icon-search" href="javascript:showDescriptionSelector()" hidden>&#128269;</a></td>
               <td id="descriptive-name"></td>
             </tr>
             <tr id="row-features">
-              <td i18n="row-features">Set features: <a href="javascript:showFeaturesSelector()" hidden>&#128269;</a></td>
+              <td i18n="row-features">Set features:</td>
               <td id="features"></td>
             </tr>
             <tr id="row-complement">
-              <td>Complement:</td>
+              <td i18n="row-complement">Complement:</td>
               <td id="complement"></td>
             </tr>
             <tr id="row-zcorrespondent" hidden>
-              <td>Z-correspondent:</td>
+              <td i18n="row-zcorrespondent">Z-correspondent:</td>
               <td id="zcorrespondent"></td>
             </tr>
             <tr id="row-ic-vector">
@@ -144,7 +146,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
               <td id="spectra"></td>
             </tr>
             <tr id="row-sumclass" hidden>
-              <td>Sum & sum class:</a></td>
+              <td i18n="row-sumclass">Sum & sum class:</a></td>
               <td id="sumclass"></td>
             </tr>
             <tr id="row-rotations" hidden>
@@ -152,53 +154,55 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
               <td id="rotations"></td>
             </tr>
             <tr id="row-symmetries" hidden>
-              <td>Symmetries/Equivalences:</td>
+              <td i18n="row-symmetries">Symmetries/Equivalences:</td>
               <td id="symmetries"></td>
             </tr>
             <tr id="row-combinatorials" hidden>
-              <td>Combinatoriality:</td>
+              <td i18n="row-combinatorials">Combinatoriality:</td>
               <td id="combinatorials"></td>
             </tr>
             <tr id="row-transposition" hidden>
-              <td>Transpositions:</td>
+              <td i18n="row-transpositions">Transpositions:</td>
               <td id="transpositions"></td>
             </tr>
             <tr id="row-ctt" hidden>
-              <td i18n="row-ctt">Common tones under T<sub>n</sub>:</td>
+              <td i18n="row-ctt">Common tones under <span id="ctt-op-label">T<sub>n</sub></span>:</td>
               <td id="ctt"></td>
             </tr>
             <tr id="row-inversions" hidden>
-              <td>Inversions:</td>
+              <td i18n="row-inversions">Inversions:</td>
               <td id="inversions"></td>
             </tr>
             <tr id="row-cti" hidden>
-              <td i18n="row-cti">Common tones under <span id="cti-inversion-label">I<sub>n</sub></span>:</td>
+              <td i18n="row-cti">Common tones under <span id="cti-op-label">I<sub>n</sub></span>:</td>
               <td id="cti"></td>
             </tr>
             <tr id="row-multiples" hidden>
-              <td>Multiplications:</td>
+              <td i18n="row-multiplications">Multiplications:</td>
               <td id="multiples"></td>
             </tr>
             <tr id="row-subsets" hidden>
-              <td>Subsets:</td>
+              <td i18n="row-subsets">Subsets:</td>
               <td id="subsets">
-                <a href="javascript:showSubsetSelector()">All subsets</a> | <a href="javascript:showPrimeSubsetSelector()">Subset classes</a>
+                <a i18n="row-all-subsets" href="javascript:showSubsetSelector()">All subsets</a>
+                 | 
+                <a i18n="row-prime-subsets" href="javascript:showPrimeSubsetSelector()">Subset classes</a>
               </td>
             </tr>
             <tr id="row-misc" always-visible>
-              <td>Misc.:</td>
+              <td i18n="row-misc">Misc.:</td>
               <td id="misc-area">
                 <span>
-                  <a href="javascript:playScale()">Listen</a>
+                  <a i18n="row-misc-listen" href="javascript:playScale()">Listen</a>
                 </span> | 
                 <span>
-                  <a href="javascript:showExportImageDialog()">Export&nbsp;image</a>
+                  <a i18n="row-misc-export-image" href="javascript:showExportImageDialog()">Export image</a>
                 </span> | 
                 <span>
-                  <a href="javascript:showConfigDialog()">Options</a>
+                  <a i18n="row-misc-options" href="javascript:showConfigDialog()">Options</a>
                 </span> | 
                 <span>
-                  <a href="javascript:showAboutDialog()">About</a>
+                  <a i18n="row-misc-about" href="javascript:showAboutDialog()">About</a>
                 </span>
               </td>
             </tr>
@@ -207,119 +211,127 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       </div>
       <dialog id="dialog-about" class="dialog-container">
         <div class="dialog-header">
-          <span class="dialog-title">ABOUT</span>
+          <span class="dialog-title" i18n="dialog-about-title">ABOUT</span>
           <a class="close-button" href="javascript:hideDialog('dialog-about')" autofocus></a>
         </div>
         <div class="dialog-main">
-          <b>Pitch-Class Set Visualizer, version <span id="version-number"></span></b>.
-          <br />
-          Licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">GNU Affero General Public License version 3</a>.<br />
-          &#169;&nbsp;2024 Josias Matschulat.
+          <b i18n="dialog-about-line1">
+            Pitch-Class Set Visualizer, version <span id="version-number"></span>.
+          </b><br />
+          <span i18n="dialog-about-line2">
+            Licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">GNU Affero General Public License version 3</a>.
+          </span><br />
+          <span>
+            &#169;&nbsp;2024 Josias Matschulat.
+          </span><br /><br />
+          <span i18n="dialog-about-line4">
+            Descriptive names adapted from <span>Larry Solomon, &#169;&nbsp;1997, 2005</span>,<br /> with additions from <span>Straus, 2016</span>.
+          </span>
           <br /><br />
-          Descriptive names adapted from Larry Solomon, &#169;&nbsp;1997, 2005,<br />with additions from Straus, 2016.
-          <br /><br />
-          Get the <a href="https://github.com/josiasmat/pcset-viz" target="_blank">source code</a> at GitHub.
+          <span i18n="dialog-about-line5">
+            Get the <a i18n="dialog-about-source" href="https://github.com/josiasmat/pcset-viz" target="_blank">source code</a> at GitHub.
+          </span>
         </div>
       </dialog>
       <dialog id="dialog-set-selector" class="dialog-container">
         <div class="dialog-header">
-          <span class="dialog-title">SET SELECTOR</span>
+          <span class="dialog-title" i18n="dialog-set-selector-title">SET SELECTOR</span>
           <a class="close-button" href="javascript:hideDialog('dialog-set-selector')"></a>
         </div>
         <div class="dialog-main">
           <table id="table-set-selector">
             <tbody>
-              <tr>
-                <th>Type</th>
-                <th id="dialog-set-selector-second-column-header">Sets</th>
-              </tr>
               <tr id="table-set-row-filter-features">
-                <td>Feature filter:</td>
+                <td i18n="header-feature-filter">Feature filter:</td>
                 <td>
                   <span>
                     <input id="chk-set-filter-allinterval" type="checkbox" onchange="SetSelector.update()">
-                    <label for="chk-set-filter-allinterval">All interval</label>
+                    <label i18n="all-interval" for="chk-set-filter-allinterval">All-interval</label>
                   </span>
                   <span>
                     <input id="chk-set-filter-combinatorial" type="checkbox" onchange="SetSelector.update()">
-                    <label for="chk-set-filter-combinatorial">Combinatorial</label>
+                    <label i18n="combinatorial" for="chk-set-filter-combinatorial">Combinatorial</label>
                   </span>
                   <span>
                     <input id="chk-set-filter-deepscale" type="checkbox" onchange="SetSelector.update()">
-                    <label for="chk-set-filter-deepscale">Deep scale</label>
+                    <label i18n="deep-scale" for="chk-set-filter-deepscale">Deep scale</label>
                   </span>
                   <span>
                     <input id="chk-set-filter-generated" type="checkbox" onchange="SetSelector.update()">
-                    <label for="chk-set-filter-generated">Generated</label>
+                    <label i18n="generated" for="chk-set-filter-generated">Generated</label>
                   </span>
                   <span>
                     <input id="chk-set-filter-maxarea" type="checkbox" onchange="SetSelector.update()">
-                    <label for="chk-set-filter-maxarea">Maximal area</label>
+                    <label i18n="maximal-area" for="chk-set-filter-maxarea">Maximal area</label>
                   </span>
                   <span>
                     <input id="chk-set-filter-maxeven" type="checkbox" onchange="SetSelector.update()">
-                    <label for="chk-set-filter-maxeven">Maximally even</label>
+                    <label i18n="maximally-even" for="chk-set-filter-maxeven">Maximally even</label>
                   </span>
                   <span>
                     <input id="chk-set-filter-mirror" type="checkbox" onchange="SetSelector.update()">
-                    <label for="chk-set-filter-mirror">Mirror</label>
+                    <label i18n="mirror" for="chk-set-filter-mirror">Mirror</label>
                   </span>
                   <span>
                     <input id="chk-set-filter-myhill" type="checkbox" onchange="SetSelector.update()">
-                    <label for="chk-set-filter-myhill">Myhill's property</label>
+                    <label i18n="myhill-property" for="chk-set-filter-myhill">Myhill's property</label>
                   </span>
                   <span>
                     <input id="chk-set-filter-propscale" type="checkbox" onchange="SetSelector.update()">
-                    <label for="chk-set-filter-propscale">Proper scale</label>
+                    <label i18n="proper-scale" for="chk-set-filter-propscale">Proper scale</label>
                   </span>
                   <span>
                     <input id="chk-set-filter-zset" type="checkbox" onchange="SetSelector.update()">
-                    <label for="chk-set-filter-zset">Z-set</label>
+                    <label i18n="z-set" for="chk-set-filter-zset">Z-set</label>
                   </span>
                 </td>
               </tr>
               <tr id="table-set-row-filter-name">
-                <td><label for="input-set-filter-name" i18n="input-set-filter-name">Name filter:</label></td>
+                <td><label for="input-set-filter-name" i18n="header-name-filter">Name filter:</label></td>
                 <td><input id="input-set-filter-name" type="search" spellcheck="false" oninput="SetSelector.update()" autofocus></td>
               </tr>
               <tr>
-                <td>Dyads:</td>
+                <th i18n="header-type">Type</th>
+                <th id="dialog-set-selector-second-column-header">Sets</th>
+              </tr>
+              <tr>
+                <td><z i18n="sets-cardinality-2">Dyads</z>:</td>
                 <td id="table-set-row2"></td>
               </tr>
               <tr>
-                <td>Trichords:</td>
+                <td><z i18n="sets-cardinality-3">Trichords</z>:</td>
                 <td id="table-set-row3"></td>
               </tr>
               <tr>
-                <td>Tetrachords:</td>
+                <td><z i18n="sets-cardinality-4">Tetrachords</z>:</td>
                 <td id="table-set-row4"></td>
               </tr>
               <tr>
-                <td>Pentachords:</td>
+                <td><z i18n="sets-cardinality-5">Pentachords</z>:</td>
                 <td id="table-set-row5"></td>
               </tr>
               <tr>
-                <td>Hexachords:</td>
+                <td><z i18n="sets-cardinality-6">Hexachords</z>:</td>
                 <td id="table-set-row6"></td>
               </tr>
               <tr>
-                <td>Heptachords:</td>
+                <td><z i18n="sets-cardinality-7">Heptachords</z>:</td>
                 <td id="table-set-row7"></td>
               </tr>
               <tr>
-                <td>Octachords:</td>
+                <td><z i18n="sets-cardinality-8">Octachords</z>:</td>
                 <td id="table-set-row8"></td>
               </tr>
               <tr>
-                <td>Nonachords:</td>
+                <td><z i18n="sets-cardinality-9">Nonachords</z>:</td>
                 <td id="table-set-row9"></td>
               </tr>
               <tr>
-                <td>Decachords:</td>
+                <td><z i18n="sets-cardinality-10">Decachords</z>:</td>
                 <td id="table-set-row10"></td>
               </tr>
               <tr>
-                <td>Others:</td>
+                <td i18n="header-others">Others:</td>
                 <td id="table-set-row0"></td>
               </tr>
             </tbody>
@@ -328,45 +340,49 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       </dialog>
       <dialog id="dialog-config" class="dialog-container">
         <div class="dialog-header">
-          <span class="dialog-title">OPTIONS</span>
+          <span i18n="dialog-options-title" class="dialog-title">OPTIONS</span>
           <a class="close-button" href="javascript:hideDialog('dialog-config')"></a>
         </div>
         <div class="dialog-main">
           <table id="dialog-config-table">
             <tbody>
+              <tr id="options-language-row" hidden>
+                <td i18n="options-language-header">Language</td>
+                <td id="options-language-checkboxes-area"></td>
+              </tr>
               <tr>
-                <td>Import/export</td>
+                <td i18n="options-import-export-header">Import/export</td>
                 <td>
-                  <span style="margin-right: 4rem;">Favorites:
-                  <a href="javascript:loadFavoritesFromFile()" autofocus>Import from file</a> |
-                  <a href="javascript:saveFavoritesToFile()">Export to file</a></span>
-                  <span>Configuration:
-                  <a href="javascript:loadConfigFromFile()">Import from file</a> |
-                  <a href="javascript:saveConfigToFile()">Export to file</a></span>
+                  <span i18n="import-export-favorites" style="margin-right: 4rem;">Favorites:
+                  <a i18n="import-from-file" href="javascript:loadFavoritesFromFile()" autofocus>Import from file</a> |
+                  <a i18n="export-to-file" href="javascript:saveFavoritesToFile()">Export to file</a></span>
+                  <span i18n="import-export-config">Configuration:
+                  <a i18n="import-from-file" href="javascript:loadConfigFromFile()">Import from file</a> |
+                  <a i18n="export-to-file" href="javascript:saveConfigToFile()">Export to file</a></span>
                 </td>
               </tr>
               <tr>
-                <td>Visible data<br />
-                  (<a href="javascript:resetVisibleDataRows()">Reset</a> &#x00b7; 
-                   <a href="javascript:setAllDataRowsVisible()">All</a>)
+                <td i18n="options-visible-data-header">Visible data<br />
+                  (<a i18n="reset" href="javascript:resetVisibleDataRows()">Reset</a> &#x00b7; 
+                   <a i18n="all" href="javascript:setAllDataRowsVisible()">All</a>)
                 </td>
                 <td id="visible-data-checkboxes-area"></td>
               </tr>
               <tr>
-                <td>Forte/Morris name</td>
+                <td i18n="options-forte-name-header">Forte/Morris name</td>
                 <td>
                   <span>
                     <input id="radio-prime-form-unique" type="radio" name="prime-form" value="true" onchange="onChange()" checked>
-                    <label for="radio-prime-form-unique">Prime and its inverse are the same (Forte)</label>
+                    <label i18n="options-forte-name-1" for="radio-prime-form-unique">Prime and its inverse are the same (Forte)</label>
                   </span>
                   <span>
                     <input id="radio-prime-form-distinct" type="radio" name="prime-form" value="false" onchange="onChange()">
-                    <label for="radio-prime-form-distinct">Differentiate prime and its inverse</label>
+                    <label i18n="options-forte-name-2" for="radio-prime-form-distinct">Differentiate prime and its inverse</label>
                   </span>
                 </td>
               </tr>
               <tr>
-                <td>Pitch-class format</td>
+                <td i18n="options-set-format-header">Set format</td>
                 <td>
                   <span>
                     <input id="radio-setformat-short-ab" type="radio" name="set-format" value="short-ab" onchange="onChange()" checked>
@@ -392,24 +408,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                 </td>
               </tr>
               <tr>
-                <td>Set bracketing</td>
+                <td i18n="options-set-bracketing-header">Set delimiters</td>
                 <td>
                   <span>
                     <input id="radio-setbrackets-square" type="radio" name="set-brackets" value="[]" onchange="onChange(true)" checked>
-                    <label for="radio-setbrackets-square">[…] square brackets</label>
+                    <label i18n="options-set-bracketing-1" for="radio-setbrackets-square">[…] square brackets</label>
                   </span>
                   <span>
                     <input id="radio-setbrackets-round" type="radio" name="set-brackets" value="()" onchange="onChange(true)">
-                    <label for="radio-setbrackets-round">(…) parentheses</label>
+                    <label i18n="options-set-bracketing-2" for="radio-setbrackets-round">(…) parentheses</label>
                   </span>
                   <span>
                     <input id="radio-setbrackets-curly" type="radio" name="set-brackets" value="{}" onchange="onChange(true)">
-                    <label for="radio-setbrackets-curly">{…} curly braces</label>
+                    <label i18n="options-set-bracketing-3" for="radio-setbrackets-curly">{…} curly braces</label>
                   </span>
                 </td>
               </tr>
               <tr>
-                <td>Vector format</td>
+                <td i18n="options-vector-format-header">Vector format</td>
                 <td>
                   <span>
                     <input id="radio-vectorformat-short" type="radio" name="vector-format" value="short" onchange="onChange()" checked>
@@ -423,119 +439,119 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                 </td>
               </tr>
               <tr>
-                <td>Inversion format</td>
+                <td i18n="options-inversion-op-header">Inversion operator</td>
                 <td>
                   <span>
                     <input id="radio-inversionformat-in" type="radio" name="inversion-format" value="In" onchange="onChange(true)" checked>
-                    <label for="radio-inversionformat-in">Simple (I<sub>n</sub>)</label>
+                    <label i18n="options-inversion-op-1" for="radio-inversionformat-in">Simple (<z>I<sub>n</sub></z>)</label>
                   </span>
                   <span>
                     <input id="radio-inversionformat-tni" type="radio" name="inversion-format" value="TnI" onchange="onChange(true)">
-                    <label for="radio-inversionformat-tni">Compound (T<sub>n</sub>I)</label>
+                    <label i18n="options-inversion-op-2" for="radio-inversionformat-tni">Compound (<z>T<sub>n</sub>I</z>)</label>
                   </span>
                   <span class="keyboard-shortcut" style="float: inline-end;">(Alt+I)</span>
                 </td>
               </tr>
               <tr>
-                <td>Clockface visualization</td>
+                <td i18n="options-clockface-header">Clockface visualization</td>
                 <td>
                   <span>
                     <input id="chk-note-names" type="checkbox" onchange="onChange()">
-                    <label for="chk-note-names">Note names <span class="keyboard-shortcut">(Alt+N)<span></label>
+                    <label i18n="options-clockface-note-names" for="chk-note-names">Note names <span class="keyboard-shortcut">(Alt+N)<span></label>
                   </span>
                   <span>
                     <input id="chk-polygon" type="checkbox" onchange="onChange()">
-                    <label for="chk-polygon">Set geometry <span class="keyboard-shortcut">(Alt+G)</span></label>
+                    <label i18n="options-clockface-polygon" for="chk-polygon">Set geometry <span class="keyboard-shortcut">(Alt+G)</span></label>
                   </span>
                   <span>
                     <input id="chk-sym-axes" type="checkbox" onchange="onChange()">
-                    <label for="chk-sym-axes">Axes of symmetry <span class="keyboard-shortcut">(Alt+S)</span></label>
+                    <label i18n="options-clockface-symaxes" for="chk-sym-axes">Axes of symmetry <span class="keyboard-shortcut">(Alt+S)</span></label>
                   </span>
                   <span>
                     <input id="chk-fifths" type="checkbox" onchange="onChange()">
-                    <label for="chk-fifths">Circle of fifths <span class="keyboard-shortcut">(Alt+5)</span></label>
+                    <label i18n="options-clockface-fifths" for="chk-fifths">Circle of fifths <span class="keyboard-shortcut">(Alt+5)</span></label>
                   </span>
                 </td>
               </tr>
               <tr>
-                <td>MIDI input</td>
+                <td i18n="options-midi-header">MIDI input</td>
                 <td>
                   <span>
-                    <label for="select-midi-device">Device:</label>
+                    <label i18n="options-midi-device" for="select-midi-device">Device:</label>
                     <select name="select-midi-device" id="select-midi-device" onchange="selectMidiDevice()">
-                      <option value="">No device selected</option>
+                      <option value="">-</option>
                     </select>
                     &#x2192;
-                    <span id="midi-connection-status" status="0">Disconnected</span>
+                    <span id="midi-connection-status" status="0"></span>
                   </span>
                   <span>
-                    <label for="">Mode:</label>
+                    <label i18n="options-midi-mode-label" for="">Mode:</label>
                     <select name="select-midi-mode" id="select-midi-mode" onchange="selectMidiMode()">
-                      <option value="scale">Scale</option>
-                      <option value="chord">Chord</option>
-                      <option value="direct">Direct</option>
-                      <option value="toggle">Toggle</option>
+                      <option i18n="options-midi-mode-scale" value="scale">Scale</option>
+                      <option i18n="options-midi-mode-chord" value="chord">Chord</option>
+                      <option i18n="options-midi-mode-direct" value="direct">Direct</option>
+                      <option i18n="options-midi-mode-toggle" value="toggle">Toggle</option>
                     </select>
                   </span>
                   <span>
                     <input id="chk-midi-pedal" type="checkbox" onchange="selectMidiMode()">
-                    <label for="chk-midi-pedal">Hold with sustain pedal</label>
+                    <label i18n="options-midi-pedal" for="chk-midi-pedal">Hold with sustain pedal</label>
                   </span>
                 </td>
               </tr>
               <tr>
-                <td>Sound</td>
+                <td i18n="options-sound-header">Sound</td>
                 <td>
                   <span>
                     <input id="chk-sound-toggle" type="checkbox" onchange="updateConfigFromInterface()">
-                    <label for="chk-sound-toggle">Play sound on pitch-class toggle</label>
+                    <label i18n="options-sound-toggle" for="chk-sound-toggle">Play sound on pitch-class toggle</label>
                   </span>
                   <span>
                     <input id="chk-sound-midi" type="checkbox" onchange="updateConfigFromInterface()">
-                    <label for="chk-sound-midi">Play sound on MIDI input</label>
+                    <label i18n="options-sound-midi" for="chk-sound-midi">Play sound on MIDI input</label>
                   </span>
                 </td>
               </tr>
               <tr>
-                <td>App layout</td>
+                <td i18n="options-app-layout-header">App layout</td>
                 <td>
                   <span>
                     <input id="radio-svg-first" type="radio" name="div-layout" value="svg-first" onchange="onChange()" checked>
-                    <label for="radio-svg-first">Clockface visualization first</label>
+                    <label i18n="options-app-layout-1" for="radio-svg-first">Clockface visualization first</label>
                   </span>
                   <span>
                     <input id="radio-data-first" type="radio" name="div-layout" value="data-first" onchange="onChange()">
-                    <label for="radio-data-first">Data table first</label>
+                    <label i18n="options-app-layout-2" for="radio-data-first">Data table first</label>
                   </span>
                 </td>
               </tr>
               <tr>
-                <td>Appearance</td>
+                <td i18n="options-appearance-header">Appearance</td>
                 <td>
                   <span style="margin-right: 4ch;">
-                    <span>Theme:</span>
+                    <span i18n="options-appearance-theme-label">Theme:</span>
                     <span>
                       <input id="radio-theme-auto" type="radio" name="theme" value="auto" onchange="onChange()" checked>
-                      <label for="radio-theme-auto">Follow browser setting</label>
+                      <label i18n="options-appearance-theme-auto" for="radio-theme-auto">Follow browser setting</label>
                     </span>
                     <span>
                       <input id="radio-theme-light" type="radio" name="theme" value="light" onchange="onChange()">
-                      <label for="radio-theme-light">Light</label>
+                      <label i18n="options-appearance-theme-light" for="radio-theme-light">Light</label>
                     </span>
                     <span>
                       <input id="radio-theme-dark" type="radio" name="theme" value="dark" onchange="onChange()">
-                      <label for="radio-theme-dark">Dark</label>
+                      <label i18n="options-appearance-theme-dark" for="radio-theme-dark">Dark</label>
                     </span>
                   </span>
                   <span>
-                    <span>Font style:</span>
+                    <span i18n="options-appearance-font-label">Font style:</span>
                     <span>
                       <input id="radio-font-sans" type="radio" name="font" value="sans" onchange="onChange()" checked>
-                      <label for="radio-font-sans">Sans-serif</label>
+                      <label i18n="options-appearance-font-sans" for="radio-font-sans">Sans-serif</label>
                     </span>
                     <span>
                       <input id="radio-font-serif" type="radio" name="font" value="serif" onchange="onChange()">
-                      <label for="radio-font-serif">Serif</label>
+                      <label i18n="options-appearance-font-serif" for="radio-font-serif">Serif</label>
                     </span>
                   </span>
                 </td>
@@ -546,7 +562,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       </dialog>
       <dialog id="dialog-export-image" class="dialog-container">
         <div class="dialog-header">
-          <span class="dialog-title">EXPORT IMAGE</span>
+          <span i18n="expimg-dialog-title" class="dialog-title">EXPORT IMAGE</span>
           <a class="close-button" href="javascript:hideDialog('dialog-export-image')"></a>
         </div>
         <div class="dialog-main">
@@ -557,35 +573,35 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
             <table>
               <tbody>
                 <tr>
-                  <td><label for="expimg-select-type">Type</label></td>
+                  <td><label i18n="expimg-type-header" for="expimg-select-type">Type</label></td>
                   <td><select name="expimg-type" id="expimg-select-type" onchange="updateImageExportDialog()" autofocus>
-                    <option value="clockface-set">Clockface (set)</option>
-                    <option value="clockface-intervals">Clockface (intervals)</option>
-                    <option value="clockface-inversion">Clockface (inversion)</option>
-                    <option value="clockface-transposition">Clockface (transposition)</option>
-                    <option value="ruler-set">Ruler (set)</option>
-                    <option value="staff-set">Staff (set)</option>
-                    <option value="tonnetz-set">Tonnetz (set)</option>
+                    <option i18n="expimg-type-cf-set" value="clockface-set">Clockface (set)</option>
+                    <option i18n="expimg-type-cf-int" value="clockface-intervals">Clockface (intervals)</option>
+                    <option i18n="expimg-type-cf-inv" value="clockface-inversion">Clockface (inversion)</option>
+                    <option i18n="expimg-type-cf-trn" value="clockface-transposition">Clockface (transposition)</option>
+                    <option i18n="expimg-type-ruler" value="ruler-set">Ruler (set)</option>
+                    <option i18n="expimg-type-staff" value="staff-set">Staff (set)</option>
+                    <option i18n="expimg-type-tonnetz" value="tonnetz-set">Tonnetz (set)</option>
                   </select></td>
                 </tr>
                 <tr includetype="clockface-inversion">
-                  <td>Invert</td>
+                  <td i18n="expimg-invert-header">Invert</td>
                   <td>
-                    <label for="expimg-inversion-index">Index:</label>
+                    <label i18n="expimg-invert-index-label" for="expimg-inversion-index">Index:</label>
                     <input type="number" id="expimg-inversion-index" name="expimg-inversion-index" oninput="updateImageExportDialog()" 
                       value="0" min="-1" max="12" step="1" list="expimg-inversion-index-list"/>
                   </td>
                 </tr>
                 <tr includetype="clockface-transposition">
-                  <td>Transpose</td>
+                  <td i18n="expimg-transpose-header">Transpose</td>
                   <td>
-                    <label for="expimg-transposition-index">Index:</label>
+                    <label i18n="expimg-transpose-index-label" for="expimg-transposition-index">Index:</label>
                     <input type="number" id="expimg-transposition-index" name="expimg-transposition-index" oninput="updateImageExportDialog()" 
                       value="1" min="-12" max="12" step="1" previous="1" list="expimg-transposition-index-list"/>
                   </td>
                 </tr>
                 <tr includetype="ruler-set">
-                  <td><label for="expimg-first-pc">Start at</label></td>
+                  <td><label i18n="expimg-ruler-start-at" for="expimg-first-pc">Start at</label></td>
                   <td>
                     <span class="range-label">0</span>
                     <input type="range" id="expimg-first-pc" name="expimg-first-pc" oninput="updateImageExportDialog()" 
@@ -602,201 +618,193 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                   </datalist>
                 </tr>
                 <tr includetype="tonnetz-set">
-                  <td>Tonnetz</td>
+                  <td i18n="expimg-tonnetz-header">Tonnetz</td>
                   <td>
                     <span>
-                      <label for="expimg-tonnetz-centerpc">PC at center:</label>
+                      <label i18n="expimg-tonnetz-pc-center" for="expimg-tonnetz-centerpc">PC at center:</label>
                       <input type="number" id="expimg-tonnetz-centerpc" name="expimg-tonnetz-centerpc" oninput="updateImageExportDialog()" 
                         value="4" min="-1" max="12" step="1" />
                     </span>
                     <span>
-                      <label for="expimg-tonnetz-width">Width:</label>
+                      <label i18n="expimg-tonnetz-width" for="expimg-tonnetz-width">Width:</label>
                       <input type="number" id="expimg-tonnetz-width" name="expimg-tonnetz-width" oninput="updateImageExportDialog()" 
                         value="6" min="2" max="20" step="1" />
                     </span>
                     <span>
-                      <label for="expimg-tonnetz-height">Height:</label>
+                      <label i18n="expimg-tonnetz-height" for="expimg-tonnetz-height">Height:</label>
                       <input type="number" id="expimg-tonnetz-height" name="expimg-tonnetz-height" oninput="updateImageExportDialog()" 
                         value="5" min="2" max="20" step="1" />
                     </span>
                     <span>
-                      <label for="expimg-tonnetz-h-cut">H-cut:</label>
+                      <label i18n="expimg-tonnetz-h-cut" for="expimg-tonnetz-h-cut">H-cut:</label>
                       <input type="number" id="expimg-tonnetz-h-cut" name="expimg-tonnetz-h-cut" oninput="updateImageExportDialog()" 
                         value="0" min="0" max="10" step="1" />
                     </span>
                   </td>
-                  <datalist id="expimg-tonnetz-size-list">
-                    <option value="2"></option><option value="3"></option>
-                    <option value="4"></option><option value="5"></option>
-                    <option value="6"></option><option value="7"></option>
-                    <option value="8"></option><option value="9"></option>
-                    <option value="10"></option><option value="11"></option>
-                    <option value="12"></option>
-                  </datalist>
                 </tr>
                 <tr>
-                  <td>Elements</td>
+                  <td i18n="expimg-elements-header">Elements</td>
                   <td id="expimg-elements-area">
                     <span includetype="clockface-intervals">
                       <input id="chk-export-ic1" type="checkbox" onchange="updateImageExportDialog()">
-                      <label for="chk-export-ic1">IC1</label>
+                      <label i18n="expimg-elements-ic1" for="chk-export-ic1">IC1</label>
                     </span>
                     <span includetype="clockface-intervals">
                       <input id="chk-export-ic2" type="checkbox" onchange="updateImageExportDialog()">
-                      <label for="chk-export-ic2">IC2</label>
+                      <label i18n="expimg-elements-ic2" for="chk-export-ic2">IC2</label>
                     </span>
                     <span includetype="clockface-intervals">
                       <input id="chk-export-ic3" type="checkbox" onchange="updateImageExportDialog()">
-                      <label for="chk-export-ic3">IC3</label>
+                      <label i18n="expimg-elements-ic3" for="chk-export-ic3">IC3</label>
                     </span>
                     <span includetype="clockface-intervals">
                       <input id="chk-export-ic4" type="checkbox" onchange="updateImageExportDialog()">
-                      <label for="chk-export-ic4">IC4</label>
+                      <label i18n="expimg-elements-ic4" for="chk-export-ic4">IC4</label>
                     </span>
                     <span includetype="clockface-intervals">
                       <input id="chk-export-ic5" type="checkbox" onchange="updateImageExportDialog()">
-                      <label for="chk-export-ic5">IC5</label>
+                      <label i18n="expimg-elements-ic5" for="chk-export-ic5">IC5</label>
                     </span>
                     <span includetype="clockface-intervals">
                       <input id="chk-export-ic6" type="checkbox" onchange="updateImageExportDialog()">
-                      <label for="chk-export-ic6">IC6</label>
+                      <label i18n="expimg-elements-ic6" for="chk-export-ic6">IC6</label>
                     </span>
                     <span includetype="clockface-set">
                       <input id="chk-export-polygon" type="checkbox" onchange="updateImageExportDialog()">
-                      <label for="chk-export-polygon">Set geometry</label>
+                      <label i18n="expimg-elements-polygon" for="chk-export-polygon">Set geometry</label>
                     </span>
                     <span includetype="clockface-set">
                       <input id="chk-export-sym-axes" type="checkbox" onchange="updateImageExportDialog()">
-                      <label for="chk-export-sym-axes">Axes of symmetry</label>
+                      <label i18n="expimg-elements-symaxes" for="chk-export-sym-axes">Axes of symmetry</label>
                     </span>
                     <span includetype="clockface-inversion">
                       <input id="chk-export-inversion-axis" type="checkbox" onchange="updateImageExportDialog()">
-                      <label for="chk-export-inversion-axis">Inversion axis</label>
+                      <label i18n="expimg-elements-invaxis" for="chk-export-inversion-axis">Inversion axis</label>
                     </span>
                     <span includetype="clockface-inversion clockface-transposition">
                       <input id="chk-all-paths" type="checkbox" onchange="updateImageExportDialog()">
-                      <label for="chk-all-paths">All paths</label>
+                      <label i18n="expimg-elements-all-paths" for="chk-all-paths">All paths</label>
                     </span>
                     <span includetype="tonnetz-set">
                       <input id="chk-tonnetz-fill-faces" type="checkbox" onchange="updateImageExportDialog()">
-                      <label for="chk-tonnetz-fill-faces">Fill faces</label>
+                      <label i18n="expimg-elements-fill-faces" for="chk-tonnetz-fill-faces">Fill faces</label>
                     </span>
                     <span includetype="tonnetz-set">
                       <input id="chk-tonnetz-all-vertices" type="checkbox" onchange="updateImageExportDialog()">
-                      <label for="chk-tonnetz-all-vertices">All vertices</label>
+                      <label i18n="expimg-elements-all-vertices" for="chk-tonnetz-all-vertices">All vertices</label>
                     </span>
                     <span includetype="tonnetz-set">
                       <input id="chk-tonnetz-all-edges" type="checkbox" onchange="updateImageExportDialog()">
-                      <label for="chk-tonnetz-all-edges">All edges</label>
+                      <label i18n="expimg-elements-all-edges" for="chk-tonnetz-all-edges">All edges</label>
                     </span>
                     <span includetype="tonnetz-set">
                       <input id="chk-tonnetz-extended-edges" type="checkbox" onchange="updateImageExportDialog()">
-                      <label for="chk-tonnetz-extended-edges">Extended edges</label>
+                      <label i18n="expimg-elements-extended-edges" for="chk-tonnetz-extended-edges">Extended edges</label>
                     </span>
                     <span includetype="clockface-set clockface-intervals clockface-inversion clockface-transposition">
                       <input id="chk-export-fifths" type="checkbox" onchange="updateImageExportDialog()">
-                      <label for="chk-export-fifths">Circle of fifths</label>
+                      <label i18n="expimg-elements-circle-fifths" for="chk-export-fifths">Circle of fifths</label>
                     </span>
                     <span includetype="ruler-set">
                       <input id="chk-export-double-row" type="checkbox" onchange="updateImageExportDialog()">
-                      <label for="chk-export-double-row">Double row (as in a keyboard)</label>
+                      <label i18n="expimg-elements-double-row" for="chk-export-double-row">Double row (as in a keyboard)</label>
                     </span>
                     <span includetype="staff-set" style="padding-right: 0.5ch;">
-                      <label for="expimg-select-staff-clef">Clef:</label>
+                      <label i18n="expimg-elements-clef-label" for="expimg-select-staff-clef">Clef:</label>
                       <select name="expimg-staff-clef" id="expimg-select-staff-clef" onchange="updateImageExportDialog()">
-                        <option value="G2">Treble</option>
-                        <option value="C3">Alto</option>
-                        <option value="C4">Tenor</option>
-                        <option value="F4">Bass</option>
+                        <option i18n="expimg-elements-clef-treb" value="G2">Treble</option>
+                        <option i18n="expimg-elements-clef-alto" value="C3">Alto</option>
+                        <option i18n="expimg-elements-clef-tenr" value="C4">Tenor</option>
+                        <option i18n="expimg-elements-clef-bass" value="F4">Bass</option>
                       </select> 
                     </span>
                     <span includetype="staff-set" style="padding-right: 0.5ch;">
-                      <label for="expimg-select-staff-notehead">Notehead:</label>
+                      <label i18n="expimg-elements-notehead-label" for="expimg-select-staff-notehead">Notehead:</label>
                       <select name="expimg-staff-notehead" id="expimg-select-staff-notehead" onchange="updateImageExportDialog()">
-                        <option value="q">Quarter</option>
-                        <option value="h">Half</option>
-                        <option value="w">Whole</option>
+                        <option i18n="expimg-elements-notehead-q" value="q">Quarter</option>
+                        <option i18n="expimg-elements-notehead-h" value="h">Half</option>
+                        <option i18n="expimg-elements-notehead-w" value="w">Whole</option>
                       </select> 
                     </span>
                     <span includetype="staff-set">
-                      <label for="expimg-select-staff-barline">Barline:</label>
+                      <label i18n="expimg-elements-barline-label" for="expimg-select-staff-barline">Barline:</label>
                       <select name="expimg-staff-barline" id="expimg-select-staff-barline" onchange="updateImageExportDialog()">
-                        <option value="">None</option>
-                        <option value="single">Single</option>
-                        <option value="double">Double</option>
-                        <option value="final">Final</option>
+                        <option i18n="expimg-elements-barline-0" value="">None</option>
+                        <option i18n="expimg-elements-barline-1" value="single">Single</option>
+                        <option i18n="expimg-elements-barline-2" value="double">Double</option>
+                        <option i18n="expimg-elements-barline-3" value="final">Final</option>
                       </select> 
                     </span>
                   </td>
                 </tr>
                 <tr excludetype="staff-set">
-                  <td>Text</td>
+                  <td i18n="expimg-text-header">Text</td>
                   <td id="expimg-text-options-area">
                     <span>
                       <input id="rad-expimg-text-always" name="expimg-show-text" type="radio" 
                         value="always" checked onchange="updateImageExportDialog()">
-                      <label for="rad-expimg-text-always">Show all</label>
+                      <label i18n="expimg-text-show-all" for="rad-expimg-text-always">Show all</label>
                     </span>
                     <span>
                       <input id="rad-expimg-text-enabled" name="expimg-show-text" type="radio" 
                         value="enabled" onchange="updateImageExportDialog()">
-                      <label for="rad-expimg-text-enabled">Only enabled</label>
+                      <label i18n="expimg-text-enabled" for="rad-expimg-text-enabled">Only enabled</label>
                     </span>
                     <span>
                       <input id="rad-expimg-text-never" name="expimg-show-text" type="radio"
                         value="never" onchange="updateImageExportDialog()">
-                      <label for="rad-expimg-text-never">Hide all</label>
+                      <label i18n="expimg-text-hide" for="rad-expimg-text-never">Hide all</label>
                     </span>
                     <span>
                       <input id="chk-export-note-names" type="checkbox" onchange="updateImageExportDialog()">
-                      <label for="chk-export-note-names">Note names</label>
+                      <label i18n="expimg-text-note-names" for="chk-export-note-names">Note names</label>
                     </span>
                   </td>
                 </tr>
                 <tr includetype="staff-set">
-                  <td><label for="expimg-select-staff-clef">Shift</label></td>
+                  <td i18n="expimg-staff-shift-header" for="expimg-select-staff-clef">Shift</td>
                   <td>
-                    <a id="expimg-staff-shiftup-link" href="javascript:exportStaffShiftNotes(-1)">▼ Down</a> • 
-                    <a id="expimg-staff-shiftdown-link" href="javascript:exportStaffShiftNotes(1)">Up ▲</a>
+                    <a id="expimg-staff-shiftup-link" href="javascript:exportStaffShiftNotes(-1)">▼ <z i18n="shift-down">Down</z></a> • 
+                    <a id="expimg-staff-shiftdown-link" href="javascript:exportStaffShiftNotes(1)"><z i18n="shift-up">Up</z> ▲</a>
                   </td>
                 </tr>                                    
                 <tr>
-                  <td><label for="expimg-select-theme">Theme</label></td>
+                  <td><label i18n="expimg-theme-header" for="expimg-select-theme">Theme</label></td>
                   <td>
                     <span excludetype="staff-set" style="padding-right: 0.5ch;">
                       <select name="expimg-theme" id="expimg-select-theme" onchange="updateImageExportDialog()">
-                        <option value="basic">Simple</option>
-                        <option value="hard">Strong</option>
-                        <option value="solid">Solid</option>
-                        <option value="soft">Subtle</option>
+                        <option i18n="expimg-theme-1" value="basic">Simple</option>
+                        <option i18n="expimg-theme-2" value="hard">Strong</option>
+                        <option i18n="expimg-theme-3" value="solid">Solid</option>
+                        <option i18n="expimg-theme-4" value="soft">Subtle</option>
                       </select> 
                     </span>
                     <span style="padding-right: 0.5ch;">
-                      <label for="expimg-select-theme-color">Color:</label>
+                      <label i18n="expimg-theme-color-label" for="expimg-select-theme-color">Color:</label>
                       <select name="expimg-theme-color" id="expimg-select-theme-color" onchange="updateImageExportDialog()">
-                        <option value="">None</option>
-                        <option value="red">Red</option>
-                        <option value="green">Green</option>
-                        <option value="blue">Blue</option>
-                        <option value="colorful">Colorful</option>
+                        <option i18n="expimg-theme-color-0" value="">None</option>
+                        <option i18n="expimg-theme-color-1" value="red">Red</option>
+                        <option i18n="expimg-theme-color-2" value="green">Green</option>
+                        <option i18n="expimg-theme-color-3" value="blue">Blue</option>
+                        <option i18n="expimg-theme-color-4" value="colorful">Colorful</option>
                       </select>
                     </span>
                     <span>
-                      <label for="expimg-select-theme-bg">Background:</label>
+                      <label i18n="expimg-theme-bg-label" for="expimg-select-theme-bg">Background:</label>
                       <select name="expimg-theme-bg" id="expimg-select-theme-bg" onchange="updateImageExportDialog()">
-                        <option value="light">Light</option>
-                        <option value="dark">Dark</option>
+                        <option i18n="expimg-theme-bg-light" value="light">Light</option>
+                        <option i18n="expimg-theme-bg-dark" value="dark">Dark</option>
                       </select>
                     </span>
                   </td>
                 </tr>
                 <tr excludetype="ruler-set staff-set">
-                  <td><label for="expimg-scale">Scaling</label></td>
+                  <td><label i18n="expimg-scaling-header" for="expimg-scale">Scaling</label></td>
                   <td>
-                    <span class="range-label">Small</span>
+                    <span i18n="expimg-scaling-label-small" class="range-label">Small</span>
                     <input type="range" id="expimg-scale" name="expimg-scale" oninput="updateImageExportDialog()" 
                     value="1.15" min="1.0" max="1.3" step="0.075" list="expimg-scale-list"/>
-                    <span class="range-label">Large</span>
+                    <span i18n="expimg-scaling-label-large" class="range-label">Large</span>
                   </td>
                   <datalist id="expimg-scale-list">
                     <option value="1.0" ></option>
@@ -807,12 +815,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                   </datalist>
                 </tr>
                 <tr excludetype="staff-set">
-                  <td><label for="expimg-stroke">Strokes</label></td>
+                  <td><label i18n="expimg-strokes-header" for="expimg-stroke">Strokes</label></td>
                   <td>
-                    <span class="range-label">Thin</span>
+                    <span i18n="expimg-strokes-label-thin" class="range-label">Thin</span>
                     <input type="range" id="expimg-stroke" name="expimg-stroke" oninput="updateImageExportDialog()" 
                     value="2.0" min="1.25" max="4.25" step="0.75" list="expimg-stroke-list"/>
-                    <span class="range-label">Thick</span>
+                    <span i18n="expimg-strokes-label-thick" class="range-label">Thick</span>
                   </td>
                   <datalist id="expimg-stroke-list">
                     <option value="1.25"></option>
@@ -823,29 +831,29 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                   </datalist>
                 </tr>
                 <tr>
-                  <td>Format</td>
+                  <td i18n="expimg-format-header">Format</td>
                   <td>
                     <span>
                       <input id="radio-export-file-svg" type="radio" name="export-file-type" value="svg" onchange="updateImageExportDialog()" checked>
-                      <label for="radio-export-file-svg">SVG image</label>
+                      <label i18n="expimg-format-svg" for="radio-export-file-svg">SVG image</label>
                     </span>
                     <span>
                       <input id="radio-export-file-png" type="radio" name="export-file-type" value="png" onchange="updateImageExportDialog()">
-                      <label for="radio-export-file-png">PNG image</label>
+                      <label i18n="expimg-format-png" for="radio-export-file-png">PNG image</label>
                     </span>
                     <span id="span-input-export-file-png-size" hidden>
-                      <label for="input-export-file-png-size">Height:</label>
+                      <label i18n="expimg-format-height-label" for="input-export-file-png-size">Height:</label>
                       <input id="input-export-file-png-size" type="number" value="1000" step="100" min="100" max="10000" onchange="updateImageExportDialog()"/>
-                      <label for="input-export-file-png-size"> pixels</label>
+                      <label i18n="expimg-format-pixels-label" for="input-export-file-png-size">pixels</label>
                     </span>
                   </td>
                 </tr>
                 <tr>
-                  <td>Export</td>
+                  <td i18n="expimg-export-header">Export</td>
                   <td>
-                    <a id="export-image-download-svg-link" href="javascript:downloadImage('svg')">Save SVG file</a>
-                    <a id="export-image-download-png-link" href="javascript:downloadImage('png')" hidden>Save PNG file</a>
-                    <span id="export-image-copy-link"> | <a href="javascript:copyImageToClipboard()">Copy image to clipboard</a></span>
+                    <a i18n="expimg-export-svg-download" id="export-image-download-svg-link" href="javascript:downloadImage('svg')">Save SVG file</a>
+                    <a i18n="expimg-export-png-download" id="export-image-download-png-link" href="javascript:downloadImage('png')" hidden>Save PNG file</a>
+                    <span id="export-image-copy-link"> | <a i18n="expimg-export-copy-to-clipboard" href="javascript:copyImageToClipboard()">Copy image to clipboard</a></span>
                   </td>
                 </tr>
               </tbody>

@@ -1,17 +1,263 @@
 {
-    "language": "en-US",
+    "lang": {
+        "code": "en",
+        "name": "English"
+    },
     
     "strings": {
         "main-title": "Pitch-Class Set Visualizer",
         "input-main": "Type a set:",
+        "row-favorites": "Favorite sets:",
+        "row-ruler-view": "Ruler view:",
+        "row-staff-view": "Staff view:",
+        "row-operations": "Operation:",
+        "op-transpose": "Transpose",
+        "op-invert": "Invert",
+        "op-multiply": "Multiply",
+        "op-shift": "Shift",
+        "row-binv": "Binary representation:",
         "row-normal": "Normal order:",
-        "row-reduced": "Transposed to zero:",
         "row-prime": "Prime form:",
-        "row-forte": "Forte name:",
+        "row-prime-inverse": "Inverse:",
+        "row-forte": "Forte/Morris name:",
         "row-carter": "Carter number:",
         "row-descriptive-name": "Descriptive name(s):",
+        "row-features": "Set features:",
+        "row-complement": "Complement:",
+        "row-zcorrespondent": "Z-correspondent:",
         "row-ic-vector": "Interval-class vector:",
-        "row-ct-vector": "Common tone vector:"
+        "row-ct-vector": "Common-tone vector:",
+        "row-spectra": "Interval spectra:",
+        "row-spectra_variation": "Variation",
+        "row-sumclass": "Sum & sum class:",
+        "row-rotations": "Modes:",
+        "row-symmetries": "Symmetries/Equivalences:",
+        "row-combinatorials": "Combinatoriality:",
+        "row-transpositions": "Transpositions:",
+        "row-ctt": "Common tones under %0:",
+        "row-inversions": "Inversions:",
+        "row-cti": "Common tones under %0:",
+        "row-multiplications": "Multiplications:",
+        "row-subsets": "Subsets:",
+        "row-all-subsets": "All subsets",
+        "row-prime-subsets": "Subset classes",
+        "row-misc": "Misc.:",
+        "row-misc-listen": "Listen",
+        "row-misc-export-image": "Export image",
+        "row-misc-options": "Options",
+        "row-misc-about": "About",
+        "dialog-about-title": "ABOUT",
+        "dialog-about-line1": "Pitch-Class Set Visualizer, version %0.",
+        "dialog-about-line2": "Licensed under the %0.",
+        "dialog-about-line4": "Descriptive names adapted from %0,%1 with additions from %2.",
+        "dialog-about-line5": "Get the %0 at GitHub.",
+        "dialog-about-source": "source code",
+        "dialog-set-selector-title": "SET SELECTOR",
+        "header-type": "Type",
+        "header-feature-filter": "Feature filter:",
+        "header-name-filter": "Name filter:",
+        "all-interval": "All-interval",
+        "combinatorial": "Combinatorial",
+        "deep-scale": "Deep scale",
+        "generated": "Generated",
+        "generated-x": "Generated (%0)",
+        "maximal-area": "Maximal area",
+        "maximally-even": "Maximally even",
+        "mirror": "Mirror",
+        "myhill-property": "Myhill's property",
+        "proper-scale": "Proper scale",
+        "strictly-proper-scale": "Strictly proper scale",
+        "z-set": "Z-set",
+        "header-dyads": "Dyads:",
+        "header-others": "Others:",
+        "dialog-options-title": "OPTIONS",
+        "options-language-header": "Language",
+        "options-import-export-header": "Import/export",
+        "import-export-favorites": "Favorites: %0 | %1",
+        "import-export-config": "Configuration: %0 | %1",
+        "import-from-file": "Import from file",
+        "import-to-file": "Export to file",
+        "options-visible-data-header": "Visible data%0(%1 &#x00b7; %2)",
+        "reset": "Reset",
+        "all": "All",
+        "options-forte-name-header": "Forte/Morris name",
+        "options-forte-name-1": "Prime and its inverse are the same (Forte)",
+        "options-forte-name-2": "Differentiate prime and its inverse",
+        "options-set-format-header": "Set format",
+        "options-set-bracketing-header": "Set delimiters",
+        "options-set-bracketing-1": "[…] square brackets",
+        "options-set-bracketing-2": "(…) parentheses",
+        "options-set-bracketing-3": "{…} curly braces",
+        "options-vector-format-header": "Vector format",
+        "options-inversion-op-header": "Inversion operator",
+        "options-inversion-op-1": "Simple (%0)",
+        "options-inversion-op-2": "Compound (%0)",
+        "options-clockface-header": "Clockface visualization",
+        "options-clockface-note-names": "Note names",
+        "options-clockface-polygon": "Set geometry",
+        "options-clockface-symaxes": "Axes of symmetry",
+        "options-clockface-fifths": "Circle of fifths",
+        "options-midi-header": "MIDI input",
+        "options-midi-device": "Device:",
+        "options-midi-device-null": "No device selected",
+        "options-midi-device-none": "No device available",
+        "options-midi-connecting": "Connecting…",
+        "options-midi-connected": "Connected",
+        "options-midi-disconnected": "Disconnected",
+        "options-midi-fail": "Failed connection",
+        "options-midi-denied": "MIDI access denied",
+        "options-midi-mode-label": "Mode:",
+        "options-midi-mode-scale": "Scale",
+        "options-midi-mode-chord": "Chord",
+        "options-midi-mode-direct": "Direct",
+        "options-midi-mode-toggle": "Toggle",
+        "options-midi-pedal": "Hold with sustain pedal",
+        "options-sound-header": "Sound",
+        "options-sound-toggle": "Play sound on pitch-class toggle",
+        "options-sound-midi": "Play sound on MIDI input",
+        "options-app-layout-header": "App layout",
+        "options-app-layout-1": "Clockface visualization first",
+        "options-app-layout-2": "Data table first",
+        "options-appearance-header": "Appearance",
+        "options-appearance-theme-label": "Theme:",
+        "options-appearance-theme-auto": "Follow browser setting",
+        "options-appearance-theme-light": "Light",
+        "options-appearance-theme-dark": "Dark",
+        "options-appearance-font-label": "Font style:",
+        "options-appearance-font-sans": "Sans-serif",
+        "options-appearance-font-serif": "Serif",
+        "expimg-dialog-title": "EXPORT IMAGE",
+        "expimg-type-header": "Type",
+        "expimg-type-cf-set": "Clockface (set)",
+        "expimg-type-cf-int": "Clockface (intervals)",
+        "expimg-type-cf-inv": "Clockface (inversion)",
+        "expimg-type-cf-trn": "Clockface (transposition)",
+        "expimg-type-ruler": "Ruler (set)",
+        "expimg-type-staff": "Staff (set)",
+        "expimg-type-tonnetz": "Tonnetz (set)",
+        "expimg-invert-header": "Invert",
+        "expimg-invert-index-label": "Index:",
+        "expimg-transpose-header": "Transpose",
+        "expimg-transpose-index-label": "Index:",
+        "expimg-ruler-start-at": "Start at",
+        "expimg-tonnetz-header": "Tonnetz",
+        "expimg-tonnetz-pc-center": "PC at center:",
+        "expimg-tonnetz-width": "Width:",
+        "expimg-tonnetz-height": "Height:",
+        "expimg-tonnetz-h-cut": "H-cut:",
+        "expimg-elements-header": "Elements",
+        "expimg-elements-ic1": "IC1",
+        "expimg-elements-ic2": "IC2",
+        "expimg-elements-ic3": "IC3",
+        "expimg-elements-ic4": "IC4",
+        "expimg-elements-ic5": "IC5",
+        "expimg-elements-ic6": "IC6",
+        "expimg-elements-polygon": "Set geometry",
+        "expimg-elements-symaxes": "Axes of symmetry",
+        "expimg-elements-invaxis": "Inversion axis",
+        "expimg-elements-all-paths": "All paths",
+        "expimg-elements-fill-faces": "Fill faces",
+        "expimg-elements-all-vertices": "All vertices",
+        "expimg-elements-all-edges": "All edges",
+        "expimg-elements-extended-edges": "Extended edges",
+        "expimg-elements-circle-fifths": "Circle of fifths",
+        "expimg-elements-double-row": "Double row (as in a keyboard)",
+        "expimg-elements-clef-label": "Clef:",
+        "expimg-elements-clef-treb": "Treble",
+        "expimg-elements-clef-alto": "Alto",
+        "expimg-elements-clef-tenr": "Tenor",
+        "expimg-elements-clef-bass": "Bass",
+        "expimg-elements-notehead-label": "Notehead:",
+        "expimg-elements-notehead-q": "Quarter",
+        "expimg-elements-notehead-h": "Half",
+        "expimg-elements-notehead-w": "Whole",
+        "expimg-elements-barline-label": "Barline:",
+        "expimg-elements-barline-0": "None",
+        "expimg-elements-barline-1": "Single",
+        "expimg-elements-barline-2": "Double",
+        "expimg-elements-barline-3": "Final",
+        "expimg-text-header": "Text",
+        "expimg-text-show-all": "Show all",
+        "expimg-text-enabled": "Only enabled",
+        "expimg-text-hide": "Hide all",
+        "expimg-text-note-names": "Note names",
+        "expimg-staff-shift-header": "Shift",
+        "shift-down": "Down",
+        "shift-up": "Up",
+        "expimg-theme-header": "Theme",
+        "expimg-theme-1": "Simple",
+        "expimg-theme-2": "Strong",
+        "expimg-theme-3": "Solid",
+        "expimg-theme-4": "Subtle",
+        "expimg-theme-color-label": "Color:",
+        "expimg-theme-color-0": "None",
+        "expimg-theme-color-1": "Red",
+        "expimg-theme-color-2": "Green",
+        "expimg-theme-color-3": "Blue",
+        "expimg-theme-color-4": "Colorful",
+        "expimg-theme-bg-label": "Background:",
+        "expimg-theme-bg-light": "Light",
+        "expimg-theme-bg-dark": "Dark",
+        "expimg-scaling-header": "Scaling",
+        "expimg-scaling-label-small": "Small",
+        "expimg-scaling-label-large": "Large",
+        "expimg-strokes-header": "Strokes",
+        "expimg-strokes-label-thin": "Thin",
+        "expimg-strokes-label-thick": "Thick",
+        "expimg-format-header": "Format",
+        "expimg-format-svg": "SVG image",
+        "expimg-format-png": "PNG image",
+        "expimg-format-height-label": "Height:",
+        "expimg-format-pixels-label": "pixels",
+        "expimg-export-header": "Export",
+        "expimg-export-svg-download": "Save SVG file",
+        "expimg-export-png-download": "Save PNG file",
+        "expimg-export-copy-to-clipboard": "Copy image to clipboard",
+        "selector-prime-header": "Prime forms",
+        "selector-prime-inv-header": "Prime forms and their inverses",
+        "selector-forte-header": "Forte/Morris names",
+        "selector-carter-header": "Carter numbers",
+        "selector-descriptive-names-header": "Descriptive names",
+        "selector-subsets-header": "Subsets of %0",
+        "selector-subsets-classes-header": "Subsets classes of %0",
+        "alert-config-loaded": "Configuration loaded!",
+        "alert-config-load-error": "Error loading config file: %0",
+        "alert-favorites-loaded": "Favorites loaded!",
+        "alert-favorites-load-error": "Error loading favorites file: %0",
+        "alert-image-copy-ok": "Image copied to the clipboard!",
+        "alert-image-copy-err": "Unable to copy image to clipboard: %0",
+        "alert-text-copy-ok": "\"%0\" copied to the clipboard!",
+        "err-no-file-selected": "No file selected",
+        "err-invalid-json": "Invalid JSON file",
+        "err-clipboard-svg-unsupported": "SVG images not supported by the clipboard.",
+        "err-clipboard-png-unsupported": "PNG images not supported by the clipboard.",
+        "copy": "copy",
+        "set-cardinality-0": "Null set",
+        "sets-cardinality-0": "Null sets",
+        "set-cardinality-1": "Singleton",
+        "sets-cardinality-1": "Singletons",
+        "set-cardinality-2": "Dyad",
+        "sets-cardinality-2": "Dyads",
+        "set-cardinality-3": "Trichord",
+        "sets-cardinality-3": "Trichords",
+        "set-cardinality-4": "Tetrachord",
+        "sets-cardinality-4": "Tetrachords",
+        "set-cardinality-5": "Pentachord",
+        "sets-cardinality-5": "Pentachords",
+        "set-cardinality-6": "Hexachord",
+        "sets-cardinality-6": "Hexachords",
+        "set-cardinality-7": "Heptachord",
+        "sets-cardinality-7": "Heptachords",
+        "set-cardinality-8": "Octachord",
+        "sets-cardinality-8": "Octachords",
+        "set-cardinality-9": "Nonachord",
+        "sets-cardinality-9": "Nonachords",
+        "set-cardinality-10": "Decachord",
+        "sets-cardinality-10": "Decachords",
+        "set-cardinality-11": "Undecachord",
+        "sets-cardinality-11": "Undecachords",
+        "set-cardinality-12": "Dodecachord",
+        "sets-cardinality-12": "Dodecachords"
     },
 
     "sets": {
@@ -84,7 +330,7 @@
         "[013]": {
             "names": [
                 "Phrygian trichord",
-                "Octatonic segment"
+                "Trichordal octatonic segment"
             ]
         },
         "[023]": {
@@ -93,7 +339,7 @@
         "[014]": {
             "names": [
                 "Major-minor trichord 1",
-                "Hexatonic segment"
+                "Trichordal hexatonic segment"
             ]
         },
         "[034]": {
@@ -140,7 +386,7 @@
         "[027]": {
             "names": [
                 "Quartal trichord",
-                "Stack of fourths/fifths"
+                "Stacked fourths/fifths tricord"
             ]
         },
         "[036]": {
@@ -173,7 +419,7 @@
         "[0134]": {
             "names": [
                 "Alternating tetramirror",
-                "Octatonic segment 1"
+                "Tetrachordal octatonic segment 1"
             ]
         },
         "[0125]": {
@@ -194,7 +440,7 @@
         "[0145]": {
             "names": [
                 "Arabian tetramirror",
-                "Hexatonic segment"
+                "Tetrachordal hexatonic segment"
             ]
         },
         "[0156]": {
@@ -207,7 +453,7 @@
             "names": [
                 "Minor tetramirror", 
                 "Dorian tetramirror",
-                "Octatonic segment 2"
+                "Tetrachordal octatonic segment 2"
             ]
         },
         "[0135]": {
@@ -276,13 +522,13 @@
         "[0257]": {
             "names": [
                 "Quartal tetramirror",
-                "Stack of fourths/fifths"
+                "Stacked fourths/fifths tetrachord"
             ]
         },
         "[0248]": {
             "names": [
                 "Augmented-seventh chord",
-                "Whole-tone subset"
+                "Whole-tone tetrachordal subset"
             ]
         },
         "[0268]": {
@@ -673,7 +919,7 @@
         "[0123456]": {
             "names": ["Chromatic heptamirror"]
         },
-        "[0124789]": {
+        "[0125679]": {
             "names": ["Chromatic phrygian inverse (1123113)"]
         },
         "[0125789]": {
@@ -698,7 +944,7 @@
             "names": ["Tritone major heptachord"]
         },
         "[0246789]": {
-            "names": ["Enigmatic heptatonic (1322211"]
+            "names": ["Enigmatic heptatonic (1322211)"]
         },
         "[0124689]": {
             "names": [
@@ -795,7 +1041,7 @@
         "[01235678A]": {
             "names": ["Raga Ramdasi Malhar (211122111)"]
         },
-        "[01235689A]": {
+        "[01235679A]": {
             "names": ["Diminishing nonachord"]
         },
         "[01245689A]": {

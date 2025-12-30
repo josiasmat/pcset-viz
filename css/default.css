@@ -23,6 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 :root {
     --sans-font: "Inter Tight", sans-serif;
     --serif-font: "Frank Ruhl Libre", serif;
+    --set-font: "JetBrains Mono", monospace;
     --bg-light: #fbfbfb;
     --bg-dark: #111;
     --fg-light: black;
@@ -96,7 +97,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 body.font-sans {
     font-family: var(--sans-font);
     font-weight: 300;
-    #input-set-filter-name {
+    select, input {
         font-family: var(--sans-font);
     }
 }
@@ -104,7 +105,7 @@ body.font-sans {
 body.font-serif {
     font-family: var(--serif-font);
     font-weight: 300;
-    #input-set-filter-name {
+    select, input {
         font-family: var(--serif-font);
     }
 }
@@ -206,6 +207,9 @@ main {
         select, input[type="number"] {
             vertical-align: bottom;
         }
+        #cti-op-label, #ctt-op-label {
+            font-family: var(--serif-font);
+        }
     }
     .graphics-view {
         line-height: 0px;
@@ -271,7 +275,7 @@ main {
 }
 
 .setfont {
-    font-family: "JetBrains Mono", monospace;
+    font-family: var(--set-font);
     font-size: 90%;
     font-weight: 200;
 }
@@ -392,26 +396,32 @@ dialog.dialog-container[open] {
     min-width: min(90ch, 95%);
     max-width: 95%;
     max-height: 95%;
-    table {
-        user-select: none;
-        th, td {
-            &:first-child {
-                width: 15ch;
-                text-align: center;
-                font-weight: 500;
-            }
-            &:last-child {
-                line-height: 200%;
-            }
-            span {
-                text-wrap: nowrap;
-                margin-right: 10px;
-            }
+    .dialog-main {
+        font-size: 90%;
+        select {
+            font-size: 90%;
         }
-        .keyboard-shortcut {
-            font-size: smaller;
-            font-weight: 300;
-            color: var(--fg-dim-color);
+        table {
+            user-select: none;
+            th, td {
+                &:first-child {
+                    width: 17ch;
+                    text-align: center;
+                    font-weight: 500;
+                }
+                &:last-child {
+                    line-height: 200%;
+                }
+                span {
+                    text-wrap: nowrap;
+                    margin-right: 10px;
+                }
+            }
+            .keyboard-shortcut {
+                font-size: smaller;
+                font-weight: 300;
+                color: var(--fg-dim-color);
+            }
         }
     }
 }
@@ -448,6 +458,7 @@ dialog.dialog-container[open] {
     max-height: 95%;
     .dialog-main {
         display: flex;
+        overflow: hidden;
     }
     #dialog-export-preview {
         flex: 1 0;
@@ -455,8 +466,10 @@ dialog.dialog-container[open] {
         margin: 2px;
         padding: 8px;
         box-sizing: border-box;
+        overflow: hidden;
     }
     #dialog-export-options {
+        overflow-y: auto;
         flex: 1.7 1;
         max-height: fit-content;
         min-width: 54ch;
@@ -475,6 +488,9 @@ dialog.dialog-container[open] {
                     margin-right: 10px;
                 }
             }
+        }
+        #input-export-file-png-size {
+            margin-left: 0.5ch;
         }
     }
 }

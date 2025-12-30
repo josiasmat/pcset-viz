@@ -74,8 +74,10 @@ function loadFavoritesFromFile() {
         hideConfigDialog();
         saveFavorites();
         requestAnimationFrame(() => requestAnimationFrame(() => 
-            alert("Favorites loaded!")
+            alert(i18n.get("alert-favorites-loaded", "Favorites loaded!"))
         ));
     })
-    .catch((err) => alert(`Error loading favorites file: ${err}`));
+    .catch((err) => alert(i18n.getp(
+        "alert-favorites-load-error", "Error loading favorites file: %0", [err]
+    )));
 }

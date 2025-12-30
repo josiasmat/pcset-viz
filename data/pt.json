@@ -1,0 +1,1081 @@
+{
+    "lang": {
+        "code": "pt",
+        "name": "Português"
+    },
+    
+    "strings": {
+        "main-title": "Visualizador de Pitch-Class Set",
+        "input-main": "Digite um conjunto:",
+        "row-favorites": "Conjuntos favoritos:",
+        "row-ruler-view": "Visão de régua:",
+        "row-staff-view": "Visão de pauta:",
+        "row-operations": "Operação:",
+        "op-transpose": "Transpor",
+        "op-invert": "Inverter",
+        "op-multiply": "Multiplicar",
+        "op-shift": "Deslocar",
+        "row-binv": "Representação binária:",
+        "row-normal": "Ordem normal:",
+        "row-prime": "Forma primária:",
+        "row-prime-inverse": "Inverso:",
+        "row-forte": "Nome de Forte/Morris:",
+        "row-carter": "Número de Carter:",
+        "row-descriptive-name": "Nome(s) descritivo(s):",
+        "row-features": "Características:",
+        "row-complement": "Complemento:",
+        "row-zcorrespondent": "Correspondente-Z:",
+        "row-ic-vector": "Vetor de classe intervalar:",
+        "row-ct-vector": "Vetor de notas comuns:",
+        "row-spectra": "Espectro intervalar:",
+        "row-spectra_variation": "Variação",
+        "row-sumclass": "Soma e classe de soma:",
+        "row-rotations": "Modos:",
+        "row-symmetries": "Simetrias/Equivalências:",
+        "row-combinatorials": "Combinatorialidade:",
+        "row-transpositions": "Transposições:",
+        "row-ctt": "Notas comuns sob %0:",
+        "row-inversions": "Inversões:",
+        "row-cti": "Notas comuns sob %0:",
+        "row-multiplications": "Multiplicações:",
+        "row-subsets": "Subconjuntos:",
+        "row-all-subsets": "Todos os subconjuntos",
+        "row-prime-subsets": "Classes de subconjuntos",
+        "row-misc": "Miscelânea:",
+        "row-misc-listen": "Escutar",
+        "row-misc-export-image": "Exportar imagem",
+        "row-misc-options": "Opções",
+        "row-misc-about": "Sobre",
+        "dialog-about-title": "SOBRE",
+        "dialog-about-line1": "Visualizador de Pitch-Class Set, versão %0.",
+        "dialog-about-line2": "Distribuído sob a licença %0.",
+        "dialog-about-line4": "Nomes descritivos adaptados de %0, %1com acréscimos de %2.",
+        "dialog-about-line5": "Obtenha o %0 pelo GitHub.",
+        "dialog-about-source": "código fonte",
+        "dialog-set-selector-title": "SELETOR DE CONJUNTO",
+        "header-type": "Tipo",
+        "header-feature-filter": "Filtro de características:",
+        "header-name-filter": "Filtro de nome:",
+        "all-interval": "Todo-intervalar",
+        "all-combinatorial": "Todo-combinatorial",
+        "combinatorial": "Combinatorial",
+        "deep-scale": "Escala profunda",
+        "generated": "Gerado",
+        "generated-x": "Gerado (%0)",
+        "maximal-area": "Área máxima",
+        "maximally-even": "Maximamente distribuído",
+        "mirror": "Simétrico",
+        "myhill-property": "Propriedade de Myhill",
+        "proper-scale": "Escala própria",
+        "strictly-proper-scale": "Escala estritamente própria",
+        "z-set": "Conjunto-Z",
+        "header-others": "Outros:",
+        "dialog-options-title": "OPÇÕES",
+        "options-language-header": "Idioma",
+        "options-import-export-header": "Importar/exportar",
+        "import-export-favorites": "Favoritos: %0 | %1",
+        "import-export-config": "Configurações: %0 | %1",
+        "import-from-file": "Importar de um arquivo",
+        "export-to-file": "Exportar para arquivo",
+        "options-visible-data-header": "Dados visíveis%0(%1 &#x00b7; %2)",
+        "reset": "Redefinir",
+        "all": "Todos",
+        "options-forte-name-header": "Nome de Forte/Morris",
+        "options-forte-name-1": "Forma primária e seu inverso equivalentes (Forte)",
+        "options-forte-name-2": "Diferenciar forma primária e seu inverso",
+        "options-set-format-header": "Formato de conjunto",
+        "options-set-bracketing-header": "Delimitadores de conjunto",
+        "options-set-bracketing-1": "[…] colchetes",
+        "options-set-bracketing-2": "(…) parênteses",
+        "options-set-bracketing-3": "{…} chavetas",
+        "options-vector-format-header": "Formato de vetor",
+        "options-inversion-op-header": "Operador de inversão",
+        "options-inversion-op-1": "Simples (%0)",
+        "options-inversion-op-2": "Composta (%0)",
+        "options-clockface-header": "Visualização de relógio",
+        "options-clockface-note-names": "Nomes de notas",
+        "options-clockface-polygon": "Geometria do conjunto",
+        "options-clockface-symaxes": "Eixos de simetria",
+        "options-clockface-fifths": "Círculo de quintas",
+        "options-midi-header": "Entrada MIDI",
+        "options-midi-device": "Dispositivo:",
+        "options-midi-device-null": "Nenhum dispositivo selecionado",
+        "options-midi-device-none": "Nenhum dispositivo disponível",
+        "options-midi-connecting": "Conectando…",
+        "options-midi-connected": "Conectado",
+        "options-midi-disconnected": "Desconectado",
+        "options-midi-fail": "Falha na conexão",
+        "options-midi-denied": "Acesso ao MIDI bloqueado",
+        "options-midi-mode-label": "Modo:",
+        "options-midi-mode-scale": "Escala",
+        "options-midi-mode-chord": "Acorde",
+        "options-midi-mode-direct": "Direto",
+        "options-midi-mode-toggle": "Alternar",
+        "options-midi-pedal": "Manter com pedal de sustain",
+        "options-sound-header": "Som",
+        "options-sound-toggle": "Tocar som ao ativar classe-de-altura",
+        "options-sound-midi": "Tocar som na entrada MIDI",
+        "options-app-layout-header": "Layout do app",
+        "options-app-layout-1": "Visualização de relógio primeiro",
+        "options-app-layout-2": "Tabela de dados primeiro",
+        "options-appearance-header": "Aparência",
+        "options-appearance-theme-label": "Tema:",
+        "options-appearance-theme-auto": "Seguir definição do navegador",
+        "options-appearance-theme-light": "Claro",
+        "options-appearance-theme-dark": "Escuro",
+        "options-appearance-font-label": "Estilo de fonte:",
+        "options-appearance-font-sans": "Sem serifa",
+        "options-appearance-font-serif": "Com serifa",
+        "expimg-dialog-title": "EXPORTAR IMAGEM",
+        "expimg-type-header": "Tipo",
+        "expimg-type-cf-set": "Círculo (conjunto)",
+        "expimg-type-cf-int": "Círculo (intervalos)",
+        "expimg-type-cf-inv": "Círculo (inversões)",
+        "expimg-type-cf-trn": "Círculo (transposições)",
+        "expimg-type-ruler": "Régua (conjunto)",
+        "expimg-type-staff": "Pauta (conjunto)",
+        "expimg-type-tonnetz": "Tonnetz (conjunto)",
+        "expimg-invert-header": "Inversão",
+        "expimg-invert-index-label": "Índice:",
+        "expimg-transpose-header": "Transposição",
+        "expimg-transpose-index-label": "Índice:",
+        "expimg-ruler-start-at": "Iniciar em",
+        "expimg-tonnetz-header": "Tonnetz",
+        "expimg-tonnetz-pc-center": "Classe no centro:",
+        "expimg-tonnetz-width": "Largura:",
+        "expimg-tonnetz-height": "Altura:",
+        "expimg-tonnetz-h-cut": "Corte:",
+        "expimg-elements-header": "Elementos",
+        "expimg-elements-ic1": "CI1",
+        "expimg-elements-ic2": "CI2",
+        "expimg-elements-ic3": "CI3",
+        "expimg-elements-ic4": "CI4",
+        "expimg-elements-ic5": "CI5",
+        "expimg-elements-ic6": "CI6",
+        "expimg-elements-polygon": "Geometria do conjunto",
+        "expimg-elements-symaxes": "Eixos de simetria",
+        "expimg-elements-invaxis": "Eixo de inversão",
+        "expimg-elements-all-paths": "Todos os traços",
+        "expimg-elements-fill-faces": "Preencher faces",
+        "expimg-elements-all-vertices": "Todos os vértices",
+        "expimg-elements-all-edges": "Todas as arestas",
+        "expimg-elements-extended-edges": "Arestas externas",
+        "expimg-elements-circle-fifths": "Círculo de quintas",
+        "expimg-elements-double-row": "Régua dupla (como em um teclado)",
+        "expimg-elements-clef-label": "Clave:",
+        "expimg-elements-clef-treb": "Sol",
+        "expimg-elements-clef-alto": "Dó (3ª linha)",
+        "expimg-elements-clef-tenr": "Dó (4ª linha)",
+        "expimg-elements-clef-bass": "Fá",
+        "expimg-elements-notehead-label": "Cabeça de nota:",
+        "expimg-elements-notehead-q": "Semínima",
+        "expimg-elements-notehead-h": "Mínima",
+        "expimg-elements-notehead-w": "Semibreve",
+        "expimg-elements-barline-label": "Barra:",
+        "expimg-elements-barline-0": "Nenhuma",
+        "expimg-elements-barline-1": "Simples",
+        "expimg-elements-barline-2": "Dupla",
+        "expimg-elements-barline-3": "Final",
+        "expimg-text-header": "Texto",
+        "expimg-text-show-all": "Mostrar todos",
+        "expimg-text-enabled": "Somente ativados",
+        "expimg-text-hide": "Ocultar todos",
+        "expimg-text-note-names": "Nomes de nota",
+        "expimg-staff-shift-header": "Reordenar",
+        "shift-down": "Abaixo",
+        "shift-up": "Acima",
+        "expimg-theme-header": "Tema",
+        "expimg-theme-1": "Simples",
+        "expimg-theme-2": "Destacado",
+        "expimg-theme-3": "Sólido",
+        "expimg-theme-4": "Sutil",
+        "expimg-theme-color-label": "Cor:",
+        "expimg-theme-color-0": "Nenhuma",
+        "expimg-theme-color-1": "Vermelho",
+        "expimg-theme-color-2": "Verde",
+        "expimg-theme-color-3": "Azul",
+        "expimg-theme-color-4": "Colorido",
+        "expimg-theme-bg-label": "Fundo:",
+        "expimg-theme-bg-light": "Claro",
+        "expimg-theme-bg-dark": "Escuro",
+        "expimg-scaling-header": "Escala",
+        "expimg-scaling-label-small": "Pequeno",
+        "expimg-scaling-label-large": "Grande",
+        "expimg-strokes-header": "Traços",
+        "expimg-strokes-label-thin": "Finos",
+        "expimg-strokes-label-thick": "Espessos",
+        "expimg-format-header": "Formato",
+        "expimg-format-svg": "Imagem SVG",
+        "expimg-format-png": "Imagem PNG",
+        "expimg-format-height-label": "Altura:",
+        "expimg-format-pixels-label": "pixels",
+        "expimg-export-header": "Exportar",
+        "expimg-export-svg-download": "Salvar arquivo SVG",
+        "expimg-export-png-download": "Salvar arquivo PNG",
+        "expimg-export-copy-to-clipboard": "Copiar imagem para área de transferência",
+        "selector-prime-header": "Formas primárias",
+        "selector-prime-inv-header": "Formas primárias e suas inversões",
+        "selector-forte-header": "Nomes de Forte/Morris",
+        "selector-carter-header": "Números de Carter",
+        "selector-descriptive-names-header": "Nomes descritivos",
+        "selector-subsets-header": "Subconjuntos de %0",
+        "selector-subsets-classes-header": "Classes de subconjuntos de %0",
+        "alert-config-loaded": "Configuração carregada!",
+        "alert-config-load-error": "Erro ao carregar arquivo de configuração: %0",
+        "alert-favorites-loaded": "Favoritos carregados!",
+        "alert-favorites-load-error": "Erro ao carregar arquivo de favoritos: %0",
+        "alert-image-copy-ok": "Imagem copiada!",
+        "alert-image-copy-err": "Não foi possível copiar a imagem: %0",
+        "alert-text-copy-ok": "\"%0\" copiado para a área de transferência!",
+        "err-no-file-selected": "Nenhum arquivo selecionado",
+        "err-invalid-json": "Arquivo JSON inválido",
+        "err-clipboard-svg-unsupported": "Sem suporte para cópia de imagens SVG.",
+        "err-clipboard-png-unsupported": "Sem suporte para cópia de imagens PNG.",
+        "copy": "copiar",
+        "set-cardinality-0": "Conjunto nulo",
+        "sets-cardinality-0": "Conjuntos nulos",
+        "set-cardinality-1": "Singleto",
+        "sets-cardinality-1": "Singletos",
+        "set-cardinality-2": "Díade",
+        "sets-cardinality-2": "Díades",
+        "set-cardinality-3": "Tricorde",
+        "sets-cardinality-3": "Tricordes",
+        "set-cardinality-4": "Tetracorde",
+        "sets-cardinality-4": "Tetracordes",
+        "set-cardinality-5": "Pentacorde",
+        "sets-cardinality-5": "Pentacordes",
+        "set-cardinality-6": "Hexacorde",
+        "sets-cardinality-6": "Hexacordes",
+        "set-cardinality-7": "Heptacorde",
+        "sets-cardinality-7": "Heptacordes",
+        "set-cardinality-8": "Octacorde",
+        "sets-cardinality-8": "Octacordes",
+        "set-cardinality-9": "Nonacorde",
+        "sets-cardinality-9": "Nonacordes",
+        "set-cardinality-10": "Decacorde",
+        "sets-cardinality-10": "Decacordes",
+        "set-cardinality-11": "Undecacorde",
+        "sets-cardinality-11": "Undecacordes",
+        "set-cardinality-12": "Dodecacorde",
+        "sets-cardinality-12": "Dodecacordes"
+    },
+
+    "sets": {
+        "[]": {
+            "names": ["Conjunto nulo"]
+        },
+        "[0]": {
+            "names": [
+                "Singleto", 
+                "Uníssono"
+            ]
+        },
+        "[01]": {
+            "names": [
+                "Classe intervalar 1", 
+                "Semitom", 
+                "Segunda menor", 
+                "Sétima maior", 
+                "Díade cromática"
+            ]
+        },
+        "[02]": {
+            "names": [
+                "Classe intervalar 2", 
+                "Tom inteiro", 
+                "Segunda maior", 
+                "Sétima menor"
+        ]
+        },
+        "[03]": {
+            "names": [
+                "Classe intervalar 3", 
+                "Terça menor", 
+                "Sexta maior", 
+                "Segunda aumentada", 
+                "Sétima diminuta"
+            ]
+        },
+        "[04]": {
+            "names": [
+                "Classe intervalar 4", 
+                "Terça maior", 
+                "Sexta menor", 
+                "Quarta diminuta", 
+                "Quinta aumentada"
+            ]
+        },
+        "[05]": {
+            "names": [
+                "Classe intervalar 5", 
+                "Quarta justa", 
+                "Quinta justa"
+            ]
+        },
+        "[06]": {
+            "names": [
+                "Classe intervalar 6", 
+                "Trítono", 
+                "Quarta aumentada", 
+                "Quinta diminuta", 
+                "Díade maximamente uniforme"
+            ]
+        },
+        "[012]": {
+            "names": [
+                "Tricorde BACH", 
+                "Tricorde cromático"
+            ]
+        },
+        "[013]": {
+            "names": [
+                "Tricorde frígio",
+                "Segmento octatônico tricordal"
+            ]
+        },
+        "[023]": {
+            "names": ["Tricorde menor"]
+        },
+        "[014]": {
+            "names": [
+                "Tricorde maior-menor 1",
+                "Segmento hexatônico tricordal"
+            ]
+        },
+        "[034]": {
+            "names": ["Tricorde maior-menor 2"]
+        },
+        "[015]": {
+            "names": ["Acorde de sétima-maior incompleto 1"]
+        },
+        "[045]": {
+            "names": ["Acorde de sétima-maior incompleto 2"]
+        },
+        "[016]": {
+            "names": [
+                "Acorde da Sagração 1", 
+                "Trítono-quarta 1"
+            ]
+        },
+        "[056]": {
+            "names": [
+                "Acorde da Sagração 2", 
+                "Trítono-quarta 2"
+            ]
+        },
+        "[024]": {
+            "names": [
+                "Tricorde de tons-inteiros"
+            ]
+        },
+        "[025]": {
+            "names": ["Acorde de sétima-menor incompleto"]
+        },
+        "[035]": {
+            "names": ["Acorde de sétima de dominante incompleto 2"]
+        },
+        "[026]": {
+            "names": [
+                "Acorde de sétima de dominante incompleto 1", 
+                "Acorde de sexta-italiana"
+            ]
+        },
+        "[046]": {
+            "names": ["Acorde meio-diminuto incompleto"]
+        },
+        "[027]": {
+            "names": [
+                "Tricorde quartal",
+                "Tricorde de quartas/quintas empilhadas"
+            ]
+        },
+        "[036]": {
+            "names": [
+                "Acorde diminuto",
+                "Tríade diminuta"
+            ]
+        },
+        "[037]": {
+            "names": ["Acorde/tríade menor"]
+        },
+        "[047]": {
+            "names": ["Acorde/tríade maior"]
+        },
+        "[048]": {
+            "names": [
+                "Acorde aumentado",
+                "Tríade aumentada",
+                "Tricorde maximamente distribuído"
+            ]
+        },
+        "[0123]": {
+            "names": [
+                "Tetracorde BACH", 
+                "Tetracorde cromático"
+            ]
+        },
+        "[0124]": {
+            "names": ["Tetracluster de segunda-maior 2"]
+        },
+        "[0234]": {
+            "names": ["Tetracluster de segunda-maior 1"]
+        },
+        "[0134]": {
+            "names": [
+                "Tetracorde simétrico alternado",
+                "Segmento octatônico tetracordal 1"
+            ]
+        },
+        "[0125]": {
+            "names": ["Tetracluster de terça-menor 2"]
+        },
+        "[0345]": {
+            "names": ["Tetracluster de terça-menor 1"]
+        },
+        "[0126]": {
+            "names": ["Tetracluster de terça-maior 2"]
+        },
+        "[0456]": {
+            "names": ["Tetracluster de terça-maior 1"]
+        },
+        "[0127]": {
+            "names": ["Tetracorde simétrico de quarta-justa"]
+        },
+        "[0145]": {
+            "names": [
+                "Tetracorde simétrico arábico",
+                "Segmento hexatônico tetracordal"
+            ]
+        },
+        "[0156]": {
+            "names": ["Tetracorde simétrico de dupla-quarta"]
+        },
+        "[0167]": {
+            "names": ["Tetracorde simétrico de duplo-trítono"]
+        },
+        "[0235]": {
+            "names": [
+                "Tetracorde menor", 
+                "Tetracorde dórico",
+                "Segmento octatônico tetracordal 2"
+            ]
+        },
+        "[0135]": {
+            "names": ["Tetracorde frígio"]
+        },
+        "[0245]": {
+            "names": ["Tetracorde maior", "Tetracorde jônico"]
+        },
+        "[0236]": {
+            "names": ["Tetracorde harmônico-menor"]
+        },
+        "[0346]": {
+            "names": ["Tetracorde diminuto de terça-maior"]
+        },
+        "[0136]": {
+            "names": ["Tetracorde diminuto de segunda-menor"]
+        },
+        "[0356]": {
+            "names": ["Tetracorde diminuto de quarta-justa"]
+        },
+        "[0237]": {
+            "names": ["Tetracorde menor de segunda-maior"]
+        },
+        "[0457]": {
+            "names": ["Tetracorde maior de quarta-justa"]
+        },
+        "[0146]": {
+            "names": ["Tetracorde todo-intervalar 1"]
+        },
+        "[0256]": {
+            "names": ["Tetracorde todo-intervalar 2"]
+        },
+        "[0157]": {
+            "names": ["Tetracorde quartal de segunda-menor"]
+        },
+        "[0267]": {
+            "names": ["Tetracorde quartal de trítono"]
+        },
+        "[0347]": {
+            "names": ["Tetracorde maior-menor simétrico"]
+        },
+        "[0147]": {
+            "names": ["Tetracorde maior-diminuto"]
+        },
+        "[0367]": {
+            "names": ["Tetracorde menor-diminuto"]
+        },
+        "[0148]": {
+            "names": ["Tetracorde menor-aumentado"]
+        },
+        "[0348]": {
+            "names": ["Tetracorde aumentado-maior"]
+        },
+        "[0158]": {
+            "names": ["Acorde de sétima-maior"]
+        },
+        "[0246]": {
+            "names": ["Tetracorde de tons-inteiros"]
+        },
+        "[0247]": {
+            "names": ["Tetracorde maior de segunda-maior"]
+        },
+        "[0357]": {
+            "names": ["Tetracorde menor de quarta-justa"]
+        },
+        "[0257]": {
+            "names": [
+                "Tetracorde quartal simétrico",
+                "Tetracorde de quartas/quintas empilhadas"
+            ]
+        },
+        "[0248]": {
+            "names": [
+                "Acorde aumentado de sétima",
+                "Subconjunto tetracordal de tons-inteiros"
+            ]
+        },
+        "[0268]": {
+            "names": ["Acorde de sexta-francesa"]
+        },
+        "[0358]": {
+            "names": [
+                "Acorde menor com sétima",
+                "Acorde de sétima-menor"
+            ]
+        },
+        "[0258]": {
+            "names": [
+                "Acorde meio-diminuto",
+                "Acorde de Tristão"
+            ]
+        },
+        "[0368]": {
+            "names": [
+                "Acorde de sétima de dominante", 
+                "Acorde de sexta-alemã"
+            ]
+        },
+        "[0369]": {
+            "names": [
+                "Acorde de sétima-diminuta", 
+                "Tetracorde maximamente distribuído"
+            ]
+        },
+        "[0137]": {
+            "names": ["Tetracorde todo-intervalar 3"]
+        },
+        "[0467]": {
+            "names": ["Tetracorde todo-intervalar 4"]
+        },
+
+        "[01234]": {
+            "names": ["Pentacorde cromático"]
+        },
+        "[01235]": {
+            "names": ["Pentacluster de segunda-maior 2"]
+        },
+        "[02345]": {
+            "names": ["Pentacluster de segunda-maior 1"]
+        },
+        "[01245]": {
+            "names": ["Pentacorde maior de segunda-menor"]
+        },
+        "[01345]": {
+            "names": ["Pentacluster espanhol"]
+        },
+        "[01236]": {
+            "names": ["Pentacluster de blues"]
+        },
+        "[03456]": {
+            "names": ["Pentacluster de terça-menor"]
+        },
+        "[01237]": {
+            "names": ["Pentacluster de terça-maior 2"]
+        },
+        "[04567]": {
+            "names": ["Pentacluster de terça-maior 1"]
+        },
+        "[01256]": {
+            "names": [
+                "Pentacluster oriental 1", 
+                "Raga Megharanji"
+            ]
+        },
+        "[01456]": {
+            "names": ["Pentacluster oriental 2"]
+        },
+        "[01267]": {
+            "names": [
+                "Pentacluster duplo 1", 
+                "Raga Nabhomani"
+            ]
+        },
+        "[01567]": {
+            "names": ["Pentacluster duplo 2"]
+        },
+        "[02346]": {
+            "names": ["Pentacorde simétrico ao trítono"]
+        },
+        "[01246]": {
+            "names": ["Pentacorde com expansão ao trítono"]
+        },
+        "[02456]": {
+            "names": ["Pentacorde com contração ao trítono"]
+        },
+        "[01346]": {
+            "names": ["Pentacorde alternado 1"]
+        },
+        "[02356]": {
+            "names": ["Pentacorde alternado 2"]
+        },
+        "[02347]": {
+            "names": ["Pentacluster ao centro 1"]
+        },
+        "[03457]": {
+            "names": ["Pentacluster ao centro 2"]
+        },
+        "[01356]": {
+            "names": ["Pentacorde lócrio"]
+        },
+        "[01248]": {
+            "names": ["Pentacluster aumentado 1"]
+        },
+        "[02348]": {
+            "names": ["Pentacluster aumentado 2"]
+        },
+        "[01257]": {
+            "names": ["Pentacorde de três-quartas e duas-segundas 1"]
+        },
+        "[02567]": {
+            "names": ["Pentacorde de três-quartas e duas-segundas 2"]
+        },
+        "[01268]": {
+            "names": ["Pentacorde assimétrico-simétrico"]
+        },
+        "[01347]": {
+            "names": ["Pentacorde maior-menor-diminuto 1"]
+        },
+        "[03467]": {
+            "names": ["Pentacorde maior-menor-diminuto 2"]
+        },
+        "[01348]": {
+            "names": ["Acorde menor-maior de nona"]
+        },
+        "[01457]": {
+            "names": ["Pentacorde cigano 1"]
+        },
+        "[02367]": {
+            "names": ["Pentacorde cigano 2"]
+        },
+        "[01367]": {
+            "names": ["Pentacorde javanês"]
+        },
+        "[01467]": {
+            "names": ["Pentacorde balinês"]
+        },
+        "[01378]": {
+            "names": [
+                "Pentatônica balinesa Pelog (12414)", 
+                "Raga Bhupala", 
+                "Raga Bibhas"]
+        },
+        "[01578]": {
+            "names": [
+                "Pentatônica Hirajoshi (21414)", 
+                "Pentatônica Iwato (14142)", 
+                "Pentatônica Sakura (14214)", 
+                "Raga Saveri (14214)"
+            ]
+        },
+        "[01458]": {
+            "names": [
+                "Pentatônica síria (13134)",
+                "Acorde maior-aumentado de nona"
+            ]
+        },
+        "[03478]": {
+            "names": [
+                "Pentacorde libanês",
+                "Acorde aumentado-menor"
+            ]
+        },
+        "[01478]": {
+            "names": [
+                "Pentacorde persa",
+                "Raga Reva/Ramkali (13314)"
+            ]
+        },
+        "[02357]": {
+            "names": ["Pentacorde menor"]
+        },
+        "[02457]": {
+            "names": ["Pentacorde maior"]
+        },
+        "[01357]": {
+            "names": ["Pentacorde frígio"]
+        },
+        "[02467]": {
+            "names": ["Pentacorde lídio"]
+        },
+        "[02358]": {
+            "names": ["Acorde diminuto-maior de nona"]
+        },
+        "[03568]": {
+            "names": ["Acorde menor-diminuto de nona"]
+        },
+        "[02458]": {
+            "names": ["Acorde diminuto-aumentado de nona"]
+        },
+        "[03468]": {
+            "names": ["Acorde aumentado-diminuto de nona"]
+        },
+        "[01358]": {
+            "names": ["Acorde maior de nona"]
+        },
+        "[03578]": {
+            "names": ["Acorde menor de nona"]
+        },
+        "[02368]": {
+            "names": ["Pentacorde de sexta-aumentada 1"]
+        },
+        "[02568]": {
+            "names": ["Pentacorde de sexta-aumentada 2"]
+        },
+        "[01368]": {
+            "names": ["Pentacorde Kumoi 2"]
+        },
+        "[02578]": {
+            "names": ["Pentacorde Kumoi 1"]
+        },
+        "[01468]": {
+            "names": ["Pentacorde enigmático 1"]
+        },
+        "[02478]": {
+            "names": [
+                "Pentacorde enigmático 2",
+                "Pentatônica alterada (14223)"
+            ]
+        },
+        "[01369]": {
+            "names": ["Acorde diminuto de nona-menor chord"]
+        },
+        "[02369]": {
+            "names": [
+                "Pentacorde Ranjaniraga",
+                "Pentacorde de nona abaixada"
+            ]
+        },
+        "[01469]": {
+            "names": ["Pentacorde napolitano 1"]
+        },
+        "[01479]": {
+            "names": ["Pentacorde napolitano 2"]
+        },
+        "[02468]": {
+            "names": ["Pentacorde de tons-inteiros"]
+        },
+        "[02469]": {
+            "names": [
+                "Pentacorde de nona de dominante",
+                "Pentacorde maior-menor",
+                "Pentacorde de Prometeu",
+                "Pentatônica dominante (22332)"
+            ]
+        },
+        "[02479]": {
+            "names": [
+                "Escala/coleção pentatônica",
+                "Pentatônica de teclas-pretas",
+                "Pentatônica anemitônica",
+                "Pentacorde quartal simétrico",
+                "Pentacorde maximamente distribuído",
+                "Pentacorde Slendro",
+                "Raga Bilahari"
+            ]
+        },
+        "[01247]": {
+            "names": ["Pentacluster de sétima-maior"]
+        },
+        "[03567]": {
+            "names": ["Pentacluster de sétima-menor"]
+        },
+        "[03458]": {
+            "names": ["Pentacorde de cluster central simétrico"]
+        },
+        "[01258]": {
+            "names": ["Pentacluster diminuto 1"]
+        },
+        "[03678]": {
+            "names": ["Pentacluster diminuto 2"]
+        },
+        "[012345]": {
+            "names": [
+                "Hexacorde cromático",
+                "Todo-combinatorial de 1ª-ordem 1"
+            ]
+        },
+        "[012478]": {
+            "names": ["Hexacorde todo-tricordal 1"]
+        },
+        "[014678]": {
+            "names": ["Hexacorde todo-tricordal 2"]
+        },
+        "[012567]": {
+            "names": ["Hexacorde simétrico de duplo-cluster"]
+        },
+        "[012678]": {
+            "names": [
+                "Modo 5 de Messiaen (114114)",
+                "Todo-combinatorial de 2ª-ordem"
+            ]
+        },
+        "[023457]": {
+            "names": ["Todo-combinatorial de 1ª-ordem 2"]
+        },
+        "[013467]": {
+            "names": ["Hexacorde simétrico alternado"]
+        },
+        "[023478]": {
+            "names": ["Raga Megha/\"Cloud\""]
+        },
+        "[014589]": {
+            "names": [
+                "Coleção hexatônica",
+                "Escala aumentada",
+                "Genus tertium",
+                "Todo-combinatorial de 3ª-ordem"
+            ]
+        },
+        "[023568]": {
+            "names": ["Hexacorde super-lócrio"]
+        },
+        "[024578]": {
+            "names": ["Hexacorde menor-melódico"]
+        },
+        "[013568]": {
+            "names": [
+                "Hexacorde lócrio",
+                "Raga Suddha Saveri"
+            ]
+        },
+        "[023578]": {
+            "names": ["Hexacorde menor"]
+        },
+        "[013578]": {
+            "names": ["Hexacorde frígio"]
+        },
+        "[023569]": {
+            "names": ["Hexacorde piramidal"]
+        },
+        "[013569]": {
+            "names": ["Hexacorde duplo-frígio"]
+        },
+        "[013679]": {
+            "names": ["Hexacorde menor-bitonal"]
+        },
+        "[023689]": {
+            "names": [
+                "Acorde de Petrushka",
+                "Hexacorde maior-bitonal"
+            ]
+        },
+        "[024579]": {
+            "names": [
+                "Diatônica maior de Arezzo (221223)",
+                "Hexacorde maior",
+                "Hexacorde quartal",
+                "Todo-combinatorial de 1ª-ordem 3"
+            ]
+        },
+        "[023579]": {
+            "names": ["Hexacorde dórico"]
+        },
+        "[024679]": {
+            "names": [
+                "Hexacorde de 11ª de dominante",
+                "Hexacorde lídio"
+            ]
+        },
+        "[013579]": {
+            "names": ["Acorde místico de Scriabin"]
+        },
+        "[024689]": {
+            "names": [
+                "Hexacorde harmônico",
+                "Hexacorde de 11ª-aumentada"
+            ]
+        },
+        "[02468A]": {
+            "names": [
+                "Escala/coleção de tons-inteiros",
+                "Modo 1 de Messiaen (222222)",
+                "Hexacorde maximamente distribuído",
+                "Todo-combinatorial de 6ª-ordem"
+            ]
+        },
+        "[012569]": {
+            "names": ["Hexacorde anagramático de Schoenberg"]
+        },
+        "[012589]": {
+            "names": ["Raga Bauli (133131)"]
+        },
+        "[023479]": {
+            "names": ["Modo 1 de blues"]
+        },
+        "[0123456]": {
+            "names": ["Heptacorde cromático"]
+        },
+        "[0125679]": {
+            "names": ["Frígio cromático invertido (1123113)"]
+        },
+        "[0125789]": {
+            "names": [
+                "Raga Pantuvarali (1321131)",
+                "Mixolídio cromático (1131132)",
+                "Dórico cromático (1132113)",
+                "Mela Kanakangi (1132113)"
+            ]
+        },
+        "[0134589]": {
+            "names": ["Heptatônica cigana (1312113"]
+        },
+        "[0125689]": {
+            "names": [
+                "Escala persa, cigana maior, húngara menor, harmônica-dupla (1312131)",
+                "Raga Bhairav That, Mayamdavagaula (1312131)",
+                "Escala oriental (1311312)"
+            ]
+        },
+        "[0245679]": {
+            "names": ["Heptacorde maior com trítono"]
+        },
+        "[0246789]": {
+            "names": ["Heptatônica enigmática (1322211)"]
+        },
+        "[0124689]": {
+            "names": [
+                "Modo menor-napolitano (1222131)",
+                "Raga Mela Dhenuka"
+            ]
+        },
+        "[0134679]": {
+            "names": [
+                "Heptacorde alternado 1",
+                "Modo maior-húngaro (3121212)"
+            ]
+        },
+        "[0235689]": {
+            "names": ["Heptacorde alternado 2"]
+        },
+        "[0134689]": {
+            "names": [
+                "Modo menor-harmônico (2122131)",
+                "Escala cigana espanhola",
+                "Mela Kiravani",
+                "Pilu That"
+            ]
+        },
+        "[0135689]": {
+            "names": [
+                "Escala Dharmavati (2131221)",
+                "Escala menor-harmônica invertida (1312212)",
+                "Mela Cakravana",
+                "Raga Ahir Bhairav"
+            ]
+        },
+        "[012468A]": {
+            "names": [
+                "Modo maior-napolitano (122221)",
+                "Modo de tons-inteiros com subtônica (222211)"
+            ]
+        },
+        "[013468A]": {
+            "names": [
+                "Escala menor-melódica ascendente (2122221)",
+                "Escala acústica",
+                "Escala harmônica/super-lócria",
+                "Heptacorde de 13ª-aumentada",
+                "Menor de Jazz"
+            ]
+        },
+        "[013568A]": {
+            "names": [
+                "Coleção diatônica",
+                "Heptacorde maior diatônico (2212221)",
+                "Heptacorde maximamente distribuído"
+            ]
+        },
+        "[01234567]": {
+            "names": ["Octacorde cromático"]
+        },
+        "[01236789]": {
+            "names": ["Modo 4 de Messiaen (11131113)"]
+        },
+        "[0123579A]": {
+            "names": ["Escala octatônica espanhola (12111222)"]
+        },
+        "[0123578A]": {
+            "names": [
+                "Octacorde quartal",
+                "Óctade diatônica"
+            ]
+        },
+        "[0124678A]": {
+            "names": ["Modo 6 de Messiaen (11221122)"]
+        },
+        "[0124579A]": {
+            "names": [
+                "Escala frígia espanhola (12112112)",
+                "Modo 2 de blues (21211212)"
+            ]
+        },
+        "[0134679A]": {
+            "names": [
+                "Escala/coleção octatônica",
+                "Escala diminuta",
+                "Escala octatônica alternada (12121212)",
+                "Modo 2 de Messiaen (12121212)",
+                "Octacorde maximamente distribuído"
+            ]
+        },
+        "[012345678]": {
+            "names": ["Nonacorde cromático"]
+        },
+        "[01234578A]": {
+            "names": ["Escala nonatônica de blues (211111212)"]
+        },
+        "[01235678A]": {
+            "names": ["Raga Ramdasi Malhar (211122111)"]
+        },
+        "[01235679A]": {
+            "names": ["Nonacorde diminutivo"]
+        },
+        "[01245689A]": {
+            "names": [
+                "Escala/coleção eneatônica",
+                "Modo 3 de Messiaen (112112112)",
+                "Nonacorde maximamente distribuído",
+                "Tsjerepnin"
+            ]
+        },
+        "[0123456789]": {
+            "names": ["Decacorde cromático"]
+        },
+        "[012345789A]": {
+            "names": ["Escala maior-menor mista"]
+        },
+        "[012346789A]": {
+            "names": [
+                "Modo 7 de Messiaen (1111211112)",
+                "Decacorde maximamente distribuído"
+            ]
+        },
+        "[0123456789A]": {
+            "names": ["Undecacorde cromático"]
+        },
+        "[0123456789AB]": {
+            "names": ["Escala cromática"]
+        }
+    }
+}
