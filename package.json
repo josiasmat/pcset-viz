@@ -4,6 +4,6 @@
     "http-server": "*"
   },
   "scripts": {
-    "server": "npx http-server"
+    "server": "npx http-server --port 8000 -c-1 -o"
   }
 }
