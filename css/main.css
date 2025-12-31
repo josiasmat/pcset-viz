@@ -239,6 +239,20 @@ main {
         height: 100%;
         th, td {
             &:first-child {
+                width: 23ch;
+            }
+        }
+    }
+    html[lang="en"] #data-area {
+        th, td {
+            &:first-child {
+                width: 20ch;
+            }
+        }
+    }
+    html[lang="pt"] #data-area {
+        th, td {
+            &:first-child {
                 width: 21ch;
             }
         }
