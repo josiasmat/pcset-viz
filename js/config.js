@@ -64,7 +64,7 @@ function getRandomStartupPcSet() {
 
 
 function readConfig() {
-    config.language = config_storage.readString("language", null);
+    config.language = i18n.getLanguageFromURL() ?? config_storage.readString("language", null);
     config.layout = config_storage.readString("layout", "svg-first");
     config.set_format = config_storage.readString("set-format", SET_FORMATS[0]);
     config.set_brackets = config_storage.readString("set-brackets", SET_BRACKETS[0]);
@@ -124,9 +124,16 @@ function saveConfigToFile() {
 function loadConfigFromFile() {
     loadJsonFromFile()
     .then((obj) => {
+        const previous_language = config.language;
         Object.assign(config, obj);
-        updateInterfaceFromConfig();
-        updateConfigDialog();
+        if ( previous_language != obj.language ) {
+            changeLanguage(obj.language);
+            // changeLanguage() already calls both 
+            // updateInterfaceFromConfig() and updateConfigDialog()
+        } else {
+            updateInterfaceFromConfig();
+            updateConfigDialog();
+        }
         showPcset({no_history: true});
         saveConfig();
         requestAnimationFrame(() => requestAnimationFrame(() => 

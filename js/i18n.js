@@ -108,8 +108,7 @@ const i18n = {
 
     /** @returns {String} */
     getPreferredLanguage() {
-        return this.getLanguageFromURL()
-            ?? this.getBrowserLanguage()
+        return this.getBrowserLanguage()
             ?? this.language
             ?? this.fallback_lang;
     },
