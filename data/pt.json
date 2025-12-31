@@ -57,8 +57,8 @@
         "header-feature-filter": "Filtro de características:",
         "header-name-filter": "Filtro de nome:",
         "all-interval": "Todo-intervalar",
-        "all-combinatorial": "Todo-combinatorial",
-        "combinatorial": "Combinatorial",
+        "all-combinatorial": "Todo-combinatório",
+        "combinatorial": "Combinatório",
         "deep-scale": "Escala profunda",
         "generated": "Gerado",
         "generated-x": "Gerado (%0)",
@@ -758,7 +758,7 @@
             ]
         },
         "[01369]": {
-            "names": ["Acorde diminuto de nona-menor chord"]
+            "names": ["Acorde diminuto de nona-menor"]
         },
         "[02369]": {
             "names": [
@@ -812,7 +812,7 @@
         "[012345]": {
             "names": [
                 "Hexacorde cromático",
-                "Todo-combinatorial de 1ª-ordem 1"
+                "Todo-combinatório de 1ª-ordem 1"
             ]
         },
         "[012478]": {
@@ -827,11 +827,11 @@
         "[012678]": {
             "names": [
                 "Modo 5 de Messiaen (114114)",
-                "Todo-combinatorial de 2ª-ordem"
+                "Todo-combinatório de 2ª-ordem"
             ]
         },
         "[023457]": {
-            "names": ["Todo-combinatorial de 1ª-ordem 2"]
+            "names": ["Todo-combinatório de 1ª-ordem 2"]
         },
         "[013467]": {
             "names": ["Hexacorde simétrico alternado"]
@@ -844,7 +844,7 @@
                 "Coleção hexatônica",
                 "Escala aumentada",
                 "Genus tertium",
-                "Todo-combinatorial de 3ª-ordem"
+                "Todo-combinatório de 3ª-ordem"
             ]
         },
         "[023568]": {
@@ -885,7 +885,7 @@
                 "Diatônica maior de Arezzo (221223)",
                 "Hexacorde maior",
                 "Hexacorde quartal",
-                "Todo-combinatorial de 1ª-ordem 3"
+                "Todo-combinatório de 1ª-ordem 3"
             ]
         },
         "[023579]": {
@@ -911,7 +911,7 @@
                 "Escala/coleção de tons-inteiros",
                 "Modo 1 de Messiaen (222222)",
                 "Hexacorde maximamente distribuído",
-                "Todo-combinatorial de 6ª-ordem"
+                "Todo-combinatório de 6ª-ordem"
             ]
         },
         "[012569]": {
