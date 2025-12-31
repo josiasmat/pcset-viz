@@ -495,6 +495,10 @@ populateConfigDialogTableRows();
 readConfig();
 
 // Load data files 
+const DATA_FILES = Array.from(document.head.querySelectorAll("link"))
+                   .map((elm) => elm.getAttribute("href"))
+                   .filter((href) => href?.startsWith("data/") && href?.endsWith(".json"));
+
 Promise.all(DATA_FILES.map(
     (datafile) => i18n.fetchDataFile(datafile, (data) => {
         // Correct non-compliant reduced forms

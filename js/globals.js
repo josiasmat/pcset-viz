@@ -2,8 +2,6 @@
 
 const VERSION = "2025-12-31";
 
-const DATA_FILES = ["data/en.json", "data/es.json", "data/pt.json"];
-
 const SET_FORMATS = ["short-ab","short-te","numbers","notes-sharps","notes-flats"];
 const SET_BRACKETS = ["[]","{}","()"];
 const VECTOR_FORMATS = ["short", "long"];
