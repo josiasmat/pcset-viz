@@ -19,9 +19,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 <html>
   <head>
     <title i18n="main-title">Pitch-Class Set Visualizer</title>
+    <meta name="author" content="Josias Matschulat" />
     <meta id="color-scheme" name="color-scheme" content="light" />
-    <link rel="stylesheet" href="css/default.css">
-    <link rel="stylesheet" href="css/clockface.css">
+    <meta name="keywords" content="music,music theory,pitch-class set theory" />
+    <meta name="description" 
+      content="Interactive web tool for visualizing, manipulating, and exploring pitch-class sets."
+    />
+    <link rel="stylesheet" href="css/main.css" blocking="render">
+    <link rel="stylesheet" href="css/clockface.css" blocking="render">
+    <link rel="stylesheet" href="css/dialogs.css">
     <script type="text/javascript" src="js/utils.js" defer></script>
     <script type="text/javascript" src="js/storage-handler.js" defer></script>
     <script type="text/javascript" src="js/fileutils.js" defer></script>
@@ -44,7 +50,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <script type="text/javascript" src="js/main.js" defer></script>
     <link rel="preload" href="data/en.json" as="fetch" type="application/json" crossorigin="anonymous">
     <link rel="preload" href="data/pt.json" as="fetch" type="application/json" crossorigin="anonymous">
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="assets/favicon.png">
+    <link rel="icon" type="image/svg+xml" sizes="any" href="assets/favicon.svg">
+    <link rel="license" type="text/markdown" href="/LICENSE.md">
   </head>
   <body>
     <main id="main-area">
