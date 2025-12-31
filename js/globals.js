@@ -1,6 +1,6 @@
 "use strict";
 
-const VERSION = "2025-12-30";
+const VERSION = "2025-12-31";
 
 const DATA_FILES = ["data/en.json", "data/es.json", "data/pt.json"];
 
