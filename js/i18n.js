@@ -147,18 +147,7 @@ const i18n = {
 }
 
 
-async function fetchJson(filepath, try_gz) {
-    if ( try_gz ) {
-        const compressed_path = filepath + '.gz';
-        const response = await fetch(compressed_path);
-        if ( response.ok ) {
-            const blob = await response.blob();
-            const ds = new DecompressionStream('gzip');
-            const result = new Response(blob.stream().pipeThrough(ds));
-            if ( result.ok )
-                return await result.json();
-        }
-    }
+async function fetchJson(filepath) {
     const response = await fetch(filepath);
     if ( ! response.ok )
         throw new Error( (try_gz)
