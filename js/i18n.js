@@ -176,7 +176,8 @@ function changeLanguage(code) {
     Table.collectRows();
     populateConfigDialogTableRows();
     updateInterfaceFromConfig();
-    updateConfigDialog();
+    if ( isDialogOpen("dialog-config") )
+        updateConfigDialog();
     saveConfig();
     if ( Object.hasOwn(i18n.data[code], "sets") )
         document.querySelector("#row-descriptive-name a").removeAttribute("hidden");

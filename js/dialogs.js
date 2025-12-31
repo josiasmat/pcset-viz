@@ -144,6 +144,10 @@ function hideAllDialogs() {
         hideDialog(dialog.id);
 }
 
+function isDialogOpen(id) {
+    return document.getElementById(id).hasAttribute("open");
+}
+
 function handleDialogClick(e) {
     if ( this == e.target ) {
         const rect = this.getBoundingClientRect();
