@@ -1,6 +1,6 @@
 # Pitch-Class Set Visualizer
 
-A tool for visualizing pitch-class sets.
+Interactive web tool for visualizing, manipulating, and exploring pitch-class sets.
 
 ![Screenshot](/assets/screenshot.png)
 
