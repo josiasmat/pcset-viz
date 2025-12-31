@@ -1,7 +1,7 @@
 {
   "name": "pcset-viz",
   "devDependencies": {
-    "http-server": "^14.1.1"
+    "http-server": "*"
   },
   "scripts": {
     "server": "npx http-server"
