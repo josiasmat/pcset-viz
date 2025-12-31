@@ -172,6 +172,7 @@ async function fetchJson(filepath, try_gz) {
 function changeLanguage(code) {
     if ( i18n.setLanguage(code) != code ) return;
     config.language = code;
+    document.documentElement.setAttribute("lang", code);
     i18n.translateDOM(document.body);
     Table.collectRows();
     populateConfigDialogTableRows();
