@@ -21,6 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 function showConfigDialog() {
     updateConfigDialog();
     showDialog("dialog-config");
+    document.getElementById("dialog-config").querySelector(".dialog-main").scrollTop = 0;
 }
 
 function hideConfigDialog() {
