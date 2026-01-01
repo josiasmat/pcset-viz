@@ -257,11 +257,16 @@ function taggedSetCollectionToLinks(sets, op = null, options = {}) { //} op = nu
         const indexes = integerRangesToStr(item[0]);
         if ( item[0].length > 1 ) item[1] = item[1].normal;
         strings.push(
-            `${op.replace('n', "<sub>" + indexes + "</sub>")}${(options.eq ?? " = ").replaceAll(' ',"&nbsp;")}${
+            `<span class="operator">${
+                op.replace('n', "<sub>" + indexes + "</sub>")
+             }</span>${
+                (options.eq ?? " = ").replaceAll(' ',"&nbsp;")
+             }${
                 pcsetHyperlink(item[1], op
                     ? { ...options, op: [op,item[0][0]], normalize: options.normalize ?? true }
                     : { ...options, normalize: options.normalize ?? true }
-                )}`
+                )
+             }`
         )
     }
     return strings.join(options.sep ?? ", ");

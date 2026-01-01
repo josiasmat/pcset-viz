@@ -28,6 +28,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <link rel="stylesheet" href="css/main.css" blocking="render">
     <link rel="stylesheet" href="css/clockface.css" blocking="render">
     <link rel="stylesheet" href="css/dialogs.css">
+    <link rel="preload" href="data/en.json" as="fetch" type="application/json" crossorigin="anonymous" hreflang="en">
+    <link rel="preload" href="data/es.json" as="fetch" type="application/json" crossorigin="anonymous" hreflang="es">
+    <link rel="preload" href="data/pt.json" as="fetch" type="application/json" crossorigin="anonymous" hreflang="pt">
+    <link rel="icon" type="image/png" sizes="128x128" href="assets/favicon.png">
+    <link rel="icon" type="image/svg+xml" sizes="any" href="assets/favicon.svg">
+    <link rel="license" type="text/markdown" href="/LICENSE.md">
     <script type="text/javascript" src="js/utils.js" defer></script>
     <script type="text/javascript" src="js/storage-handler.js" defer></script>
     <script type="text/javascript" src="js/fileutils.js" defer></script>
@@ -48,12 +54,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <script type="text/javascript" src="js/imgexport.js" defer></script>
     <script type="text/javascript" src="js/audio.js" defer></script>
     <script type="text/javascript" src="js/main.js" defer></script>
-    <link rel="preload" href="data/en.json" as="fetch" type="application/json" crossorigin="anonymous" hreflang="en">
-    <link rel="preload" href="data/es.json" as="fetch" type="application/json" crossorigin="anonymous" hreflang="es">
-    <link rel="preload" href="data/pt.json" as="fetch" type="application/json" crossorigin="anonymous" hreflang="pt">
-    <link rel="icon" type="image/png" sizes="128x128" href="assets/favicon.png">
-    <link rel="icon" type="image/svg+xml" sizes="any" href="assets/favicon.svg">
-    <link rel="license" type="text/markdown" href="/LICENSE.md">
   </head>
   <body>
     <main id="main-area">
@@ -175,7 +175,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
               <td id="transpositions"></td>
             </tr>
             <tr id="row-ctt" hidden>
-              <td i18n="row-ctt">Common tones under <span id="ctt-op-label">T<sub>n</sub></span>:</td>
+              <td i18n="row-ctt">Common tones under <span id="ctt-op-label" class="operator">T<sub>n</sub></span>:</td>
               <td id="ctt"></td>
             </tr>
             <tr id="row-inversions" hidden>
@@ -183,7 +183,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
               <td id="inversions"></td>
             </tr>
             <tr id="row-cti" hidden>
-              <td i18n="row-cti">Common tones under <span id="cti-op-label">I<sub>n</sub></span>:</td>
+              <td i18n="row-cti">Common tones under <span id="cti-op-label" class="operator">I<sub>n</sub></span>:</td>
               <td id="cti"></td>
             </tr>
             <tr id="row-multiples" hidden>
@@ -452,11 +452,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                 <td>
                   <span>
                     <input id="radio-inversionformat-in" type="radio" name="inversion-format" value="In" onchange="onChange(true)" checked>
-                    <label i18n="options-inversion-op-1" for="radio-inversionformat-in">Simple (<z>I<sub>n</sub></z>)</label>
+                    <label i18n="options-inversion-op-1" for="radio-inversionformat-in">Simple (<z class="operator">I<sub>n</sub></z>)</label>
                   </span>
                   <span>
                     <input id="radio-inversionformat-tni" type="radio" name="inversion-format" value="TnI" onchange="onChange(true)">
-                    <label i18n="options-inversion-op-2" for="radio-inversionformat-tni">Compound (<z>T<sub>n</sub>I</z>)</label>
+                    <label i18n="options-inversion-op-2" for="radio-inversionformat-tni">Compound (<z class="operator">T<sub>n</sub>I</z>)</label>
                   </span>
                   <span class="keyboard-shortcut" style="float: inline-end;">(Alt+I)</span>
                 </td>

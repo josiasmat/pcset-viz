@@ -207,9 +207,6 @@ main {
         select, input[type="number"] {
             vertical-align: bottom;
         }
-        #cti-op-label, #ctt-op-label {
-            font-family: var(--serif-font);
-        }
     }
     .graphics-view {
         line-height: 0px;
@@ -447,4 +444,8 @@ td sub {
     vertical-align: baseline;
     position: relative;
     bottom: -0.2em;
+}
+
+.operator {
+    font-family: var(--serif-font);
 }
