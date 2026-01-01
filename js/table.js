@@ -42,9 +42,7 @@ const table_cells = {
     transpositions: document.getElementById("transpositions"),
     inversions: document.getElementById("inversions"),
     ctt: document.getElementById("ctt"),
-    ctt_op_label: document.getElementById("ctt-op-label"),
     cti: document.getElementById("cti"),
-    cti_op_label: document.getElementById("cti-op-label"),
     multiplications: document.getElementById("multiples"),
     subsets: document.getElementById("subsets"),
     operation: {
@@ -318,7 +316,7 @@ const Table = {
         table_cells.cti.setHTMLUnsafe(textOrDash(
             taggedSetCollectionToLinks(ctis, config.inversion_format, {eq: ": "})
         ));
-        table_cells.cti_op_label.setHTMLUnsafe(
+        document.getElementById("cti-op-label").setHTMLUnsafe(
             ( config.inversion_format == "In" ) ? "I<sub>n</sub>" : "T<sub>n</sub>I"
         );
     },
