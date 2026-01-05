@@ -92,6 +92,7 @@
         "options-inversion-op-header": "Inversion operator",
         "options-inversion-op-1": "Simple (%0)",
         "options-inversion-op-2": "Compound (%0)",
+        "options-inversion-op-3": "Functional (%0)",
         "options-clockface-header": "Clockface visualization",
         "options-clockface-note-names": "Note names",
         "options-clockface-polygon": "Set geometry",

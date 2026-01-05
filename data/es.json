@@ -92,6 +92,7 @@
         "options-inversion-op-header": "Operador de inversión",
         "options-inversion-op-1": "Simple (%0)",
         "options-inversion-op-2": "Compuesto (%0)",
+        "options-inversion-op-3": "Funcional (%0)",
         "options-clockface-header": "Visualización de reloj",
         "options-clockface-note-names": "Nombres de notas",
         "options-clockface-polygon": "Geometría del conjunto",

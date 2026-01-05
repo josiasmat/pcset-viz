@@ -92,6 +92,7 @@
         "options-inversion-op-header": "Operador de inversão",
         "options-inversion-op-1": "Simples (%0)",
         "options-inversion-op-2": "Composta (%0)",
+        "options-inversion-op-3": "Funcional (%0)",
         "options-clockface-header": "Visualização de relógio",
         "options-clockface-note-names": "Nomes de notas",
         "options-clockface-polygon": "Geometria do conjunto",

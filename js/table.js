@@ -317,7 +317,9 @@ const Table = {
             taggedSetCollectionToLinks(ctis, config.inversion_format, {eq: ": "})
         ));
         document.getElementById("cti-op-label").setHTMLUnsafe(
-            ( config.inversion_format == "In" ) ? "I<sub>n</sub>" : "T<sub>n</sub>I"
+            ( config.inversion_format == "In" )  ? "I<sub>n</sub>" : 
+            ( config.inversion_format == "TnI" ) ? "T<sub>n</sub>I" :
+                                                   "IT<sub>n</sub>"
         );
     },
 
