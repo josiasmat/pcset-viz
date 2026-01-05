@@ -93,7 +93,7 @@ function updateConfigDialog() {
 function selectMidiMode() {
     midi.mode = document.getElementById("select-midi-mode").value;
     const midi_pedal_elm = document.getElementById("chk-midi-pedal");
-    midi.pedal.enabled = midi_pedal_elm.checked;
+    if ( midi_pedal_elm.checked ) midi.pedal.enable(); else midi.pedal.disable();
     midi_pedal_elm.disabled = (midi.mode == "toggle");
     saveMidiConfig();
 }
