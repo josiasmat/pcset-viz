@@ -361,7 +361,8 @@
         "[056]": {
             "names": [
                 "Acorde da Sagração 2", 
-                "Trítono-quarta 2"
+                "Trítono-quarta 2",
+                "Tricorde beta"
             ]
         },
         "[024]": {
@@ -501,7 +502,10 @@
             "names": ["Tetracorde maior-menor simétrico"]
         },
         "[0147]": {
-            "names": ["Tetracorde maior-diminuto"]
+            "names": [
+                "Tetracorde maior-diminuto",
+                "Tetracorde beta"
+            ]
         },
         "[0367]": {
             "names": ["Tetracorde menor-diminuto"]
@@ -763,15 +767,19 @@
         },
         "[02369]": {
             "names": [
-                "Pentacorde Ranjaniraga",
-                "Pentacorde de nona abaixada"
+                "Pentacorde de nona abaixada",
+                "Pentacorde beta",
+                "Pentacorde Ranjaniraga"
             ]
         },
         "[01469]": {
             "names": ["Pentacorde napolitano 1"]
         },
         "[01479]": {
-            "names": ["Pentacorde napolitano 2"]
+            "names": [
+                "Pentacorde napolitano 2",
+                "Acorde de Elektra"
+            ]
         },
         "[02468]": {
             "names": ["Pentacorde de tons-inteiros"]

@@ -361,7 +361,8 @@
         "[056]": {
             "names": [
                 "Rite chord 2", 
-                "Tritone-fourth 2"
+                "Tritone-fourth 2",
+                "Beta trichord"
             ]
         },
         "[024]": {
@@ -497,7 +498,10 @@
             "names": ["Major-minor tetramirror"]
         },
         "[0147]": {
-            "names": ["Major-diminished tetrachord"]
+            "names": [
+                "Major-diminished tetrachord",
+                "Beta tetrachord"
+            ]
         },
         "[0367]": {
             "names": ["Minor-diminished tetrachord"]
@@ -756,15 +760,22 @@
         },
         "[02369]": {
             "names": [
-                "Ranjaniraga pentachord",
-                "Flat-ninth pentachord"
+                "Flat-ninth pentachord",
+                "Beta pentachord",
+                "Ranjaniraga pentachord"
             ]
         },
         "[01469]": {
-            "names": ["Neapolitan pentachord 1"]
+            "names": [
+                "Neapolitan pentachord 1",
+                "Gamma pentachord"
+            ]
         },
         "[01479]": {
-            "names": ["Neapolitan pentachord 2"]
+            "names": [
+                "Neapolitan pentachord 2",
+                "Elektra chord"
+            ]
         },
         "[02468]": {
             "names": ["Whole-tone pentamirror"]
