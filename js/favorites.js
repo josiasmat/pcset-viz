@@ -40,12 +40,21 @@ function getFavoritesLinks() {
 }
 
 
+function sortFavorites() {
+    favorites.sort((a,b) => a.size != b.size 
+        ? a.size - b.size 
+        : a.binary_value - b.binary_value
+    );
+}
+
+
 function toggleFavorite() {
     const fav_index = findFavorite(state.pcset);
     if ( fav_index != -1 )
         favorites.splice(fav_index, 1);
     else
         favorites.push(state.pcset.normal);
+    sortFavorites();
     Table.updateFavorites();
     saveFavorites();
 }
