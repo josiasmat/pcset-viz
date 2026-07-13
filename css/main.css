@@ -110,179 +110,55 @@ body.font-serif {
     }
 }
 
-body {
-    position: absolute; 
-    width: 100%; 
-    background-color: var(--bg-border-color); 
+html, body, main {
+    width: 100%;
     box-sizing: border-box;
     margin: 0;
+    background-color: var(--bg-border-color); 
     font-style: normal;
 }
 
+main {
+    display: grid;
+    padding: 6px;
+    gap: 6px;
+    color: var(--fg-color);
+}
+
 @media (aspect-ratio >= 1.2) {
-    body {
-        overflow: hidden; 
+    html {
         height: 100%;
+        overflow: hidden;
+    }
+    body {
+        height: 100%;
+        overflow: hidden; 
         font-size: 12pt;
     }
+    main {
+        height: 100%;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: 1fr;
+    }
 }
+
 @media (aspect-ratio < 1.2) {
     body {
         overflow: visible; 
         height: auto;
     }
-}
-
-main {
-    display: flex;
-    width: 100%;
-    box-sizing: border-box;
-    color: var(--fg-color);
-}
-
-@media (aspect-ratio >= 1.2) {
-    main {
-        height: 100%;
-        flex-direction: row;
-        & > div:first-child {
-            border-right: none !important;
-        }
-    }
-}
-@media (aspect-ratio < 1.2) {
     main {
         height: auto;
-        flex-direction: column;
-        & > div:first-child {
-            border-bottom: none !important;
-        }
+        grid-template-columns: 1fr;
     }
 }
 
-#visualization-area, #data-area {
-    border: 6px solid var(--bg-border-color);
+main>div {
     box-sizing: border-box;
     padding: 10px;
-}
-
-#visualization-area {
-    background-color: var(--bg-color);
-}
-
-@media (aspect-ratio >= 1.2) {
-    #visualization-area {
-        width: 50%;
-        height: 100%;
-    }
-}
-@media (1.0 < aspect-ratio < 1.2) {
-    #visualization-area {
-        width: 100%;
-        height: 99.3vh;
-    }
-}
-@media (aspect-ratio <= 1.0) {
-    #visualization-area {
-        width: 100%;
-        aspect-ratio: 1;
-    }
-}
-
-#data-area {
-    background-color: var(--bg-color);
-    color: var(--fg-color);
-    overflow: auto;
-    table {
-        #input-main {
-            appearance: none;
-            color: var(--input-fg-color);
-            background-color: var(--input-bg-color);
-            border-color: var(--input-border-color);
-            border-style: solid;
-            font-family: var(--serif-font);
-            font-size: 140%;
-            width: 98%;
-            padding: 0 0.5ch;
-        }
-        select, input[type="number"] {
-            vertical-align: bottom;
-        }
-    }
-    .graphics-view {
-        line-height: 0px;
-        svg {
-            box-sizing: border-box; 
-            object-fit: contain;
-            max-width: 100%; 
-            height: auto;
-        }
-    }
-    #ruler-view {
-        padding-top: 3px;
-        padding-bottom: 3px;
-    }
-    #staff-view {
-        padding-top: 1px;
-        padding-bottom: 1px;
-        svg {
-            width: 100%;
-        }
-    }
-}
-
-@media (aspect-ratio >= 1.2) {
-    #data-area {
-        width: 50%;
-        height: 100%;
-        th, td {
-            &:first-child {
-                width: 23ch;
-            }
-        }
-    }
-    html[lang="en"] #data-area {
-        th, td {
-            &:first-child {
-                width: 20ch;
-            }
-        }
-    }
-    html[lang="pt"] #data-area {
-        th, td {
-            &:first-child {
-                width: 21ch;
-            }
-        }
-    }
-}
-
-@media (aspect-ratio < 1.2) {
-    #data-area {
-        width: 100%;
-        height: auto;
-        th, td {
-            &:first-child {
-                width: 20ch;
-            }
-        }
-    }
-}
-
-@media (aspect-ratio < 0.8) {
-    #data-area {
-        th, td {
-            &:first-child {
-                width: 30%;
-            }
-        }
-        /* font-size: 3.0vw; */
-        &, label, input, select {
-            font-size: 3.7vw;
-        }
-        #staff-view svg {
-            height: 10vh;
-        }
-    }
+    min-height: 0;
+    border: 1px solid var(--dialog-border-color);
+    box-shadow: 2px 2px 3px #0007;
 }
 
 .setfont {

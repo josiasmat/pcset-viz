@@ -1,5 +1,6 @@
 
 #visualization-area {
+    background-color: var(--bg-color);
     svg {
         box-sizing: border-box; 
         object-fit: contain;

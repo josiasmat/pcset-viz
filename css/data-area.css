@@ -1,0 +1,96 @@
+#data-area {
+    background-color: var(--bg-color);
+    color: var(--fg-color);
+    overflow: auto;
+    table {
+        #input-main {
+            appearance: none;
+            color: var(--input-fg-color);
+            background-color: var(--input-bg-color);
+            border-color: var(--input-border-color);
+            border-style: solid;
+            font-family: var(--serif-font);
+            font-size: 140%;
+            width: 98%;
+            padding: 0 0.5ch;
+        }
+        select, input[type="number"] {
+            vertical-align: bottom;
+        }
+    }
+    .graphics-view {
+        line-height: 0px;
+        svg {
+            box-sizing: border-box; 
+            object-fit: contain;
+            max-width: 100%; 
+            height: auto;
+        }
+    }
+    #ruler-view {
+        padding-top: 3px;
+        padding-bottom: 3px;
+    }
+    #staff-view {
+        padding-top: 1px;
+        padding-bottom: 1px;
+        svg {
+            width: 100%;
+        }
+    }
+}
+
+@media (aspect-ratio >= 1.2) {
+    #data-area {
+        /* width: 50%; */
+        /* height: 100%; */
+        th, td {
+            &:first-child {
+                width: 23ch;
+            }
+        }
+    }
+    html[lang="en"] #data-area {
+        th, td {
+            &:first-child {
+                width: 20ch;
+            }
+        }
+    }
+    html[lang="pt"] #data-area {
+        th, td {
+            &:first-child {
+                width: 21ch;
+            }
+        }
+    }
+}
+
+@media (aspect-ratio < 1.2) {
+    #data-area {
+        /* width: 100%; */
+        /* height: auto; */
+        th, td {
+            &:first-child {
+                width: 20ch;
+            }
+        }
+    }
+}
+
+@media (aspect-ratio < 0.8) {
+    #data-area {
+        th, td {
+            &:first-child {
+                width: 30%;
+            }
+        }
+        /* font-size: 3.0vw; */
+        &, label, input, select {
+            font-size: 3.7vw;
+        }
+        #staff-view svg {
+            height: 10vh;
+        }
+    }
+}
