@@ -36,6 +36,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
-        with:
-          # Allow extra queue time when GitHub Pages is under load.
-          timeout: 1800000
